@@ -6,14 +6,15 @@ import { White, Zinc } from '@/constants/theme';
 /**
  * A name's first letter in a circle - the account button (36, black), the
  * account sheet (52), the menu's profile card (48, white on black) and each
- * customer row (36, grey).
+ * customer row (36, grey), and the loan rows (40, grey, bold).
  */
-type Tone = 'dark' | 'light' | 'muted';
+type Tone = 'dark' | 'light' | 'muted' | 'soft';
 
 const TONES = {
   dark: { bg: Zinc[900], ink: White, weight: '700' as const },
   light: { bg: White, ink: Zinc[950], weight: '700' as const },
   muted: { bg: Zinc[100], ink: Zinc[700], weight: '600' as const },
+  soft: { bg: Zinc[100], ink: Zinc[700], weight: '700' as const },
 };
 
 export function Initial({ name, size, tone = 'dark' }: { name: string; size: number; tone?: Tone }) {
