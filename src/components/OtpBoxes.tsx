@@ -75,7 +75,7 @@ export const OtpBoxes = forwardRef<OtpBoxesHandle, {
 
 /** The blinking 2x26 caret in the active empty box: on 0.5s, off 0.5s. */
 function Caret() {
-  const opacity = useRef(new Animated.Value(1)).current;
+  const [opacity] = useState(() => new Animated.Value(1));
   useEffect(() => {
     const blink = Animated.loop(
       Animated.sequence([

@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, Easing } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 /** The design's busy indicator: a three-quarter arc turning once every 0.8s. */
 export function Spinner({ size = 20, color = '#FFFFFF' }: { size?: number; color?: string }) {
-  const turn = useRef(new Animated.Value(0)).current;
+  const [turn] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const loop = Animated.loop(
