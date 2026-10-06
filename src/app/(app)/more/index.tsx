@@ -80,6 +80,7 @@ const SECTIONS: Section[] = [
 /** Where each designed destination lives; everything else opens /soon. */
 const ROUTES: Partial<Record<ItemKey, Href>> = {
   balance: '/more/balance',
+  shareholders: '/more/shareholders',
   inventory: '/inventory',
   sales: '/sales',
   customers: '/customers',
