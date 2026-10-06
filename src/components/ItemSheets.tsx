@@ -2,16 +2,23 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
-import { DesignIcon } from '@/components/DesignIcon';
+import { DesignIcon, type IconName } from '@/components/DesignIcon';
 import { Txt } from '@/components/Txt';
-import { Red, White, Zinc } from '@/constants/theme';
+import { Amber, Red, White, Zinc } from '@/constants/theme';
 
-/** The ⋮ menu's sheet: what was tapped, then Edit and Delete, then Cancel. */
+export type ExtraAction = { label: string; icon: IconName; onPress: () => void };
+
+/**
+ * The ⋮ menu's sheet: what was tapped (with an optional amber note under it),
+ * then Edit, any extra actions, Delete, then Cancel.
+ */
 export function ActionsSheet({
   open,
   onClose,
   title,
   subtitle,
+  note,
+  extra = [],
   editLabel,
   deleteLabel,
   cancelLabel,
@@ -23,6 +30,8 @@ export function ActionsSheet({
   onClose: () => void;
   title: string;
   subtitle: string;
+  note?: string;
+  extra?: ExtraAction[];
   editLabel: string;
   deleteLabel: string;
   cancelLabel: string;
@@ -37,12 +46,19 @@ export function ActionsSheet({
           {title}
         </Txt>
         <Txt style={styles.subtitle}>{subtitle}</Txt>
+        {note ? <Txt style={styles.note}>{note}</Txt> : null}
       </View>
       <View style={styles.list}>
         <Pressable accessibilityRole="button" onPress={onEdit} style={styles.action}>
           <DesignIcon name="pencil" size={20} color={Zinc[900]} />
           <Txt style={styles.actionText}>{editLabel}</Txt>
         </Pressable>
+        {extra.map((action) => (
+          <Pressable key={action.label} accessibilityRole="button" onPress={action.onPress} style={[styles.action, styles.divider]}>
+            <DesignIcon name={action.icon} size={20} color={Zinc[900]} />
+            <Txt style={styles.actionText}>{action.label}</Txt>
+          </Pressable>
+        ))}
         <Pressable accessibilityRole="button" onPress={onDelete} style={[styles.action, styles.divider]}>
           <DesignIcon name="trash" size={20} color={Red[700]} />
           <Txt style={[styles.actionText, { color: Red[700] }]}>{deleteLabel}</Txt>
@@ -96,6 +112,7 @@ const styles = StyleSheet.create({
   head: { gap: 2 },
   title: { fontSize: 18, fontWeight: '600', lineHeight: 25.2, color: Zinc[900] },
   subtitle: { fontSize: 14, color: Zinc[600] },
+  note: { fontSize: 14, color: Amber[700] },
   center: { textAlign: 'center' },
   list: { borderRadius: 16, borderWidth: 1, borderColor: Zinc[200], overflow: 'hidden' },
   action: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, backgroundColor: White },
