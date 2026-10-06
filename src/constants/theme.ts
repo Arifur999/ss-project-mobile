@@ -80,6 +80,16 @@ export const Blue = {
  */
 export const ChartPalette = ['#18181B', '#F97316', '#EC4899', '#06B6D4', '#8B5CF6', '#14B8A6', '#10B981', '#F59E0B', '#6B7280'] as const;
 
+/**
+ * The ten colours an expense category can be given, in the website's order
+ * (Hatim ExpenseDashboard PRESET_COLORS) and stored as it stores them, lower
+ * case: red, amber, blue, green, purple, pink, gray, teal, orange, cyan.
+ */
+export const CategoryPalette = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#6b7280', '#14b8a6', '#f97316', '#06b6d4'] as const;
+
+/** A category with no colour is drawn gray. */
+export const categoryColor = (color?: string | null) => (color && /^#[0-9a-f]{6}$/i.test(color) ? color : CategoryPalette[6]);
+
 export const White = '#FFFFFF';
 
 /** The dimmed backdrop behind every bottom sheet. */
