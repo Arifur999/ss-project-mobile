@@ -27,7 +27,11 @@ export type TextFieldProps = Omit<TextInputProps, 'style'> & {
   password?: { show: string; hide: string };
   /** Grow into a textarea of at least this height. */
   minHeight?: number;
-  /** Plain error text under the field, as the in-app sheets draw it. */
+  /**
+   * Plain error text under the field, as the in-app sheets draw it. An error of
+   * only whitespace marks the field red without a message - for a row whose
+   * message is shown once beneath several fields.
+   */
   plainError?: boolean;
   /** A grey hint under the field when there is no error. */
   hint?: string;
@@ -52,7 +56,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
 
   return (
     <View style={{ gap: t.labelGap }}>
-      <Txt style={[styles.label, { color: t.ink }]}>{label}</Txt>
+      {label ? <Txt style={[styles.label, { color: t.ink }]}>{label}</Txt> : null}
       <View>
         {focused && (
           <View
@@ -71,7 +75,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
           multiline={multiline}
           secureTextEntry={!!password && !revealed}
           placeholderTextColor={t.placeholder}
-          accessibilityLabel={label}
+          accessibilityLabel={input.accessibilityLabel ?? label}
           accessibilityState={{ disabled: input.editable === false }}
           aria-invalid={invalid}
           onFocus={(e) => {
@@ -116,7 +120,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
           </Pressable>
         )}
       </View>
-      {error ? (
+      {error?.trim() ? (
         <FieldError plain={plainError}>{error}</FieldError>
       ) : hint ? (
         <Txt style={[styles.hint, { color: t.hint }]}>{hint}</Txt>

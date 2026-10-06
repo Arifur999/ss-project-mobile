@@ -45,7 +45,7 @@ export function SelectField<K extends string>({
         </Txt>
         <DesignIcon name="chevronDown" size={18} color={Zinc[600]} strokeWidth={2} />
       </Pressable>
-      <FieldError plain>{error}</FieldError>
+      {error?.trim() ? <FieldError plain>{error}</FieldError> : null}
       <ChoiceSheet
         open={open}
         onClose={() => setOpen(false)}
