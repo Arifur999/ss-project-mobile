@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Line, Path } from 'react-native-svg';
 
 import { Txt } from '@/components/Txt';
 import { Green, Red, White, Zinc } from '@/constants/theme';
@@ -48,9 +48,15 @@ export function CashflowCard({ days }: { days: CashflowDay[] }) {
       <Txt style={styles.sub}>{hasDay ? weekdayDateLabel(days[picked].date, lang) : t.cashflowHint}</Txt>
 
       <View style={styles.figure} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-        <View style={[styles.grid, styles.dashed, { top: 0 }]} />
-        <View style={[styles.grid, styles.dashed, { top: PLOT_H / 2 }]} />
-        <View style={[styles.grid, styles.baseline, { top: PLOT_H }]} />
+        {/* Drawn rather than bordered: a one-sided dashed border is not
+            reliable on Android. */}
+        {width > 0 ? (
+          <Svg width={plotW} height={PLOT_H + 1} style={styles.grid}>
+            <Line x1={0} y1={0.5} x2={plotW} y2={0.5} stroke="rgba(255, 255, 255, 0.14)" strokeDasharray="3 3" />
+            <Line x1={0} y1={PLOT_H / 2 + 0.5} x2={plotW} y2={PLOT_H / 2 + 0.5} stroke="rgba(255, 255, 255, 0.14)" strokeDasharray="3 3" />
+            <Line x1={0} y1={PLOT_H + 0.5} x2={plotW} y2={PLOT_H + 0.5} stroke="rgba(255, 255, 255, 0.22)" />
+          </Svg>
+        ) : null}
         {!hidden &&
           [top, top / 2, 0].map((v, i) => (
             <Txt key={i} style={[styles.yLabel, { top: (i * PLOT_H) / 2 - 9 }]}>
@@ -119,9 +125,7 @@ const styles = StyleSheet.create({
   tileLabelText: { fontSize: 13, color: 'rgba(255, 255, 255, 0.78)' },
   tileValue: { fontSize: 17, fontWeight: '600', color: White },
   figure: { height: FIGURE_H },
-  grid: { position: 'absolute', left: AXIS, right: 0, height: 1 },
-  dashed: { borderTopWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(255, 255, 255, 0.14)' },
-  baseline: { backgroundColor: 'rgba(255, 255, 255, 0.22)' },
+  grid: { position: 'absolute', left: AXIS, top: 0 },
   yLabel: { position: 'absolute', left: 0, width: 30, textAlign: 'right', fontSize: 11, lineHeight: 18, color: 'rgba(255, 255, 255, 0.6)' },
   svg: { position: 'absolute', left: AXIS - 2, top: -2 },
   marker: { position: 'absolute', top: 0, height: PLOT_H, width: 1, backgroundColor: 'rgba(255, 255, 255, 0.4)' },
