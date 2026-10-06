@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet, type ViewStyle } from 'react-native';
 
+import { DesignIcon, type IconName } from '@/components/DesignIcon';
 import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { Red, Slate, White, Zinc } from '@/constants/theme';
@@ -24,8 +25,8 @@ type Props = {
   variant?: Variant;
   busy?: boolean;
   disabled?: boolean;
-  /** Icon before the title (hidden while busy). */
-  icon?: LucideIcon;
+  /** Icon before the title (hidden while busy): a lucide icon or a DesignIcon name. */
+  icon?: LucideIcon | IconName;
   /** Icon after the title - the arrow on "Go to dashboard". */
   trailingIcon?: LucideIcon;
   style?: ViewStyle;
@@ -51,6 +52,8 @@ export function Button({ title, onPress, variant = 'auth', busy, disabled, icon:
       ]}>
       {busy ? (
         <Spinner color={look.ink} />
+      ) : typeof Icon === 'string' ? (
+        <DesignIcon name={Icon} size={18} color={look.ink} strokeWidth={look.iconStroke} />
       ) : Icon ? (
         <Icon size={18} color={look.ink} strokeWidth={look.iconStroke} />
       ) : null}
