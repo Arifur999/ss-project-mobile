@@ -94,7 +94,9 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
               color: t.ink,
               fontFamily: fontFamily(lang, 400),
               borderColor: invalid ? Red[600] : focused ? t.focus : t.border,
-              borderWidth: invalid || focused ? 1.5 : 1,
+              // Only an error thickens the border; focus is the colour change
+              // plus the ring behind.
+              borderWidth: invalid ? 1.5 : 1,
               backgroundColor: invalid ? Red[50] : White,
             },
             inputStyle,
