@@ -38,6 +38,7 @@ export function SectionShell<K extends string>({
   retryLabel,
   right,
   fab,
+  gap = 16,
   children,
 }: {
   title: string;
@@ -49,6 +50,8 @@ export function SectionShell<K extends string>({
   retryLabel: string;
   right?: ReactNode;
   fab?: { label: string; onPress: () => void } | null;
+  /** Space between the body's blocks: 16, or 14 on the denser lists. */
+  gap?: number;
   children: ReactNode;
 }) {
   return (
@@ -74,7 +77,7 @@ export function SectionShell<K extends string>({
           })}
         </ScrollView>
 
-        <View style={styles.body}>
+        <View style={[styles.body, { gap }]}>
           {query.isPending ? (
             <View style={styles.state}>
               <Spinner color={Zinc[900]} size={24} />
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 14 },
   chipTextOn: { fontWeight: '600', color: White },
   chipTextOff: { fontWeight: '500', color: Zinc[700] },
-  body: { paddingTop: 6, paddingHorizontal: 20, gap: 16 },
+  body: { paddingTop: 6, paddingHorizontal: 20 },
   state: { minHeight: 280, justifyContent: 'center', gap: 12 },
   fab: {
     height: 52,
