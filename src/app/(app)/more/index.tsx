@@ -81,6 +81,7 @@ const SECTIONS: Section[] = [
 const ROUTES: Partial<Record<ItemKey, Href>> = {
   balance: '/more/balance',
   shareholders: '/more/shareholders',
+  loans: '/more/loans',
   inventory: '/inventory',
   sales: '/sales',
   customers: '/customers',
