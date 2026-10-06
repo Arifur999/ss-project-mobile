@@ -36,10 +36,12 @@ export function BottomSheet({
   const [visible, setVisible] = useState(open);
   const [progress] = useState(() => new Animated.Value(0));
 
-  // Stay mounted through the closing slide, then unmount.
+  // Mount as soon as it opens - adjusted during render, React's pattern for
+  // state that follows a prop - and stay mounted through the closing slide.
+  if (open && !visible) setVisible(true);
+
   useEffect(() => {
     if (open) {
-      setVisible(true);
       Animated.timing(progress, { toValue: 1, duration: 240, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
     } else {
       Animated.timing(progress, { toValue: 0, duration: 180, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(
