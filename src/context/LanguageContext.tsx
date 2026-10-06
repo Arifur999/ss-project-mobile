@@ -4,7 +4,6 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 
 import bn from '@/locales/bn.json';
 import en from '@/locales/en.json';
-import { mobileBn, mobileEn } from '@/locales/mobile';
 
 // Port of Hatim/src/context/LanguageContext.tsx: same keys, same Bangla digits,
 // same money and date formats, so a figure reads identically in both. Bangla is
@@ -12,10 +11,9 @@ import { mobileBn, mobileEn } from '@/locales/mobile';
 
 export type Lang = 'en' | 'bn';
 
-const locales: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...mobileEn },
-  bn: { ...bn, ...mobileBn },
-};
+// The website's own dictionaries, for t(key) when porting a website screen.
+// The app's screens keep their strings beside them and read them with useCopy.
+const locales: Record<Lang, Record<string, string>> = { en, bn };
 
 const STORAGE_KEY = 'app_lang';
 
