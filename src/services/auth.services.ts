@@ -23,3 +23,23 @@ export const resendOtpRequest = (email: string) =>
   http.post<{ sent: boolean; email: string }>('/auth/resend-otp', { email });
 
 export const getMeRequest = () => http.get<Account>('/auth/me');
+
+export interface RegisterOwnerInput {
+  fullName: string;
+  businessName: string;
+  phone: string;
+  email: string;
+  password: string;
+  address?: string;
+}
+
+/** Creates the owner and emails a code; nobody is signed in until it is verified. */
+export const registerOwnerRequest = (input: RegisterOwnerInput) =>
+  http.post<NeedsEmailConfirmation>('/auth/register', input);
+
+/** Emails a 6-digit reset code. Answers the same whether or not the email exists. */
+export const forgotPasswordRequest = (email: string) =>
+  http.post<{ message: string }>('/auth/forgot-password', { email });
+
+export const resetPasswordRequest = (email: string, otp: string, password: string) =>
+  http.post<{ message: string }>('/auth/reset-password', { email, otp, password });
