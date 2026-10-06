@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, TextInput, View, type TextInputProps, type TextS
 
 import { FieldError } from '@/components/FieldError';
 import { Txt } from '@/components/Txt';
-import { fontFamily } from '@/constants/fonts';
+import { fontFamily, type Weight } from '@/constants/fonts';
 import { Red, Slate, White, Zinc } from '@/constants/theme';
 import { useLang } from '@/context/LanguageContext';
 
@@ -55,6 +55,8 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
   const [revealed, setRevealed] = useState(false);
   const multiline = minHeight !== undefined;
   const invalid = !!error;
+  // A weight in inputStyle has to pick its own face: there is no synthetic bold.
+  const weight = (Number(inputStyle?.fontWeight) || 400) as Weight;
 
   return (
     <View style={{ gap: t.labelGap }}>
@@ -98,7 +100,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
               paddingVertical: multiline ? 13 : 0,
               textAlignVertical: multiline ? 'top' : 'center',
               color: t.ink,
-              fontFamily: fontFamily(lang, 400),
+              fontFamily: fontFamily(lang, weight),
               borderColor: invalid ? Red[600] : focused ? t.focus : t.border,
               // Only an error thickens the border; focus is the colour change
               // plus the ring behind.
