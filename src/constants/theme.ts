@@ -16,6 +16,7 @@ export const Slate = {
 } as const;
 
 export const Zinc = {
+  50: '#FAFAFA',
   100: '#F4F4F5',
   200: '#E4E4E7',
   300: '#D4D4D8',
@@ -32,17 +33,20 @@ export const Red = {
   50: '#FEF2F2',
   100: '#FEE2E2',
   200: '#FECACA',
+  300: '#FCA5A5',
   400: '#F87171',
   500: '#EF4444',
   600: '#DC2626',
   700: '#B91C1C',
   800: '#991B1B',
+  900: '#7F1D1D',
 } as const;
 
 export const Green = {
   50: '#F0FDF4',
   100: '#DCFCE7',
   200: '#BBF7D0',
+  300: '#86EFAC',
   400: '#4ADE80',
   500: '#22C55E',
   600: '#16A34A',
@@ -51,9 +55,30 @@ export const Green = {
 } as const;
 
 export const Amber = {
+  50: '#FFFBEB',
   100: '#FEF3C7',
+  200: '#FDE68A',
+  300: '#FCD34D',
+  400: '#FBBF24',
+  500: '#F59E0B',
+  600: '#D97706',
+  700: '#B45309',
   800: '#92400E',
+  900: '#78350F',
 } as const;
+
+/** Profit withdrawals are drawn in blue. */
+export const Blue = {
+  50: '#EFF6FF',
+  500: '#3B82F6',
+  700: '#1D4ED8',
+} as const;
+
+/**
+ * The categorical series colours of the expense charts, in the design's order.
+ * Grey last: it is the "everything else" slice.
+ */
+export const ChartPalette = ['#18181B', '#F97316', '#EC4899', '#06B6D4', '#8B5CF6', '#14B8A6', '#10B981', '#F59E0B', '#6B7280'] as const;
 
 export const White = '#FFFFFF';
 
