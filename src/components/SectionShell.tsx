@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -54,6 +54,7 @@ export function SectionShell<K extends string>({
   gap?: number;
   children: ReactNode;
 }) {
+  const chipsRef = useRef<ScrollView>(null);
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
@@ -61,7 +62,7 @@ export function SectionShell<K extends string>({
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => query.refetch()} tintColor={Zinc[900]} />}>
         <ScreenHeader title={title} onBack={() => router.navigate('/more')} backLabel={backLabel} right={right} />
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+        <ScrollView ref={chipsRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
           {sections.map((section) => {
             const on = section.key === current;
             return (
@@ -70,6 +71,8 @@ export function SectionShell<K extends string>({
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}
                 onPress={() => !on && router.replace(section.route as never)}
+                // The last sections sit past the screen edge; bring the current one into view.
+                onLayout={on ? (e) => chipsRef.current?.scrollTo({ x: Math.max(0, e.nativeEvent.layout.x - 20), animated: false }) : undefined}
                 style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
                 <Txt style={[styles.chipText, on ? styles.chipTextOn : styles.chipTextOff]}>{section.label}</Txt>
               </Pressable>
