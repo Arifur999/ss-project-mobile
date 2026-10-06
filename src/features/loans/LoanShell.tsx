@@ -11,10 +11,12 @@ export type LoanSection = 'overview' | 'people' | 'transactions' | 'statement';
 export function LoanShell({
   section,
   fab,
+  gap,
   children,
 }: {
   section: LoanSection;
   fab?: { label: string; onPress: () => void } | null;
+  gap?: number;
   children: ReactNode;
 }) {
   const t = useCopy(LOAN_COPY);
@@ -33,7 +35,8 @@ export function LoanShell({
       query={query}
       errorText={t.loadError}
       retryLabel={t.retry}
-      fab={fab}>
+      fab={fab}
+      gap={gap}>
       {children}
     </SectionShell>
   );
