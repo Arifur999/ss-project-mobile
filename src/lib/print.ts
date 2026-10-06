@@ -1,22 +1,17 @@
 import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 
 // A printable table, the app's version of Hatim/src/lib/printTable.ts: the
-// system print sheet, where "Save as PDF" is one of the printers. Bangla text
-// prints in the device's Bangla font.
+// system print sheet, where "Save as PDF" is one of the printers, or the same
+// page as a PDF handed to the share sheet. Bangla text prints in the device's
+// Bangla font.
 
 type Align = 'left' | 'right';
 
 const escape = (value: unknown) =>
   String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-export async function printTable({
-  title,
-  subtitle,
-  heading,
-  columns,
-  rows,
-  footer,
-}: {
+export type PrintableTable = {
   title: string;
   subtitle?: string;
   /** The business name across the top, as the website's printouts carry it. */
@@ -25,10 +20,19 @@ export async function printTable({
   rows: (string | number)[][];
   /** Label/value pairs under the table - totals, closing balance. */
   footer?: [string, string][];
-}) {
+};
+
+function tableHtml({
+  title,
+  subtitle,
+  heading,
+  columns,
+  rows,
+  footer,
+}: PrintableTable): string {
   const cell = (value: unknown, align: Align = 'left', tag = 'td') =>
     `<${tag} style="text-align:${align}">${escape(value)}</${tag}>`;
-  const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+  return `<!doctype html><html><head><meta charset="utf-8"><style>
     body { font-family: -apple-system, 'Noto Sans Bengali', 'Hind Siliguri', Roboto, sans-serif; color: #000; padding: 8mm; }
     h1 { margin: 0 0 4px; font-size: 17px; }
     .heading { margin: 0 0 10px; padding-bottom: 8px; border-bottom: 2px solid #000; font-size: 18px; font-weight: 700; }
@@ -47,5 +51,14 @@ export async function printTable({
     </table>
     ${footer?.length ? `<table class="footer" style="margin-top:16px">${footer.map(([k, v]) => `<tr>${cell(k)}${cell(v, 'right')}</tr>`).join('')}</table>` : ''}
   </body></html>`;
-  await Print.printAsync({ html });
+}
+
+export async function printTable(table: PrintableTable) {
+  await Print.printAsync({ html: tableHtml(table) });
+}
+
+/** The same page saved as a PDF and offered to the share sheet (WhatsApp, email, Files). */
+export async function shareTablePdf(table: PrintableTable, dialogTitle?: string) {
+  const { uri } = await Print.printToFileAsync({ html: tableHtml(table) });
+  await Sharing.shareAsync(uri, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf', dialogTitle });
 }
