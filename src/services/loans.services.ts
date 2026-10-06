@@ -116,3 +116,47 @@ export function useLoanWrite() {
     [queryClient],
   );
 }
+
+/** One row of a lender statement, as the server builds it. */
+export type StatementRow = {
+  row: Row;
+  /** Money out of our pocket. */
+  debit: number;
+  /** Money into our pocket. */
+  credit: number;
+  is_profit: boolean;
+  /** Unchanged by a profit row, which is what the statement exists to show. */
+  running_principal: number;
+};
+
+export type LenderStatement = {
+  lender: { id: string; name: string; phone: string; address: string; opening_balance: number; key: string };
+  from: string | null;
+  to: string | null;
+  opening_principal: number;
+  rows: StatementRow[];
+  total_paid: number;
+  total_received: number;
+  total_profit: number;
+  closing_principal: number;
+};
+
+/**
+ * A passbook for one lender over one window. The server folds everything
+ * before the from-date into the opening balance, so the app never downloads a
+ * lender's whole history to show one month.
+ */
+export function getLenderStatement(lenderId: string, from?: string, to?: string) {
+  const query = new URLSearchParams({ lender_id: lenderId });
+  if (from) query.set('from', from);
+  if (to) query.set('to', to);
+  return http.get<LenderStatement>(`/loans/statement?${query.toString()}`);
+}
+
+export function useLenderStatement(lenderId: string | null, from?: string, to?: string) {
+  return useQuery({
+    queryKey: ['loan-statement', lenderId, from ?? '', to ?? ''],
+    queryFn: () => getLenderStatement(lenderId as string, from, to),
+    enabled: Boolean(lenderId),
+  });
+}
