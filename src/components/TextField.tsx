@@ -36,6 +36,8 @@ export type TextFieldProps = Omit<TextInputProps, 'style'> & {
   /** A grey hint under the field when there is no error. */
   hint?: string;
   inputStyle?: TextStyle;
+  /** The smaller 13px grey label of a field paired in a row. */
+  labelStyle?: TextStyle;
 };
 
 const TONES = {
@@ -44,7 +46,7 @@ const TONES = {
 } as const;
 
 export const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
-  { label, tone = 'slate', icon: Icon, error, password, minHeight, plainError, hint, inputStyle, onFocus, onBlur, ...input },
+  { label, tone = 'slate', icon: Icon, error, password, minHeight, plainError, hint, inputStyle, labelStyle, onFocus, onBlur, ...input },
   ref,
 ) {
   const { lang } = useLang();
@@ -56,7 +58,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
 
   return (
     <View style={{ gap: t.labelGap }}>
-      {label ? <Txt style={[styles.label, { color: t.ink }]}>{label}</Txt> : null}
+      {label ? <Txt style={[styles.label, { color: t.ink }, labelStyle]}>{label}</Txt> : null}
       <View>
         {focused && (
           <View
