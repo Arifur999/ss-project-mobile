@@ -4,14 +4,15 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/ui';
+import { Button } from '@/components/Button';
+import { Txt } from '@/components/Txt';
 import { FONT_FILES } from '@/constants/fonts';
-import { Colors, Spacing } from '@/constants/theme';
+import { White, Zinc } from '@/constants/theme';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { LanguageProvider, useLang } from '@/context/LanguageContext';
+import { LanguageProvider, useCopy } from '@/context/LanguageContext';
 import { isSubscriptionLocked } from '@/lib/account';
 
 SplashScreen.preventAutoHideAsync();
@@ -46,7 +47,7 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { status, account } = useAuth();
+  const { status, account, welcome } = useAuth();
   // A font that fails to load must not hold the app on the splash screen; the
   // text falls back to the system face instead.
   const [fontsLoaded, fontError] = useFonts(FONT_FILES);
@@ -60,14 +61,21 @@ function RootNavigator() {
   if (status === 'offline') return <OfflineScreen />;
 
   const signedIn = status === 'signedIn';
-  const locked = signedIn && isSubscriptionLocked(account);
+  const greeting = signedIn && welcome;
+  const locked = signedIn && !welcome && isSubscriptionLocked(account);
+  const inside = signedIn && !welcome && !locked;
 
   // Stack.Protected is the route guard: a screen whose guard is false cannot be
-  // navigated to, and expo-router sends the user to the first allowed one.
+  // navigated to, and expo-router sends the user to the first allowed one. So
+  // signing in lands on "Welcome back!", dismissing it lands inside the app (or
+  // on the locked screen), and signing out lands on sign-in - no navigate calls.
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={signedIn && !locked}>
+    <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+      <Stack.Protected guard={inside}>
         <Stack.Screen name="(tabs)" />
+      </Stack.Protected>
+      <Stack.Protected guard={greeting}>
+        <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
       </Stack.Protected>
       <Stack.Protected guard={locked}>
         <Stack.Screen name="locked" />
@@ -75,21 +83,31 @@ function RootNavigator() {
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="login" />
         <Stack.Screen name="verify-otp" />
+        <Stack.Screen name="register" />
+        <Stack.Screen name="register-verify" />
+        <Stack.Screen name="register-success" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="forgot-password" />
       </Stack.Protected>
     </Stack>
   );
 }
 
+const OFFLINE_COPY = {
+  en: { message: 'Could not reach the server.', retry: 'Try again' },
+  bn: { message: 'সার্ভারের সাথে সংযোগ করা যায়নি।', retry: 'আবার চেষ্টা করুন' },
+};
+
 function OfflineScreen() {
   const { refreshAccount } = useAuth();
-  const { t } = useLang();
+  const t = useCopy(OFFLINE_COPY);
   const [busy, setBusy] = useState(false);
   return (
     <View style={styles.center}>
-      <Text style={styles.message}>{t('boot_offline')}</Text>
+      <Txt style={styles.message}>{t.message}</Txt>
       <Button
-        title={t('boot_retry')}
-        loading={busy}
+        title={t.retry}
+        variant="pill"
+        busy={busy}
         onPress={async () => {
           setBusy(true);
           await refreshAccount();
@@ -101,6 +119,6 @@ function OfflineScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', padding: Spacing.lg, gap: Spacing.md, backgroundColor: Colors.background },
-  message: { fontSize: 16, color: Colors.text, textAlign: 'center' },
+  center: { flex: 1, justifyContent: 'center', padding: 24, gap: 16, backgroundColor: White },
+  message: { fontSize: 16, color: Zinc[900], textAlign: 'center' },
 });
