@@ -104,3 +104,14 @@ export function computeShareholderRows(
   const totalCapital = rows.reduce((s, r) => s + r.netCapital, 0);
   return rows.map((r) => ({ ...r, sharePct: totalCapital > 0 ? (r.netCapital / totalCapital) * 100 : 0 }));
 }
+
+/**
+ * What a shareholder has put in: opening amount plus everything invested
+ * since, less everything withdrawn - Hatim/src/lib/shareholderCapital.ts.
+ */
+export function totalInvestment(investments: Row[], shareholder: Row): number {
+  return (
+    num(shareholder.opening_amount) +
+    investments.filter((r) => belongsTo(r, shareholder)).reduce((s, r) => s + num(r.invest_amount) - num(r.withdraw_amount), 0)
+  );
+}
