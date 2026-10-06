@@ -21,7 +21,9 @@ export function Txt({ style, ...rest }: TextProps) {
       style={[
         { lineHeight: Math.round(size * 1.5) },
         style,
-        { fontFamily: fontFamily(lang, weight), fontWeight: undefined },
+        // An explicit family wins - the বাংলা label of the language toggle is
+        // Hind Siliguri even on an English screen.
+        { fontFamily: flat.fontFamily ?? fontFamily(lang, weight), fontWeight: undefined },
       ]}
     />
   );
