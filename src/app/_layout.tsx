@@ -80,6 +80,7 @@ function RootNavigator() {
       <Stack.Protected guard={inside}>
         <Stack.Screen name="(app)" />
         <Stack.Screen name="soon" />
+        <Stack.Screen name="business-info" />
       </Stack.Protected>
       <Stack.Protected guard={greeting}>
         <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
