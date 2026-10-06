@@ -11,6 +11,7 @@ import { Button } from '@/components/Button';
 import { Txt } from '@/components/Txt';
 import { FONT_FILES } from '@/constants/fonts';
 import { White, Zinc } from '@/constants/theme';
+import { AmountShieldProvider } from '@/context/AmountShieldContext';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LanguageProvider, useCopy } from '@/context/LanguageContext';
 import { isSubscriptionLocked } from '@/lib/account';
@@ -36,10 +37,12 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <AuthProvider>
-            <StatusBar style="dark" />
-            <RootNavigator />
-          </AuthProvider>
+          <AmountShieldProvider>
+            <AuthProvider>
+              <StatusBar style="dark" />
+              <RootNavigator />
+            </AuthProvider>
+          </AmountShieldProvider>
         </LanguageProvider>
       </QueryClientProvider>
     </SafeAreaProvider>
