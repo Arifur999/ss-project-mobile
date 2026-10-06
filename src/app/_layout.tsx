@@ -14,6 +14,7 @@ import { White, Zinc } from '@/constants/theme';
 import { AmountShieldProvider } from '@/context/AmountShieldContext';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LanguageProvider, useCopy } from '@/context/LanguageContext';
+import { ToastProvider } from '@/context/ToastContext';
 import { isSubscriptionLocked } from '@/lib/account';
 
 SplashScreen.preventAutoHideAsync();
@@ -39,8 +40,10 @@ export default function RootLayout() {
         <LanguageProvider>
           <AmountShieldProvider>
             <AuthProvider>
-              <StatusBar style="dark" />
-              <RootNavigator />
+              <ToastProvider>
+                <StatusBar style="dark" />
+                <RootNavigator />
+              </ToastProvider>
             </AuthProvider>
           </AmountShieldProvider>
         </LanguageProvider>
