@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
@@ -25,6 +26,7 @@ export function ActionsSheet({
   closeLabel,
   onEdit,
   onDelete,
+  children,
 }: {
   open: boolean;
   onClose: () => void;
@@ -38,6 +40,8 @@ export function ActionsSheet({
   closeLabel?: string;
   onEdit: () => void;
   onDelete: () => void;
+  /** Anything to show between the title and the actions. */
+  children?: ReactNode;
 }) {
   return (
     <BottomSheet open={open} onClose={onClose} closeLabel={closeLabel}>
@@ -48,6 +52,7 @@ export function ActionsSheet({
         <Txt style={styles.subtitle}>{subtitle}</Txt>
         {note ? <Txt style={styles.note}>{note}</Txt> : null}
       </View>
+      {children}
       <View style={styles.list}>
         <Pressable accessibilityRole="button" onPress={onEdit} style={styles.action}>
           <DesignIcon name="pencil" size={20} color={Zinc[900]} />
