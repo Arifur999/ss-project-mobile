@@ -1,7 +1,8 @@
-import { ArrowLeft, Eye, EyeOff, type LucideIcon } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { DesignIcon, type IconName } from '@/components/DesignIcon';
 import { Txt } from '@/components/Txt';
 import { Zinc } from '@/constants/theme';
 
@@ -23,7 +24,7 @@ export function ScreenHeader({
   return (
     <View style={styles.bar}>
       <Pressable accessibilityRole="button" accessibilityLabel={backLabel} onPress={onBack} style={styles.icon}>
-        <ArrowLeft size={22} color={Zinc[900]} strokeWidth={2} />
+        <DesignIcon name="arrowLeft" size={22} color={Zinc[900]} strokeWidth={2} />
       </Pressable>
       <Txt accessibilityRole="header" style={styles.title} numberOfLines={1}>
         {title}
@@ -40,7 +41,8 @@ export function HeaderIconButton({
   onPress,
   disabled,
 }: {
-  icon: LucideIcon;
+  /** A DesignIcon name, or a lucide icon. */
+  icon: IconName | LucideIcon;
   label: string;
   onPress: () => void;
   disabled?: boolean;
@@ -53,7 +55,11 @@ export function HeaderIconButton({
       onPress={onPress}
       disabled={disabled}
       style={styles.icon}>
-      <Icon size={22} color={disabled ? Zinc[400] : Zinc[700]} strokeWidth={1.8} />
+      {typeof Icon === 'string' ? (
+        <DesignIcon name={Icon} size={22} color={disabled ? Zinc[400] : Zinc[700]} />
+      ) : (
+        <Icon size={22} color={disabled ? Zinc[400] : Zinc[700]} strokeWidth={1.8} />
+      )}
     </Pressable>
   );
 }
@@ -63,7 +69,7 @@ export function HeaderIconButton({
  * eye while amounts are hidden, a struck-out eye while they show.
  */
 export function EyeButton({ hidden, onPress, labels }: { hidden: boolean; onPress: () => void; labels: { show: string; hide: string } }) {
-  return <HeaderIconButton icon={hidden ? Eye : EyeOff} label={hidden ? labels.show : labels.hide} onPress={onPress} />;
+  return <HeaderIconButton icon={hidden ? 'eye' : 'eyeOff'} label={hidden ? labels.show : labels.hide} onPress={onPress} />;
 }
 
 const styles = StyleSheet.create({

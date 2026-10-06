@@ -1,4 +1,3 @@
-import { Bell } from 'lucide-react-native';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { Initial } from '@/components/Initial';
@@ -29,7 +28,7 @@ export function DashboardHeader({
         <Image source={LOGO_DARK} resizeMode="contain" style={styles.logo} accessibilityLabel="Furnify" />
         <View style={styles.actions}>
           <EyeButton hidden={hidden} onPress={toggle} labels={{ show: t.showAmounts, hide: t.hideAmounts }} />
-          <HeaderIconButton icon={Bell} label={t.notifications} onPress={onNotifications} />
+          <HeaderIconButton icon="bell" label={t.notifications} onPress={onNotifications} />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t.account(name)}
