@@ -35,7 +35,7 @@ export function FigureCard({
       style={[styles.card, badge ? styles.withBadge : styles.plain, dark ? styles.dark : styles.light]}>
       {badge ? (
         <View style={[styles.badge, { backgroundColor: badge.bg }, badge.outlined && styles.badgeOutlined]}>
-          <DesignIcon name={badge.icon} size={16} color={badge.ink} />
+          <DesignIcon name={badge.icon} size={16} color={badge.ink} strokeWidth={2} />
         </View>
       ) : null}
       <View>
