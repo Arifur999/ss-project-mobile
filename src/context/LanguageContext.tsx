@@ -134,3 +134,24 @@ export function useLang() {
   if (!ctx) throw new Error('useLang must be used within LanguageProvider');
   return ctx;
 }
+
+/** A screen's own strings, both languages side by side, as the Figma files keep them. */
+export type Copy<T> = { en: T; bn: T };
+
+/**
+ * The current language's half of a screen's copy. Typed, so a key present in
+ * English and missing in Bangla is a compile error rather than a blank label.
+ */
+export function useCopy<T>(copy: Copy<T>): T {
+  return copy[useLang().lang];
+}
+
+const BN_DIGIT_CHARS = '০১২৩৪৫৬৭৮৯';
+
+/** Western digits to Bangla ones; everything else passes through. */
+export const bnDigits = (value: string | number) =>
+  String(value).replace(/[0-9]/g, (d) => BN_DIGIT_CHARS[Number(d)]);
+
+/** Bangla digits a user typed back to Western ones, so they can be parsed. */
+export const westernDigits = (value: string) =>
+  value.replace(/[০-৯]/g, (d) => String(BN_DIGIT_CHARS.indexOf(d)));
