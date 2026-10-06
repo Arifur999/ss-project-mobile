@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -7,6 +8,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui';
+import { FONT_FILES } from '@/constants/fonts';
 import { Colors, Spacing } from '@/constants/theme';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LanguageProvider, useLang } from '@/context/LanguageContext';
@@ -45,12 +47,16 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const { status, account } = useAuth();
+  // A font that fails to load must not hold the app on the splash screen; the
+  // text falls back to the system face instead.
+  const [fontsLoaded, fontError] = useFonts(FONT_FILES);
+  const ready = status !== 'loading' && (fontsLoaded || !!fontError);
 
   useEffect(() => {
-    if (status !== 'loading') SplashScreen.hideAsync();
-  }, [status]);
+    if (ready) SplashScreen.hideAsync();
+  }, [ready]);
 
-  if (status === 'loading') return null;
+  if (!ready) return null;
   if (status === 'offline') return <OfflineScreen />;
 
   const signedIn = status === 'signedIn';
