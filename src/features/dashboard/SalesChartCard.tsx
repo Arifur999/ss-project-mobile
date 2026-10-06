@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Segmented } from '@/components/Segmented';
 import { Txt } from '@/components/Txt';
-import { Green, Red, White, Zinc } from '@/constants/theme';
+import { Green, Red, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { bnDigits, useCopy, useLang } from '@/context/LanguageContext';
 import { DASHBOARD_COPY } from '@/features/dashboard/copy';
@@ -39,22 +40,14 @@ export function SalesChartCard({ year, months }: { year: number; months: MonthBa
         <Txt style={styles.sub}>{t.monthByMonth(year)}</Txt>
       </View>
 
-      <View accessibilityRole="radiogroup" accessibilityLabel={t.show} style={styles.segments}>
-        {(['sales', 'profit', 'expense'] as Metric[]).map((id) => {
-          const selected = id === metric;
-          return (
-            <Pressable
-              key={id}
-              accessibilityRole="radio"
-              accessibilityState={{ selected }}
-              onPress={() => setMetric(id)}
-              style={[styles.segment, selected && styles.segmentOn]}>
-              <View style={[styles.dot, { backgroundColor: COLORS[id] }]} />
-              <Txt style={[styles.segmentText, { color: selected ? Zinc[900] : Zinc[600] }]}>{names[id]}</Txt>
-            </Pressable>
-          );
-        })}
-      </View>
+      <Segmented
+        label={t.show}
+        height={40}
+        fontSize={14}
+        value={metric}
+        onChange={setMetric}
+        segments={(['sales', 'profit', 'expense'] as Metric[]).map((id) => ({ key: id, label: names[id], dot: COLORS[id] }))}
+      />
 
       <View style={styles.readout}>
         <Txt style={styles.sub}>
@@ -118,18 +111,6 @@ const styles = StyleSheet.create({
   head: { gap: 2 },
   title: { fontSize: 17, fontWeight: '600', lineHeight: 23.8, color: Zinc[900] },
   sub: { fontSize: 13, color: Zinc[600] },
-  segments: { flexDirection: 'row', gap: 2, padding: 3, borderRadius: 12, backgroundColor: Zinc[200] },
-  segment: { flex: 1, height: 40, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  segmentOn: {
-    backgroundColor: White,
-    shadowColor: '#09090B',
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
-  },
-  dot: { width: 8, height: 8, borderRadius: 999 },
-  segmentText: { fontSize: 14, fontWeight: '600' },
   readout: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 },
   value: { fontSize: 20, fontWeight: '600', letterSpacing: -0.2, color: Zinc[900] },
   figure: { height: 166 },
