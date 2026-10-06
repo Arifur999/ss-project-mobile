@@ -1,7 +1,7 @@
-import { House, LayoutGrid, Package, ShoppingBag, Users, type LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DesignIcon, type IconName } from '@/components/DesignIcon';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
 import { useCopy } from '@/context/LanguageContext';
@@ -9,12 +9,12 @@ import { useCopy } from '@/context/LanguageContext';
 /** The five tabs, by route name, in the order the design draws them. */
 export type TabKey = 'index' | 'sales' | 'inventory' | 'customers' | 'more';
 
-const TABS: { key: TabKey; icon: LucideIcon }[] = [
-  { key: 'index', icon: House },
-  { key: 'sales', icon: ShoppingBag },
-  { key: 'inventory', icon: Package },
-  { key: 'customers', icon: Users },
-  { key: 'more', icon: LayoutGrid },
+const TABS: { key: TabKey; icon: IconName }[] = [
+  { key: 'index', icon: 'home' },
+  { key: 'sales', icon: 'bag' },
+  { key: 'inventory', icon: 'package' },
+  { key: 'customers', icon: 'users' },
+  { key: 'more', icon: 'grid' },
 ];
 
 const COPY = {
@@ -31,7 +31,7 @@ export function BottomNav({ active, onPress }: { active: string; onPress: (key: 
   const insets = useSafeAreaInsets();
   return (
     <View accessibilityRole="tablist" style={[styles.bar, { height: 72 + insets.bottom, paddingBottom: 10 + insets.bottom }]}>
-      {TABS.map(({ key, icon: Icon }) => {
+      {TABS.map(({ key, icon }) => {
         const selected = key === active;
         return (
           <Pressable
@@ -42,7 +42,7 @@ export function BottomNav({ active, onPress }: { active: string; onPress: (key: 
             onPress={() => onPress(key)}
             style={styles.item}>
             <View style={[styles.pill, selected && styles.pillActive]}>
-              <Icon size={20} color={selected ? White : Zinc[500]} strokeWidth={1.8} />
+              <DesignIcon name={icon} size={20} color={selected ? White : Zinc[500]} />
             </View>
             <Txt style={[styles.label, selected ? styles.labelActive : styles.labelIdle]}>{t[key]}</Txt>
           </Pressable>
