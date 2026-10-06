@@ -55,3 +55,14 @@ export function buildLoanBalanceSms(input: LoanSmsBusiness & { customerName: str
     .filter(Boolean)
     .join('\n');
 }
+
+/**
+ * The shop's own name and helpline from Business Info, as the website fills
+ * them in: these land on a customer's phone, and they know who they deal with.
+ */
+export function smsBusiness(settings: { name_en?: string | null; name_bn?: string | null; phone?: string | null } | null | undefined): LoanSmsBusiness {
+  return {
+    businessName: String(settings?.name_en || settings?.name_bn || '').trim() || 'Furnify',
+    businessPhone: String(settings?.phone || ''),
+  };
+}
