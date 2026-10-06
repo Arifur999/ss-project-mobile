@@ -52,7 +52,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "typecheck": "node scripts/typed-routes.js && tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "private": true
 }
