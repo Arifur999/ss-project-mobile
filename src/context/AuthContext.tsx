@@ -8,8 +8,10 @@ import { tokenStore } from '@/lib/tokenStore';
 import {
   getMeRequest,
   loginRequest,
+  registerOwnerRequest,
   resendOtpRequest,
   verifyOtpRequest,
+  type RegisterOwnerInput,
   type SignedIn,
 } from '@/services/auth.services';
 
@@ -27,9 +29,24 @@ type SignInResult = { kind: 'signedIn' } | { kind: 'needsOtp'; email: string };
 interface AuthContextType {
   status: AuthStatus;
   account: Account | null;
+  /**
+   * True straight after signing in, until the "Welcome back!" screen is
+   * dismissed. Never true after a cold start - that screen greets a sign-in,
+   * not an app launch.
+   */
+  welcome: boolean;
+  dismissWelcome: () => void;
   signIn: (email: string, password: string) => Promise<SignInResult>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
   resendOtp: (email: string) => Promise<void>;
+  /** Creates the owner; the code is emailed and verifyRegistration completes it. */
+  registerOwner: (input: RegisterOwnerInput) => Promise<{ email: string }>;
+  /**
+   * Confirms the registration code. Deliberately does NOT sign in: the design
+   * ends registration on "Request submitted - back to sign in", and the
+   * workspace still has a plan to start before it can be used.
+   */
+  verifyRegistration: (email: string, otp: string) => Promise<void>;
   signOut: () => Promise<void>;
   /** Re-read the account from the server (also the "Try again" when offline). */
   refreshAccount: () => Promise<void>;
@@ -67,12 +84,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [account, setAccount] = useState<Account | null>(null);
+  const [welcome, setWelcome] = useState(false);
 
   const dropSession = useCallback(async () => {
     await tokenStore.clear();
     await AsyncStorage.removeItem(ACCOUNT_HINT_KEY).catch(() => {});
     queryClient.clear();
     setAccount(null);
+    setWelcome(false);
     setStatus('signedOut');
   }, [queryClient]);
 
@@ -123,8 +142,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { tokens, ...me } = result;
     await tokenStore.save(tokens);
     setAccount(me);
+    setWelcome(true);
     setStatus('signedIn');
     saveHint(me);
+  }, []);
+
+  const dismissWelcome = useCallback(() => setWelcome(false), []);
+
+  const registerOwner = useCallback(async (input: RegisterOwnerInput) => {
+    const result = await registerOwnerRequest(input);
+    return { email: result.email };
+  }, []);
+
+  // The server answers a correct code with a session; registration drops it on
+  // purpose (see the interface). The JWTs simply expire unused.
+  const verifyRegistration = useCallback(async (email: string, otp: string) => {
+    await verifyOtpRequest(email, otp.trim());
   }, []);
 
   const signIn = useCallback(
@@ -153,8 +186,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(() => dropSession(), [dropSession]);
 
   const value = useMemo(
-    () => ({ status, account, signIn, verifyOtp, resendOtp, signOut, refreshAccount: loadAccount }),
-    [status, account, signIn, verifyOtp, resendOtp, signOut, loadAccount],
+    () => ({
+      status,
+      account,
+      welcome,
+      dismissWelcome,
+      signIn,
+      verifyOtp,
+      resendOtp,
+      registerOwner,
+      verifyRegistration,
+      signOut,
+      refreshAccount: loadAccount,
+    }),
+    [status, account, welcome, dismissWelcome, signIn, verifyOtp, resendOtp, registerOwner, verifyRegistration, signOut, loadAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
