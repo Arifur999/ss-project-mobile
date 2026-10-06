@@ -75,7 +75,7 @@ function RootNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
       <Stack.Protected guard={inside}>
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(app)" />
       </Stack.Protected>
       <Stack.Protected guard={greeting}>
         <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
