@@ -57,12 +57,24 @@ export const ACTIONS = {
   'purchase.receive': { roles: ['owner', 'manager'], permission: 'page:purchase.received' },
   // purchase.route.ts: DELETE /:id
   'purchase.delete': { roles: ['owner', 'manager'], permission: 'act:purchase.delete' },
-} as const satisfies Record<string, { roles: readonly UserRole[]; permission: string }>;
+  // customer.route.ts: POST / and PATCH /:id
+  'customers.write': { roles: ['owner', 'manager', 'sales_staff'], permission: 'page:customers.list' },
+  // customer.route.ts: DELETE /:id - refused while the customer has sales or payments
+  'customers.delete': { roles: ['owner', 'manager'], permission: 'act:customers.delete' },
+  // customerPayment.route.ts: POST /
+  'customerPayment.create': { roles: ['owner', 'manager', 'sales_staff', 'accountant'], permission: 'page:customers.due-received' },
+  // customerPayment.route.ts: DELETE /:id
+  'customerPayment.delete': { roles: ['owner', 'manager'], permission: 'act:customers.delete' },
+  // expense.route.ts: POST / - a due discount is written as an expense
+  'expense.create': { roles: ['owner', 'manager', 'accountant'], permission: 'page:expenses.transactions' },
+  // sms.route.ts: POST /send - the owner's credits, no permission beyond the role
+  'sms.send': { roles: ['owner'] },
+} as const satisfies Record<string, { roles: readonly UserRole[]; permission?: string }>;
 
 export type Action = keyof typeof ACTIONS;
 
 export function canDo(role: UserRole | undefined, granted: string[] | undefined, action: Action): boolean {
   const gate = ACTIONS[action];
   if (!role || !(gate.roles as readonly UserRole[]).includes(role)) return false;
-  return hasPermission(role, granted, gate.permission);
+  return !('permission' in gate) || hasPermission(role, granted, gate.permission);
 }
