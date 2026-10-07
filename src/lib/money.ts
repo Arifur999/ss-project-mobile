@@ -48,6 +48,15 @@ export function formatMoney(value: unknown, lang: Lang, hidden = false): string 
  * An amount the user typed: Bangla digits, commas and spaces allowed. NaN when
  * it is not a number at all, so a form can tell "0" from "nonsense".
  */
+const isPresent = (value: unknown) => value !== null && value !== undefined && value !== '';
+
+/** What a sale line was billed: its total, else its price after discount times the quantity, else its MRP - the website's saleItemAmount. */
+export function saleItemAmount(item: { total_amount?: unknown; actual_price?: unknown; selling_price?: unknown }, qty: number): number {
+  if (isPresent(item.total_amount)) return roundTaka(item.total_amount);
+  if (isPresent(item.actual_price)) return roundTaka(roundTaka(item.actual_price) * qty);
+  return roundTaka(roundTaka(item.selling_price) * qty);
+}
+
 export function parseAmount(input: string, { allowNegative = false } = {}): number {
   const clean = westernDigits(String(input ?? '')).replace(/[,\s]/g, '');
   const pattern = allowNegative ? /^-?\d+(\.\d+)?$/ : /^\d+(\.\d+)?$/;
