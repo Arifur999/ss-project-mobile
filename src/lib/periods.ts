@@ -57,6 +57,21 @@ export function listRange(period: ListPeriod, now = new Date()): Range | null {
   }
 }
 
+/** The Sales Ledger's chips, as the website's sales date filter offers them. */
+export type SalePeriod = 'all' | 'today' | 'yesterday' | 'thisMonth' | 'thisYear';
+
+export const SALE_PERIODS: SalePeriod[] = ['all', 'today', 'yesterday', 'thisMonth', 'thisYear'];
+
+/** The window a sales chip covers; null means everything. */
+export function saleRange(period: SalePeriod, now = new Date()): Range | null {
+  if (period === 'today') return { from: toISODate(now), to: toISODate(now) };
+  if (period === 'yesterday') {
+    const day = toISODate(addDays(now, -1));
+    return { from: day, to: day };
+  }
+  return listRange(period, now);
+}
+
 /** The seven days ending today - the cashflow chart, whatever the period says. */
 export function lastSevenDays(now = new Date()): string[] {
   return Array.from({ length: 7 }, (_, i) => toISODate(addDays(now, i - 6)));
