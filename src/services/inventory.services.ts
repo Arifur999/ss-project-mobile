@@ -38,19 +38,27 @@ export type StockPage = Page<StockRow> & { totalStockValue: number };
 
 export const INVENTORY_KEY = ['inventory'] as const;
 
+async function fetchStock(search: string, status: StockStatusFilter, page?: number): Promise<StockPage> {
+  const { data, total } = await getPage('/inventory/list', {
+    page,
+    limit: page ? PAGE_SIZE : undefined,
+    search: search || undefined,
+    status: status === 'all' ? undefined : status,
+  });
+  const payload = (data ?? {}) as { rows?: StockRow[]; totalStockValue?: number };
+  return { rows: payload.rows ?? [], total, totalStockValue: Number(payload.totalStockValue ?? 0) };
+}
+
 /** The stock list by product code, searched and filtered by status on the server. */
 export function useStock(search: string, status: StockStatusFilter) {
-  return usePagedQuery<StockPage>([...INVENTORY_KEY, 'list', search, status], async (page) => {
-    const { data, total } = await getPage('/inventory/list', {
-      page,
-      limit: PAGE_SIZE,
-      search: search || undefined,
-      status: status === 'all' ? undefined : status,
-    });
-    const payload = (data ?? {}) as { rows?: StockRow[]; totalStockValue?: number };
-    return { rows: payload.rows ?? [], total, totalStockValue: Number(payload.totalStockValue ?? 0) };
-  });
+  return usePagedQuery<StockPage>([...INVENTORY_KEY, 'list', search, status], (page) => fetchStock(search, status, page));
 }
+
+/**
+ * Every matching row at once (no page asked for), for printing: a printout of
+ * only the rows scrolled into view would be silently incomplete.
+ */
+export const getAllStock = (search: string, status: StockStatusFilter) => fetchStock(search, status);
 
 export type StockMovement = {
   id: string;
