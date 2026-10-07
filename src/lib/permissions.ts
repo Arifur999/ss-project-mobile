@@ -29,6 +29,14 @@ export const ACTIONS = {
   'products.delete': { roles: ['owner', 'manager'], permission: 'act:products.delete' },
   // inventory.route.ts: POST /adjust
   'inventory.adjust': { roles: ['owner', 'manager'], permission: 'page:inventory.stock' },
+  // damage.route.ts: POST /
+  'damage.write': { roles: ['owner', 'manager'], permission: 'page:damage.entries' },
+  // damage.route.ts: POST /:id/receive
+  'damage.receive': { roles: ['owner', 'manager'], permission: 'page:damage.receive' },
+  // damage.route.ts: POST /:id/transactions
+  'damage.money': { roles: ['owner', 'manager'], permission: 'page:damage.transactions' },
+  // damage.route.ts: DELETE /:id
+  'damage.delete': { roles: ['owner', 'manager'], permission: 'act:damage.delete' },
 } as const satisfies Record<string, { roles: readonly UserRole[]; permission: string }>;
 
 export type Action = keyof typeof ACTIONS;
