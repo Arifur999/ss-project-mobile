@@ -7,9 +7,10 @@ import { DesignIcon } from '@/components/DesignIcon';
 import { SearchField } from '@/components/SearchField';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
-import { useCopy } from '@/context/LanguageContext';
+import { useCopy, useLang } from '@/context/LanguageContext';
 import { MARKETING_COPY } from '@/features/marketing/copy';
 import { CONTACT_TYPES, filterContacts, type Contact, type ContactType } from '@/lib/marketingContacts';
+import { formatNumber } from '@/lib/money';
 
 // Drawn a slice at a time: a shop's customer list can run to thousands.
 const PAGE = 60;
@@ -33,6 +34,7 @@ export function RecipientSheet({
   onClose: () => void;
 }) {
   const t = useCopy(MARKETING_COPY);
+  const { lang } = useLang();
   const [types, setTypes] = useState<ContactType[]>(CONTACT_TYPES);
   const [search, setSearch] = useState('');
   const [limit, setLimit] = useState(PAGE);
@@ -109,7 +111,7 @@ export function RecipientSheet({
           );
         })
       )}
-      {shown.length > limit ? <Button title={`+ ${shown.length - limit}`} variant="pillOutline" onPress={() => setLimit((n) => n + PAGE)} /> : null}
+      {shown.length > limit ? <Button title={t.showMore(formatNumber(shown.length - limit, lang))} variant="pillOutline" onPress={() => setLimit((n) => n + PAGE)} /> : null}
       <Button title={t.done} variant="pill" onPress={onClose} />
     </BottomSheet>
   );

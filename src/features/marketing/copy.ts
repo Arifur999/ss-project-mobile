@@ -39,6 +39,7 @@ export const MARKETING_COPY = {
     noPhone: 'No phone',
     noContacts: 'No contacts match.',
     done: 'Done',
+    showMore: (n: string) => `Show ${n} more`,
     loadError: 'Could not load contacts.',
   },
   bn: {
@@ -77,6 +78,7 @@ export const MARKETING_COPY = {
     noPhone: 'ফোন নেই',
     noContacts: 'কোনো কন্টাক্ট মেলেনি।',
     done: 'ঠিক আছে',
+    showMore: (n: string) => `আরও ${n} জন দেখুন`,
     loadError: 'কন্টাক্ট আনা যায়নি।',
   },
 };
