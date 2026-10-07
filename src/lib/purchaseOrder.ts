@@ -2,9 +2,9 @@ import { roundTaka } from './money';
 import { actualDp, purchaseDeposit, purchaseItemDeposit, spAmountFor } from './purchaseAmounts';
 
 // A purchase order's lines and totals, lifted from Hatim/src/pages/purchase/
-// PurchaseOrders.tsx (applySpPercent, updateItem, addProductToOrder and the
-// totals under the form) and PurchaseLedger.tsx (invoiceMetrics), so an order
-// placed from the app is priced exactly as the website prices it.
+// PurchaseOrders.tsx (applySpPercent, updateItem and the totals under the
+// form) and PurchaseLedger.tsx (invoiceMetrics), so an order placed from the
+// app is priced exactly as the website prices it.
 
 type Row = Record<string, any>;
 
@@ -39,25 +39,6 @@ export function applySpPercent(line: OrderLine, percent: number): OrderLine {
 export function repriceLine(line: OrderLine, percent: number): OrderLine {
   const actual = actualDp(line.dp_price, line.discount_pct);
   return applySpPercent({ ...line, actual_dp: actual, total_amount: roundTaka(actual * line.qty) }, percent);
-}
-
-/** A new line for a product: its cost price and DP discount, one piece. */
-export function lineForProduct(product: Row, percent: number): OrderLine {
-  return repriceLine(
-    {
-      product_id: String(product.id),
-      product_code: String(product.product_code || ''),
-      product_name: String(product.name || ''),
-      dp_price: roundTaka(product.cost_price),
-      discount_pct: Number(product.dp_discount ?? product.discount ?? 0),
-      actual_dp: 0,
-      qty: 1,
-      total_amount: 0,
-      sp_amount: 0,
-      deposit_amount: 0,
-    },
-    percent,
-  );
 }
 
 /** The order's totals, as the form shows them. */
