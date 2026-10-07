@@ -51,6 +51,12 @@ export const ACTIONS = {
   'otherIncome.update': { roles: ['owner', 'manager'], permission: 'page:supplier.other-income' },
   // otherIncome.route.ts: DELETE /:id - the owner alone.
   'otherIncome.delete': { roles: ['owner'], permission: 'page:supplier.other-income' },
+  // purchase.route.ts: POST /
+  'purchase.create': { roles: ['owner', 'manager'], permission: 'page:purchase.orders' },
+  // purchase.route.ts: POST /:id/receive and /:id/receive-all
+  'purchase.receive': { roles: ['owner', 'manager'], permission: 'page:purchase.received' },
+  // purchase.route.ts: DELETE /:id
+  'purchase.delete': { roles: ['owner', 'manager'], permission: 'act:purchase.delete' },
 } as const satisfies Record<string, { roles: readonly UserRole[]; permission: string }>;
 
 export type Action = keyof typeof ACTIONS;
