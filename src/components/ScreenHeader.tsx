@@ -8,7 +8,9 @@ import { Zinc } from '@/constants/theme';
 
 /**
  * The 56-tall header of the in-app screens (Balance and its tabs): back arrow,
- * a 20px bold title, and room on the right for icon buttons.
+ * a 20px bold title, and room on the right for icon buttons. A tab's own
+ * screen has nowhere to go back to, so without onBack the title starts at the
+ * page margin instead.
  */
 export function ScreenHeader({
   title,
@@ -17,15 +19,17 @@ export function ScreenHeader({
   right,
 }: {
   title: string;
-  onBack: () => void;
-  backLabel: string;
+  onBack?: () => void;
+  backLabel?: string;
   right?: ReactNode;
 }) {
   return (
-    <View style={styles.bar}>
-      <Pressable accessibilityRole="button" accessibilityLabel={backLabel} onPress={onBack} style={styles.icon}>
-        <DesignIcon name="arrowLeft" size={22} color={Zinc[900]} strokeWidth={2} />
-      </Pressable>
+    <View style={[styles.bar, !onBack && styles.barNoBack]}>
+      {onBack ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={backLabel} onPress={onBack} style={styles.icon}>
+          <DesignIcon name="arrowLeft" size={22} color={Zinc[900]} strokeWidth={2} />
+        </Pressable>
+      ) : null}
       <Txt accessibilityRole="header" style={styles.title} numberOfLines={1}>
         {title}
       </Txt>
@@ -82,6 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  barNoBack: { paddingLeft: 20 },
   icon: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   title: { flex: 1, fontSize: 20, fontWeight: '700', letterSpacing: -0.2, color: Zinc[900], lineHeight: 28 },
 });
