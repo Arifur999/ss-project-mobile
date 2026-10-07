@@ -5,8 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
-import { DesignIcon } from '@/components/DesignIcon';
 import { FilterChips } from '@/components/FilterChips';
+import { PromptCard } from '@/components/PromptCard';
 import { SelectField } from '@/components/SelectField';
 import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
@@ -162,12 +162,7 @@ export default function LoanStatementScreen() {
       </View>
 
       {!lender ? (
-        <View style={styles.nobody}>
-          <View style={styles.nobodyIcon}>
-            <DesignIcon name="fileText" size={26} color={Zinc[600]} />
-          </View>
-          <Txt style={styles.nobodyText}>{t.noPersonText}</Txt>
-        </View>
+        <PromptCard icon="fileText" text={t.noPersonText} />
       ) : rangeError ? null : statement.isPending ? (
         <View style={styles.state}>
           <Spinner color={Zinc[900]} size={24} />
@@ -198,19 +193,6 @@ const styles = StyleSheet.create({
   grow: { flex: 1, minWidth: 0 },
   smallLabel: { fontSize: 13, color: Zinc[700] },
   rangeError: { fontSize: 14, color: Red[700] },
-  nobody: {
-    minHeight: 260,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    padding: 24,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: Zinc[300],
-  },
-  nobodyIcon: { width: 56, height: 56, borderRadius: 999, backgroundColor: Zinc[100], alignItems: 'center', justifyContent: 'center' },
-  nobodyText: { fontSize: 15, color: Zinc[600], textAlign: 'center' },
   state: { minHeight: 200, justifyContent: 'center', gap: 12 },
   statement: { gap: 12 },
 });
