@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { ActionsSheet, type ExtraAction } from '@/components/ItemSheets';
+import { TotalsList } from '@/components/TotalsList';
 import { Txt } from '@/components/Txt';
 import { Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
@@ -79,18 +80,7 @@ export function InvoiceSheet({
           </View>
         ))}
       </View>
-      <View style={styles.list}>
-        {totals.map((row, i) => (
-          <View key={row.label} style={[styles.totalRow, i > 0 && styles.divider]}>
-            <Txt style={styles.totalLabel}>{row.label}</Txt>
-            <Txt style={styles.totalValue}>{row.value}</Txt>
-          </View>
-        ))}
-        <View style={[styles.totalRow, styles.divider, styles.grand]}>
-          <Txt style={styles.grandLabel}>{t.grandTotal}</Txt>
-          <Txt style={styles.grandValue}>{money(metrics.grandTotal)}</Txt>
-        </View>
-      </View>
+      <TotalsList rows={totals} grand={{ label: t.grandTotal, value: money(metrics.grandTotal) }} />
       {purchase?.notes ? <Txt style={styles.notes}>{purchase.notes}</Txt> : null}
     </ActionsSheet>
   );
@@ -105,11 +95,5 @@ const styles = StyleSheet.create({
   total: { flexShrink: 0, fontSize: 14, fontWeight: '600', color: Zinc[900] },
   meta: { fontSize: 12, color: Zinc[500] },
   received: { fontSize: 12, fontWeight: '600', color: Zinc[700] },
-  totalRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingVertical: 10, paddingHorizontal: 14 },
-  totalLabel: { flex: 1, fontSize: 14, color: Zinc[600] },
-  totalValue: { fontSize: 14, fontWeight: '600', color: Zinc[900] },
-  grand: { backgroundColor: Zinc[100] },
-  grandLabel: { flex: 1, fontSize: 14, fontWeight: '700', color: Zinc[900] },
-  grandValue: { fontSize: 15, fontWeight: '700', color: Zinc[900] },
   notes: { fontSize: 14, color: Zinc[700] },
 });
