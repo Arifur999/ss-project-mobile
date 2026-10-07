@@ -16,7 +16,7 @@ import { useToast } from '@/context/ToastContext';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { todayISO } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
-import { buildLoanAccountSms, smsBusiness } from '@/lib/loanSms';
+import { buildLoanAccountSms, smsBusiness } from '@/lib/smsTexts';
 import { parseAmount } from '@/lib/money';
 import { isBdPhone, normalizePhone } from '@/lib/validation';
 import { useBusinessSettings } from '@/services/business.services';

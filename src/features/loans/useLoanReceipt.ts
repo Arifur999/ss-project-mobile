@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { buildLoanTransactionSms, smsBusiness } from '@/lib/loanSms';
+import { buildLoanTransactionSms, smsBusiness } from '@/lib/smsTexts';
 import { isBdPhone } from '@/lib/validation';
 import { useBusinessSettings } from '@/services/business.services';
 import type { Lender } from '@/services/loans.services';

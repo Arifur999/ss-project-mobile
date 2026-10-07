@@ -1,8 +1,9 @@
-// The loan SMS texts, word for word as Hatim/src/lib/smsTemplates.ts writes
-// them, so a customer gets the same message whether the shop used the website
-// or the app. The rule that matters: the balance is signed the way every loan
-// screen signs it - positive means they owe us ("Your Due Balance"), negative
-// means we owe them ("Your Current Balance") - and it is always the principal.
+// The SMS texts, word for word as Hatim/src/lib/smsTemplates.ts writes them,
+// so a customer gets the same message whether the shop used the website or the
+// app. For the loan messages the rule that matters: the balance is signed the
+// way every loan screen signs it - positive means they owe us ("Your Due
+// Balance"), negative means we owe them ("Your Current Balance") - and it is
+// always the principal.
 
 const smsAmount = (value: number) => Math.round(Number(value) || 0).toLocaleString('en-US');
 

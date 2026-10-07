@@ -21,7 +21,7 @@ import { StatementLedger, useBalanceText } from '@/features/loans/StatementLedge
 import { StatementSummary } from '@/features/loans/StatementSummary';
 import { dateLabel, monthName, todayISO } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
-import { smsBusiness } from '@/lib/loanSms';
+import { smsBusiness } from '@/lib/smsTexts';
 import { listRange } from '@/lib/periods';
 import { printTable, shareTablePdf, type PrintableTable } from '@/lib/print';
 import { useBusinessSettings } from '@/services/business.services';

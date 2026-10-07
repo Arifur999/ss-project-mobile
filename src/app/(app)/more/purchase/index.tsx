@@ -21,7 +21,7 @@ import { voucherTable } from '@/features/purchase/voucher';
 import { useCan } from '@/hooks/useCan';
 import { todayISO } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
-import { smsBusiness } from '@/lib/loanSms';
+import { smsBusiness } from '@/lib/smsTexts';
 import { formatNumber } from '@/lib/money';
 import { inRange, LIST_PERIODS, listRange, type ListPeriod } from '@/lib/periods';
 import { printTable, shareTablePdf } from '@/lib/print';
