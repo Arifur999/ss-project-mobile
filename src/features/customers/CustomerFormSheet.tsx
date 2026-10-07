@@ -24,7 +24,18 @@ type Form = { name: string; phone: string; email: string; address: string; openi
  * valid 11-digit number unless an old one was left as it was, and a number no
  * other customer already has.
  */
-export function CustomerFormSheet({ open, onClose, editing }: { open: boolean; onClose: () => void; editing: Customer | null }) {
+export function CustomerFormSheet({
+  open,
+  onClose,
+  editing,
+  onSaved,
+}: {
+  open: boolean;
+  onClose: () => void;
+  editing: Customer | null;
+  /** Hands back the saved customer - the sale form picks the one it just added. */
+  onSaved?: (customer: Customer) => void;
+}) {
   const t = useCopy(CUSTOMER_COPY);
   const toast = useToast();
   const write = useCustomerWrite();
@@ -85,8 +96,9 @@ export function CustomerFormSheet({ open, onClose, editing }: { open: boolean; o
     setSaving(true);
     setError(null);
     try {
-      await write(() => (editing ? updateCustomer(editing.id, input) : createCustomer(input)));
+      const saved = await write(() => (editing ? updateCustomer(editing.id, input) : createCustomer(input)));
       toast.show(editing ? t.customerUpdated : t.customerSaved);
+      onSaved?.(saved);
       onClose();
     } catch (e) {
       setError(errorMessage(e));
