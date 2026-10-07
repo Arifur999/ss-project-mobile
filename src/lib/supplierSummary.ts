@@ -57,3 +57,18 @@ export function supplierTotals(accounts: SupplierAccount[]) {
     totalPaid: accounts.reduce((sum, a) => sum + a.paymentAmount, 0),
   };
 }
+
+/**
+ * One supplier's signed balance on its own - the figure the website's order
+ * form shows beside the chosen supplier (positive: they hold an advance of
+ * ours; negative: we owe them), without working out every other account.
+ */
+export function supplierBalanceOf(supplier: Row, purchases: Row[], payments: Row[]): number {
+  const supplierPurchases = purchases.filter((p) => p.supplier_id === supplier.id);
+  return supplierBalance({
+    supplier,
+    items: supplierPurchases.flatMap((purchase) => purchase.purchase_items || []),
+    payments: payments.filter((p) => p.supplier_id === supplier.id),
+    purchases: supplierPurchases,
+  });
+}
