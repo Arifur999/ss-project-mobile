@@ -85,10 +85,6 @@ export const PRODUCT_COPY = {
     deleteTitle: (name: string) => `Delete ${name}?`,
     deleteText: 'It moves to the recycle bin on the website, where it can be restored.',
     linked: 'This product is in sales or purchases, so it can’t be deleted - that keeps their history intact.',
-    discardTitle: 'Discard your changes?',
-    discardText: 'What you typed will not be saved.',
-    discard: 'Discard',
-    keepEditing: 'Keep editing',
   },
   bn: {
     title: 'পণ্যের তালিকা',
@@ -170,9 +166,5 @@ export const PRODUCT_COPY = {
     deleteTitle: (name: string) => `${name} মুছবেন?`,
     deleteText: 'এটা ওয়েবসাইটের রিসাইকেল বিনে যাবে, সেখান থেকে ফেরানো যায়।',
     linked: 'এই পণ্য বিক্রি বা ক্রয়ে আছে, তাই মোছা যাবে না — এতে সেগুলোর হিসাব ঠিক থাকে।',
-    discardTitle: 'পরিবর্তনগুলো বাদ দেবেন?',
-    discardText: 'যা লিখেছেন তা সেভ হবে না।',
-    discard: 'বাদ দিন',
-    keepEditing: 'লিখতে থাকুন',
   },
 };

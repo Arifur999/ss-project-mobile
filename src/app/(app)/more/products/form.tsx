@@ -1,15 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { router, useLocalSearchParams, useNavigation } from 'expo-router';
-import { usePreventRemove } from 'expo-router/react-navigation';
-import { useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { FormFooter } from '@/components/FormFooter';
-import { ConfirmDeleteSheet } from '@/components/ItemSheets';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
 import { SuggestionChips } from '@/components/SuggestionChips';
@@ -22,6 +20,7 @@ import { PRODUCT_COPY } from '@/features/products/copy';
 import { PhotoField } from '@/features/products/PhotoField';
 import { PriceFields } from '@/features/products/PriceFields';
 import { formFromProduct, productFormErrors, productInput, type ProductForm, type ProductFormField } from '@/features/products/productForm';
+import { useLeaveGuard } from '@/hooks/useLeaveGuard';
 import { usePickImage } from '@/hooks/usePickImage';
 import { errorMessage } from '@/lib/httpClient';
 import {
@@ -34,8 +33,6 @@ import {
   useSuppliers,
 } from '@/services/products.services';
 import { uploadImage, type LocalImage } from '@/services/upload.services';
-
-type LeaveAction = Parameters<Parameters<typeof usePreventRemove>[1]>[0]['data']['action'];
 
 /** A product code the workspace already has - the server's unique (owner, code) rule. */
 const isDuplicateCode = (error: unknown) =>
@@ -50,7 +47,6 @@ const isDuplicateCode = (error: unknown) =>
 export default function ProductFormScreen() {
   const t = useCopy(PRODUCT_COPY);
   const toast = useToast();
-  const navigation = useNavigation();
   const queryClient = useQueryClient();
   const write = useProductWrite();
   const suppliers = useSuppliers();
@@ -68,15 +64,9 @@ export default function ProductFormScreen() {
   const [codeTaken, setCodeTaken] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
-  const [leaving, setLeaving] = useState<LeaveAction | null>(null);
 
   const dirty = photo !== null || photoRemoved || (Object.keys(start) as ProductFormField[]).some((k) => form[k] !== start[k]);
-  usePreventRemove(dirty && !saved, ({ data }) => setLeaving(data.action));
-  // Leaves once the saved state has rendered, so the guard above has let go.
-  useEffect(() => {
-    if (saved) router.back();
-  }, [saved]);
+  const guard = useLeaveGuard(dirty);
 
   const set = (patch: Partial<ProductForm>) => setForm((f) => ({ ...f, ...patch }));
   const photoUri = photo?.uri ?? (photoRemoved ? null : original?.image_url ?? null);
@@ -114,7 +104,7 @@ export default function ProductFormScreen() {
       const input = productInput(form, imageUrl);
       await write(() => (original ? updateProduct(original.id, input) : createProduct(input)));
       toast.show(original ? t.productUpdated(input.name) : t.productAdded(input.name));
-      setSaved(true);
+      guard.finish();
     } catch (e) {
       if (isDuplicateCode(e)) setCodeTaken(form.product_code.trim());
       else setError(errorMessage(e));
@@ -248,20 +238,7 @@ export default function ProductFormScreen() {
         <FormFooter cancelLabel={t.cancel} onCancel={() => router.back()} saveLabel={saving ? t.saving : t.save} onSave={save} saving={saving} />
       </KeyboardAvoidingView>
 
-      <ConfirmDeleteSheet
-        open={!!leaving}
-        onClose={() => setLeaving(null)}
-        title={t.discardTitle}
-        text={t.discardText}
-        cancelLabel={t.keepEditing}
-        deleteLabel={t.discard}
-        closeLabel={t.close}
-        onConfirm={() => {
-          const action = leaving;
-          setLeaving(null);
-          if (action) navigation.dispatch(action);
-        }}
-      />
+      {guard.sheet}
     </SafeAreaView>
   );
 }
