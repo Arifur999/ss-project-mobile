@@ -43,6 +43,7 @@ export function ListScreen<T>({
   errorText,
   retryLabel,
   fab,
+  children,
 }: {
   title: string;
   onBack?: () => void;
@@ -57,6 +58,8 @@ export function ListScreen<T>({
   errorText: (error: unknown) => string;
   retryLabel: string;
   fab?: { label: string; onPress: () => void } | null;
+  /** Sheets and dialogs the screen opens over the list. */
+  children?: ReactNode;
 }) {
   // Only a pull shows the refresh spinner; a background refetch stays quiet.
   const [pulling, setPulling] = useState(false);
@@ -115,6 +118,7 @@ export function ListScreen<T>({
         removeClippedSubviews={Platform.OS === 'android'}
       />
       {fab && !query.isPending ? <Fab label={fab.label} onPress={fab.onPress} /> : null}
+      {children}
     </SafeAreaView>
   );
 }
