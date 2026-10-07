@@ -1,0 +1,220 @@
+// A verbatim copy of Hatim/src/pages/customers/customerDashboardData.ts, less
+// its supabase loader and live subscription - the app loads the same three
+// lists through customers.services.ts. Every customer figure in the app comes
+// from here, so it must equal the website's: re-copy rather than edit.
+
+export type CustomerDashboardRow = {
+  id: string
+  name: string
+  phone?: string
+  address?: string
+  opening_due?: number
+  openingDue: number
+  totalPurchase: number
+  totalDiscount: number
+  collectionsAmount: number
+  invoiceDue: number
+  dueReceived: number
+  extraDiscount: number
+  currentDue: number
+}
+
+export type CustomerDashboardStats = {
+  totalCustomers: number
+  openingDue: number
+  totalPurchase: number
+  totalDiscount: number
+  collectionsAmount: number
+  extraDiscount: number
+  /** The net position across every customer: what is owed less what is in credit. */
+  currentDue: number
+  /** Only the customers who owe us - the figure to chase collections against. */
+  outstandingDue: number
+  /** Only the customers we owe, i.e. overpayments sitting on account. */
+  customerCredit: number
+}
+
+export type CustomerDashboardDataset = {
+  stats: CustomerDashboardStats
+  customerList: CustomerDashboardRow[]
+}
+
+export function parseMetaValue(notes: string, label: string) {
+  const line = String(notes || '').split('\n').find(item => item.toLowerCase().startsWith(`${label.toLowerCase()}:`))
+  return line ? line.slice(label.length + 1).trim() : ''
+}
+
+export function parseAmountText(value: string) {
+  return Number(String(value || '').replace(/[^\d.-]/g, '')) || 0
+}
+
+/**
+ * What one sale still has against it.
+ *
+ * net minus paid, and nothing else. Not `Math.max(0, storedDue, netMinusPaid)`,
+ * which is what the Sales page used: taking the largest of the three reads a
+ * stale due_amount as the truth, and clamping at zero throws away a sale the
+ * customer over-settled - so a customer who paid Tk 120,000 against Tk 100,000
+ * read as owing nothing on one screen and as Tk 20,000 in credit on another.
+ *
+ * due_amount is not consulted at all: it is NOT NULL defaulting to 0 and the
+ * sale API never computes it, so a row saved without one says 0 when the whole
+ * amount is outstanding.
+ */
+export function saleDue(sale: { net_amount?: unknown; paid_amount?: unknown }): number {
+  return Number(sale.net_amount || 0) - Number(sale.paid_amount || 0)
+}
+
+/**
+ * What one customer owes right now.
+ *
+ * The same rule buildCustomerDashboard applies to the whole list, for callers
+ * that need it for a single customer - the Due Received modal's "Previous Due".
+ * It lived there as its own hand-written sum and had drifted on two points:
+ * it took every payment off, including one already taken off its own sale, and
+ * it never took off a discount written off on a Due Received - so a customer
+ * given one still showed a leftover due on the modal that the dashboard had
+ * already cleared.
+ *
+ * Not clamped at zero. A negative is money owed back to the customer; clamp it
+ * at the call site if the screen cannot show a credit.
+ */
+export function customerCurrentDue(
+  openingDue: unknown,
+  sales: { net_amount?: unknown; paid_amount?: unknown }[],
+  payments: { sale_id?: string | null; amount?: unknown; notes?: string }[],
+): number {
+  // Derived rather than read from due_amount: that column is NOT NULL
+  // defaulting to 0 and the sale API never computes it.
+  const invoiceDue = sales.reduce(
+    (sum, sale) => sum + (Number(sale.net_amount || 0) - Number(sale.paid_amount || 0)),
+    0,
+  )
+
+  let collected = 0
+  let writtenOff = 0
+  payments.forEach(payment => {
+    // A payment carrying a sale_id has already been taken off that sale by the
+    // server, so taking it off again here would count it twice.
+    if (!payment.sale_id) collected += Number(payment.amount || 0)
+    writtenOff += parseAmountText(parseMetaValue(payment.notes || '', 'Discount Amount'))
+  })
+
+  return Number(openingDue || 0) + invoiceDue - collected - writtenOff
+}
+
+/**
+ * The dashboard's figures, from the three lists it reads.
+ *
+ * Split out of the loader so the arithmetic can be tested without a database -
+ * this is where a customer's due is decided, and it was wrong for a year.
+ */
+export function buildCustomerDashboard(
+  customers: any[],
+  sales: any[],
+  payments: any[],
+): CustomerDashboardDataset {
+  const customerMap: Record<string, CustomerDashboardRow> = {}
+  customers.forEach((customer: any) => {
+    customerMap[customer.id] = {
+      ...customer,
+      openingDue: Number(customer.opening_due || 0),
+      totalPurchase: 0,
+      totalDiscount: 0,
+      collectionsAmount: 0,
+      invoiceDue: 0,
+      dueReceived: 0,
+      extraDiscount: 0,
+      currentDue: 0,
+    }
+  })
+
+  sales.forEach((sale: any) => {
+    if (!sale.customer_id || !customerMap[sale.customer_id]) return
+
+    const discount = Number(sale.discount_amount || 0)
+    const netAmount = Number(sale.net_amount || 0)
+    const paidAmount = Number(sale.paid_amount || 0)
+    customerMap[sale.customer_id].totalPurchase += Number(sale.subtotal || 0) || netAmount + discount
+    customerMap[sale.customer_id].totalDiscount += discount
+    customerMap[sale.customer_id].collectionsAmount += paidAmount
+    // Derived, not read from due_amount. That column is nullable in no sense -
+    // it is NOT NULL defaulting to 0 (prisma/schema/sales.prisma) and the sale
+    // API takes it as an optional field it never computes, so a row saved
+    // without one stores 0 and would have contributed nothing at all. net minus
+    // paid is always derivable and cannot go stale.
+    //
+    // Not clamped at zero: a sale that was over-settled at the till is money we
+    // owe the customer, and the total below is meant to be able to say so.
+    customerMap[sale.customer_id].invoiceDue += netAmount - paidAmount
+  })
+
+  // Collections that no sale knows about, per customer.
+  //
+  // customerPayment.service.ts moves a sale's paid_amount and due_amount only
+  // when the payment carries a sale_id, and nothing in this app ever sets one -
+  // Due Received is collected against the customer's whole balance, not against
+  // one invoice, and an opening due has no invoice to attach to at all. So for
+  // every payment this app writes, the sale rows still show the full amount and
+  // the collection has to come off here.
+  //
+  // A payment that DOES carry a sale_id (older data, or a future screen that
+  // settles one invoice) is left out: that one already reduced its sale, and
+  // subtracting it again is what would double-count it.
+  const unlinkedReceived: Record<string, number> = {}
+
+  payments.forEach((payment: any) => {
+    if (!payment.customer_id || !customerMap[payment.customer_id]) return
+
+    const dueDiscount = parseAmountText(parseMetaValue(payment.notes || '', 'Discount Amount'))
+    const amount = Number(payment.amount || 0)
+    customerMap[payment.customer_id].dueReceived += amount
+    customerMap[payment.customer_id].extraDiscount += dueDiscount
+
+    if (!payment.sale_id) {
+      unlinkedReceived[payment.customer_id] = (unlinkedReceived[payment.customer_id] || 0) + amount
+      // Money that reached an account is a collection wherever it was recorded.
+      // Counting only paid_amount left the Collections column reading Tk 0 for a
+      // customer who had paid in full through Due Received.
+      customerMap[payment.customer_id].collectionsAmount += amount
+    }
+  })
+
+  // Not clamped at zero. It used to be Math.max(0, ...), which hid every credit
+  // balance: a customer who had overpaid read as owing nothing instead of being
+  // in credit, and because the headline below sums these values, the total
+  // "Current Due" was overstated by the sum of every customer's credit.
+  //
+  // A negative here is money we owe the customer, and formatCurr/amountClass
+  // already render a negative in red site-wide, so it reads correctly on screen.
+  const customerList = Object.values(customerMap).map(customer => ({
+    ...customer,
+    // What they were billed, less what they have actually handed over: the
+    // opening balance plus the unpaid part of every invoice, less the
+    // collections no invoice absorbed, less anything written off on one.
+    currentDue:
+      customer.openingDue
+      + customer.invoiceDue
+      - (unlinkedReceived[customer.id] || 0)
+      - customer.extraDiscount,
+  })).sort((a, b) => b.currentDue - a.currentDue)
+
+  return {
+    customerList,
+    stats: {
+      totalCustomers: customers.length,
+      openingDue: customerList.reduce((sum, customer) => sum + customer.openingDue, 0),
+      totalPurchase: customerList.reduce((sum, customer) => sum + customer.totalPurchase, 0),
+      totalDiscount: customerList.reduce((sum, customer) => sum + customer.totalDiscount, 0),
+      collectionsAmount: customerList.reduce((sum, customer) => sum + customer.collectionsAmount, 0),
+      extraDiscount: customerList.reduce((sum, customer) => sum + customer.extraDiscount, 0),
+      // The net position across all customers, which is what the two figures
+      // beside it (what was billed, what was collected) actually add up to.
+      currentDue: customerList.reduce((sum, customer) => sum + customer.currentDue, 0),
+      /** Only the customers who owe us, for chasing collections. */
+      outstandingDue: customerList.reduce((sum, customer) => sum + Math.max(0, customer.currentDue), 0),
+      /** Only the customers we owe, i.e. overpayments sitting on account. */
+      customerCredit: customerList.reduce((sum, customer) => sum + Math.max(0, -customer.currentDue), 0),
+    },
+  }
+}
