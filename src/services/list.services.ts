@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios';
 
+import type { Account } from '@/lib/balance';
 import { http } from '@/lib/httpClient';
 import { rangeQuery, type Range } from '@/lib/periods';
 
@@ -32,6 +33,10 @@ export async function fetchListOrDenied(
     throw error;
   }
 }
+
+/** The accounts a payment can go into: the active ones, in the order the Balance screens show them. */
+export const activeAccounts = (rows: Row[]) =>
+  rows.filter((a) => a.is_active !== false).sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0)) as Account[];
 
 /** The smallest range covering all of them. */
 export function spanOf(...ranges: Range[]): Range {

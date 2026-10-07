@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import type { Account } from '@/lib/balance';
 import { http } from '@/lib/httpClient';
-import { fetchList } from '@/services/list.services';
+import { activeAccounts, fetchList } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -34,9 +34,7 @@ export async function loadExpenseData(): Promise<ExpenseData> {
   return {
     expenses,
     categories: [...categories].sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''))) as Category[],
-    accounts: accounts
-      .filter((a) => a.is_active !== false)
-      .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0)) as Account[],
+    accounts: activeAccounts(accounts),
   };
 }
 

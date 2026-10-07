@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import type { Account } from '@/lib/balance';
 import type { DamageAction, DamageReceiveResult, DamageSource, DamageStatus } from '@/lib/damageRules';
 import { http } from '@/lib/httpClient';
-import { fetchList, fetchListOrDenied } from '@/services/list.services';
+import { activeAccounts, fetchList, fetchListOrDenied } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -92,9 +92,7 @@ export async function loadDamageData(): Promise<DamageData> {
   return {
     entries: entries ?? [],
     money,
-    accounts: accounts
-      .filter((a) => a.is_active !== false)
-      .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0)) as Account[],
+    accounts: activeAccounts(accounts),
     employees: [...new Set(employees.rows.filter((e) => e.is_active !== false).map((e) => String(e.name || '').trim()).filter(Boolean))],
   };
 }
