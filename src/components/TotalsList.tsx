@@ -5,8 +5,8 @@ import { Zinc } from '@/constants/theme';
 
 export type TotalRow = { label: string; value: string };
 
-/** A bordered list of totals, each label against its figure, closed by a shaded grand-total row. */
-export function TotalsList({ rows, grand }: { rows: TotalRow[]; grand: TotalRow }) {
+/** A bordered list of totals, each label against its figure, closed by a shaded grand-total row when there is one. */
+export function TotalsList({ rows, grand }: { rows: TotalRow[]; grand?: TotalRow }) {
   return (
     <View style={styles.list}>
       {rows.map((row, i) => (
@@ -15,10 +15,12 @@ export function TotalsList({ rows, grand }: { rows: TotalRow[]; grand: TotalRow 
           <Txt style={styles.value}>{row.value}</Txt>
         </View>
       ))}
-      <View style={[styles.row, rows.length > 0 && styles.divider, styles.grand]}>
-        <Txt style={styles.grandLabel}>{grand.label}</Txt>
-        <Txt style={styles.grandValue}>{grand.value}</Txt>
-      </View>
+      {grand ? (
+        <View style={[styles.row, rows.length > 0 && styles.divider, styles.grand]}>
+          <Txt style={styles.grandLabel}>{grand.label}</Txt>
+          <Txt style={styles.grandValue}>{grand.value}</Txt>
+        </View>
+      ) : null}
     </View>
   );
 }

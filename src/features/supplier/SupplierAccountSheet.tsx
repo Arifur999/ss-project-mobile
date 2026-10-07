@@ -1,9 +1,9 @@
 import { Linking, StyleSheet, View } from 'react-native';
 
 import { ActionsSheet, type ExtraAction } from '@/components/ItemSheets';
+import { TotalsList } from '@/components/TotalsList';
 import { Txt } from '@/components/Txt';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
-import { Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { SUPPLIER_COPY } from '@/features/supplier/copy';
@@ -57,14 +57,7 @@ export function SupplierAccountSheet({
         <Txt style={[styles.balanceLabel, { color: SIDE_LOOK[side].chipInk }]}>{t.available}</Txt>
         <Txt style={[styles.balanceValue, { color: SIDE_LOOK[side].amount }]}>{`${money(Math.abs(balance))} · ${t.side[side]}`}</Txt>
       </View>
-      <View style={styles.list}>
-        {cells.map((cell, i) => (
-          <View key={cell.label} style={[styles.row, i > 0 && styles.divider]}>
-            <Txt style={styles.rowLabel}>{cell.label}</Txt>
-            <Txt style={styles.rowValue}>{cell.value}</Txt>
-          </View>
-        ))}
-      </View>
+      <TotalsList rows={cells} />
     </ActionsSheet>
   );
 }
@@ -73,9 +66,4 @@ const styles = StyleSheet.create({
   balance: { padding: 14, borderRadius: 16, gap: 2 },
   balanceLabel: { fontSize: 12, fontWeight: '600' },
   balanceValue: { fontSize: 22, fontWeight: '700' },
-  list: { borderRadius: 14, borderWidth: 1, borderColor: Zinc[200], overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingVertical: 10, paddingHorizontal: 14 },
-  divider: { borderTopWidth: 1, borderTopColor: Zinc[100] },
-  rowLabel: { flex: 1, fontSize: 14, color: Zinc[600] },
-  rowValue: { fontSize: 14, fontWeight: '600', color: Zinc[900] },
 });
