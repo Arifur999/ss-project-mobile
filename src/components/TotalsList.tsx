@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
   divider: { borderTopWidth: 1, borderTopColor: Zinc[100] },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingVertical: 10, paddingHorizontal: 14 },
   label: { flex: 1, fontSize: 14, color: Zinc[600] },
-  value: { fontSize: 14, fontWeight: '600', color: Zinc[900] },
+  // A long figure wraps under itself rather than squeezing the label away.
+  value: { flexShrink: 1, maxWidth: '60%', textAlign: 'right', fontSize: 14, fontWeight: '600', color: Zinc[900] },
   grand: { backgroundColor: Zinc[100] },
   grandLabel: { flex: 1, fontSize: 14, fontWeight: '700', color: Zinc[900] },
   grandValue: { fontSize: 15, fontWeight: '700', color: Zinc[900] },
