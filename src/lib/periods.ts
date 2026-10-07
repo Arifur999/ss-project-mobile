@@ -72,6 +72,33 @@ export function saleRange(period: SalePeriod, now = new Date()): Range | null {
   return listRange(period, now);
 }
 
+/** The Report Summary's period, as the website's period control offers it. */
+export type ReportPeriod = 'today' | 'week' | 'month' | 'year' | 'all';
+
+export const REPORT_PERIODS: ReportPeriod[] = ['today', 'week', 'month', 'year', 'all'];
+
+/**
+ * The window a report period covers; null means everything. The week runs
+ * from Saturday and, unlike the dashboard's, ends today - a week-to-date
+ * report must not promise days that have not happened, as the website says.
+ */
+export function reportRange(period: ReportPeriod, now = new Date()): Range | null {
+  const y = now.getFullYear();
+  switch (period) {
+    case 'today':
+      return { from: toISODate(now), to: toISODate(now) };
+    case 'week':
+      return { from: toISODate(addDays(now, -((now.getDay() + 1) % 7))), to: toISODate(now) };
+    case 'month':
+      return { from: toISODate(new Date(y, now.getMonth(), 1)), to: toISODate(new Date(y, now.getMonth() + 1, 0)) };
+    case 'year':
+      return { from: `${y}-01-01`, to: `${y}-12-31` };
+    case 'all':
+    default:
+      return null;
+  }
+}
+
 /** The seven days ending today - the cashflow chart, whatever the period says. */
 export function lastSevenDays(now = new Date()): string[] {
   return Array.from({ length: 7 }, (_, i) => toISODate(addDays(now, i - 6)));
