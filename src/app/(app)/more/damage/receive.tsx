@@ -11,7 +11,8 @@ import { DamageShell } from '@/features/damage/DamageShell';
 import { PendingLineCard } from '@/features/damage/PendingLineCard';
 import { ReceiveSheet, type PendingLine } from '@/features/damage/ReceiveSheet';
 import { useCan } from '@/hooks/useCan';
-import { matches, pendingLines } from '@/lib/damageSummary';
+import { pendingLines } from '@/lib/damageSummary';
+import { matches } from '@/lib/search';
 import { formatNumber } from '@/lib/money';
 import { useDamageData } from '@/services/damage.services';
 

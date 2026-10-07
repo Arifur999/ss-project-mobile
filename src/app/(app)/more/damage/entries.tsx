@@ -13,7 +13,7 @@ import { DamageEntryCard } from '@/features/damage/DamageEntryCard';
 import { DamageShell } from '@/features/damage/DamageShell';
 import { useEntryActions } from '@/features/damage/useEntryActions';
 import { useCan } from '@/hooks/useCan';
-import { matches } from '@/lib/damageSummary';
+import { matches } from '@/lib/search';
 import { formatNumber } from '@/lib/money';
 import { inRange, LIST_PERIODS, listRange, type ListPeriod } from '@/lib/periods';
 import { useDamageData } from '@/services/damage.services';

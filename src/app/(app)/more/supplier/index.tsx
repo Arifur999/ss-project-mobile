@@ -13,7 +13,7 @@ import { SupplierAccountCard } from '@/features/supplier/SupplierAccountCard';
 import { SupplierAccountSheet } from '@/features/supplier/SupplierAccountSheet';
 import { SupplierShell } from '@/features/supplier/SupplierShell';
 import { useCan } from '@/hooks/useCan';
-import { matches } from '@/lib/damageSummary';
+import { matches } from '@/lib/search';
 import { supplierAccounts, supplierTotals, type SupplierAccount } from '@/lib/supplierSummary';
 import { supplierLabel, useSupplierData } from '@/services/supplier.services';
 

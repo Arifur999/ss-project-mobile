@@ -59,9 +59,3 @@ export function pendingLines<E extends Entry>(entries: E[]) {
   }
   return rows;
 }
-
-/** The website's search: a case-insensitive "contains" over any of the texts. */
-export const matches = (q: string, ...texts: (string | null | undefined)[]) => {
-  const term = q.trim().toLowerCase();
-  return !term || texts.some((text) => String(text || '').toLowerCase().includes(term));
-};
