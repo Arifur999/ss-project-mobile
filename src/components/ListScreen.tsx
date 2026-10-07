@@ -16,6 +16,8 @@ type PagedState = {
   isError: boolean;
   error: unknown;
   hasNextPage: boolean;
+  /** The previous search's rows, shown while this one loads. */
+  isPlaceholderData: boolean;
   isFetchingNextPage: boolean;
   fetchNextPage: () => unknown;
   refetch: () => Promise<unknown>;
@@ -106,7 +108,8 @@ export function ListScreen<T>({
         ItemSeparatorComponent={Gap}
         contentContainerStyle={[styles.content, { paddingBottom: fab ? 96 : 24 }]}
         onEndReached={() => {
-          if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
+          // Never page a list that is still the previous search's stand-in.
+          if (query.hasNextPage && !query.isFetchingNextPage && !query.isPlaceholderData) query.fetchNextPage();
         }}
         onEndReachedThreshold={0.5}
         refreshControl={<RefreshControl refreshing={pulling} onRefresh={refresh} tintColor={Zinc[900]} />}
