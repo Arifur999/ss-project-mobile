@@ -85,17 +85,58 @@ export function ActionsSheet({
   );
 }
 
-/** "Delete this …?" with what it will do, Cancel and a red Delete. */
-export function ConfirmDeleteSheet({
+/**
+ * "Do this?" with what it will do, Cancel and the confirming button - a red
+ * Delete by default, or the black pill for a step that adds rather than
+ * removes (receiving an order into stock).
+ */
+export function ConfirmSheet({
   open,
   onClose,
   title,
   text,
   cancelLabel,
-  deleteLabel,
+  confirmLabel,
   closeLabel,
   busy,
   onConfirm,
+  icon = 'trash',
+  tone = 'danger',
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  text: string;
+  cancelLabel: string;
+  confirmLabel: string;
+  closeLabel?: string;
+  busy?: boolean;
+  onConfirm: () => void;
+  icon?: IconName;
+  tone?: 'danger' | 'primary';
+}) {
+  const danger = tone === 'danger';
+  return (
+    <BottomSheet open={open} onClose={() => !busy && onClose()} closeLabel={closeLabel}>
+      <View style={[styles.warn, { backgroundColor: danger ? Red[100] : Zinc[100] }]}>
+        <DesignIcon name={icon} size={26} color={danger ? Red[700] : Zinc[900]} />
+      </View>
+      <Txt accessibilityRole="header" style={[styles.title, styles.center]}>
+        {title}
+      </Txt>
+      <Txt style={[styles.subtitle, styles.center]}>{text}</Txt>
+      <View style={styles.row}>
+        <Button title={cancelLabel} variant="pillOutline" onPress={onClose} disabled={busy} style={styles.grow} />
+        <Button title={confirmLabel} variant={danger ? 'danger' : 'pill'} onPress={onConfirm} busy={busy} style={styles.grow} />
+      </View>
+    </BottomSheet>
+  );
+}
+
+/** "Delete this …?" with what it will do, Cancel and a red Delete. */
+export function ConfirmDeleteSheet({
+  deleteLabel,
+  ...rest
 }: {
   open: boolean;
   onClose: () => void;
@@ -107,21 +148,7 @@ export function ConfirmDeleteSheet({
   busy?: boolean;
   onConfirm: () => void;
 }) {
-  return (
-    <BottomSheet open={open} onClose={() => !busy && onClose()} closeLabel={closeLabel}>
-      <View style={styles.warn}>
-        <DesignIcon name="trash" size={26} color={Red[700]} />
-      </View>
-      <Txt accessibilityRole="header" style={[styles.title, styles.center]}>
-        {title}
-      </Txt>
-      <Txt style={[styles.subtitle, styles.center]}>{text}</Txt>
-      <View style={styles.row}>
-        <Button title={cancelLabel} variant="pillOutline" onPress={onClose} disabled={busy} style={styles.grow} />
-        <Button title={deleteLabel} variant="danger" onPress={onConfirm} busy={busy} style={styles.grow} />
-      </View>
-    </BottomSheet>
-  );
+  return <ConfirmSheet {...rest} confirmLabel={deleteLabel} />;
 }
 
 const styles = StyleSheet.create({
@@ -134,7 +161,7 @@ const styles = StyleSheet.create({
   action: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, backgroundColor: White },
   divider: { borderTopWidth: 1, borderTopColor: Zinc[100] },
   actionText: { fontSize: 15, fontWeight: '600', color: Zinc[900] },
-  warn: { alignSelf: 'center', width: 56, height: 56, borderRadius: 999, backgroundColor: Red[100], alignItems: 'center', justifyContent: 'center' },
+  warn: { alignSelf: 'center', width: 56, height: 56, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   row: { flexDirection: 'row', gap: 10 },
   grow: { flex: 1 },
 });
