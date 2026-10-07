@@ -63,3 +63,16 @@ export function tickLabel(value: number): string {
 }
 
 const trim = (n: number) => String(Math.round(n * 10) / 10);
+
+/**
+ * The first of the values that was actually given, rounded - 0 when none was.
+ * Copied verbatim from Hatim/src/lib/utils.ts firstAmount: a stored 0 is a real
+ * figure, only null, undefined and '' mean "not given".
+ */
+export function firstAmount(...values: unknown[]): number {
+  for (const value of values) {
+    if (value === null || value === undefined || value === '') continue;
+    return roundTaka(value);
+  }
+  return 0;
+}
