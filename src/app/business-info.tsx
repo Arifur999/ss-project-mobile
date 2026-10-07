@@ -1,4 +1,3 @@
-import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -15,6 +14,7 @@ import { useToast } from '@/context/ToastContext';
 import { BusinessDetails } from '@/features/business/BusinessDetails';
 import { BusinessForm, businessErrors, type BusinessField } from '@/features/business/BusinessForm';
 import { BUSINESS_COPY } from '@/features/business/copy';
+import { usePickImage } from '@/hooks/usePickImage';
 import { errorMessage } from '@/lib/httpClient';
 import { toBusinessInfo, useBusinessSettings, useSaveBusinessSettings, type BusinessInfo } from '@/services/business.services';
 import { uploadImage, type LocalImage } from '@/services/upload.services';
@@ -33,6 +33,7 @@ export default function BusinessInfoScreen() {
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [logo, setLogo] = useState<LocalImage | null>(null);
+  const choosePhoto = usePickImage({ fallbackName: 'logo.jpg' });
   const [error, setError] = useState<string | null>(null);
 
   const all = businessErrors(draft, t);
@@ -57,19 +58,10 @@ export default function BusinessInfoScreen() {
   };
 
   const pickLogo = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      setError(t.photoDenied);
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.85 });
-    if (result.canceled || !result.assets[0]) return;
-    const asset = result.assets[0];
-    setLogo({
-      uri: asset.uri,
-      name: asset.fileName || 'logo.jpg',
-      mimeType: asset.mimeType || 'image/jpeg',
-    });
+    const picked = await choosePhoto();
+    if (!picked) return;
+    if ('error' in picked) setError(picked.error);
+    else setLogo(picked.image);
   };
 
   const submit = async () => {

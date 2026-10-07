@@ -34,7 +34,6 @@ export const BUSINESS_COPY = {
     errAddress: 'Enter the business address',
     loadError: 'Could not load the business info.',
     retry: 'Try again',
-    photoDenied: 'Allow photo access to choose a logo.',
   },
   bn: {
     title: 'ব্যবসার তথ্য',
@@ -68,6 +67,5 @@ export const BUSINESS_COPY = {
     errAddress: 'ব্যবসার ঠিকানা দিন',
     loadError: 'ব্যবসার তথ্য লোড করা যায়নি।',
     retry: 'আবার চেষ্টা করুন',
-    photoDenied: 'লোগো বাছাই করতে ছবির অনুমতি দিন।',
   },
 };
