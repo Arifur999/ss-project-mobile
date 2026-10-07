@@ -20,6 +20,8 @@ export function SelectField<K extends string>({
   error,
   sheetTitle,
   closeLabel,
+  searchPlaceholder,
+  emptyText,
 }: {
   label?: string;
   placeholder: string;
@@ -29,6 +31,9 @@ export function SelectField<K extends string>({
   error?: string | null;
   sheetTitle?: string;
   closeLabel?: string;
+  /** Turns on the sheet's search box, for a long list. */
+  searchPlaceholder?: string;
+  emptyText?: string;
 }) {
   const [open, setOpen] = useState(false);
   const current = options.find((o) => o.key === value);
@@ -54,6 +59,8 @@ export function SelectField<K extends string>({
         options={options}
         selected={value || null}
         onSelect={onChange}
+        searchPlaceholder={searchPlaceholder}
+        emptyText={emptyText}
       />
     </View>
   );
