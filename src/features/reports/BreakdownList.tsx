@@ -11,6 +11,16 @@ import type { BreakdownRow, ReportData } from '@/lib/reportSummary';
 export type BreakdownTab = 'sales' | 'purchases' | 'expenses' | 'supplier' | 'otherIncome';
 export const BREAKDOWN_TABS: BreakdownTab[] = ['sales', 'purchases', 'expenses', 'supplier', 'otherIncome'];
 
+/** The rows one tab lists. */
+export const breakdownRows = (report: ReportData, tab: BreakdownTab): BreakdownRow[] =>
+  ({
+    sales: report.salesBreakdown,
+    purchases: report.purchaseBreakdown,
+    expenses: report.expenseBreakdown,
+    supplier: report.supplierPaymentBreakdown,
+    otherIncome: report.otherIncomeBreakdown,
+  })[tab];
+
 /**
  * One of the Report Summary's five tables as a list: each row's name, what it
  * is made of (pieces and profit, SP, entries, owed and paid), its amount and
@@ -21,13 +31,7 @@ export function BreakdownList({ tab, report, limit }: { tab: BreakdownTab; repor
   const { lang } = useLang();
   const { money } = useAmountShield();
   const num = (n: unknown) => formatNumber(n, lang);
-  const rows: BreakdownRow[] = {
-    sales: report.salesBreakdown,
-    purchases: report.purchaseBreakdown,
-    expenses: report.expenseBreakdown,
-    supplier: report.supplierPaymentBreakdown,
-    otherIncome: report.otherIncomeBreakdown,
-  }[tab];
+  const rows = breakdownRows(report, tab);
   const detail = (row: BreakdownRow) => {
     switch (tab) {
       case 'sales':
