@@ -20,7 +20,8 @@ export function hasPermission(role: string | undefined, granted: string[] | unde
 /**
  * The writes the app offers, each with the gate its route puts in front of it
  * (hatim_Backend .../<module>.route.ts): the roles checkAuth admits, then the
- * permission requirePermission asks for. Both have to pass.
+ * permission requirePermission asks for - any one of a list, as the middleware
+ * reads one. Both have to pass.
  */
 export const ACTIONS = {
   // product.route.ts: POST / and PATCH /:id
@@ -69,12 +70,20 @@ export const ACTIONS = {
   'expense.create': { roles: ['owner', 'manager', 'accountant'], permission: 'page:expenses.transactions' },
   // sms.route.ts: POST /send - the owner's credits, no permission beyond the role
   'sms.send': { roles: ['owner'] },
-} as const satisfies Record<string, { roles: readonly UserRole[]; permission?: string }>;
+  // sale.route.ts: POST /
+  'sale.create': { roles: ['owner', 'manager', 'sales_staff'], permission: 'page:sales.new' },
+  // sale.route.ts: POST /:id/deliveries
+  'sale.deliver': { roles: ['owner', 'manager', 'sales_staff'], permission: ['page:sales.ledger', 'page:sales.new'] },
+  // sale.route.ts: DELETE /:id - the server puts the stock and its FIFO cost back
+  'sale.delete': { roles: ['owner', 'manager'], permission: 'act:sales.delete' },
+} as const satisfies Record<string, { roles: readonly UserRole[]; permission?: string | readonly string[] }>;
 
 export type Action = keyof typeof ACTIONS;
 
 export function canDo(role: UserRole | undefined, granted: string[] | undefined, action: Action): boolean {
   const gate = ACTIONS[action];
   if (!role || !(gate.roles as readonly UserRole[]).includes(role)) return false;
-  return !('permission' in gate) || hasPermission(role, granted, gate.permission);
+  if (!('permission' in gate)) return true;
+  const any: readonly string[] = typeof gate.permission === 'string' ? [gate.permission] : gate.permission;
+  return any.some((permission) => hasPermission(role, granted, permission));
 }
