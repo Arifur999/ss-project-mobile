@@ -1,10 +1,37 @@
+import { useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 
 import { errorMessage, http } from '@/lib/httpClient';
 
+/** One batch the server logged: how many it went to, what it cost, and whether the gateway took it. */
+export type SmsMessage = {
+  id: string;
+  recipient_count: number;
+  segments: number;
+  credits_used: number;
+  message: string;
+  status: 'sent' | 'failed';
+  /** The gateway's own words - the only record of why a batch was refused. */
+  response: string;
+  created_at: string;
+};
+
+export type SmsSendResult = { recipients: number; segments: number; credits_used: number; balance: number };
+
 /** Sends one message to one or more numbers from the workspace's SMS credits (owner only). */
-export const sendSms = (recipients: string[], message: string) =>
-  http.post<{ sent: number }>('/sms/send', { recipients, message });
+export const sendSms = (recipients: string[], message: string) => http.post<SmsSendResult>('/sms/send', { recipients, message });
+
+export const SMS_KEY = ['sms'] as const;
+
+/** The credits left - the owner's alone, so nobody else asks. */
+export function useSmsWallet(enabled: boolean) {
+  return useQuery({ queryKey: [...SMS_KEY, 'wallet'], queryFn: () => http.get<{ balance: number }>('/sms/wallet'), enabled });
+}
+
+/** Every batch the account has sent, from the server's log. */
+export function useSmsMessages(enabled: boolean) {
+  return useQuery({ queryKey: [...SMS_KEY, 'messages'], queryFn: async () => (await http.get<SmsMessage[]>('/sms/messages')) ?? [], enabled });
+}
 
 const trimStop = (text: string) => text.trim().replace(/[.\s]+$/, '');
 
