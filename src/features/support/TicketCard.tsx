@@ -2,14 +2,14 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
-import { useCopy, useLang } from '@/context/LanguageContext';
+import { useCopy, useLang, type Lang } from '@/context/LanguageContext';
 import { SUPPORT_COPY } from '@/features/support/copy';
 import { TICKET_LOOK } from '@/features/support/status';
 import { dateLabel, timeLabel } from '@/lib/dates';
 import type { SupportTicket } from '@/services/support.services';
 
 /** "07 Oct 2026, 9:30 AM" for a ticket's timestamps, in the phone's own time. */
-export function stampLabel(iso: string, lang: 'en' | 'bn') {
+export function stampLabel(iso: string, lang: Lang) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
   const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
