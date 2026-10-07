@@ -161,7 +161,9 @@ export default function NewDamageScreen() {
           </View>
 
           <TextField tone="zinc" label={t.notes} placeholder={t.optional} value={form.notes} onChangeText={(notes) => set({ notes })} minHeight={64} />
-          <Txt style={styles.stockNote}>{t.stockNote}</Txt>
+          <View style={styles.stockNote}>
+            <Txt style={styles.stockNoteText}>{t.stockNote}</Txt>
+          </View>
           <AlertBanner tone="error">{error}</AlertBanner>
         </ScrollView>
         <FormFooter cancelLabel={t.cancel} onCancel={() => router.back()} saveLabel={saving ? t.saving : t.save} onSave={save} saving={saving} />
@@ -182,5 +184,6 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, fontWeight: '600', color: Zinc[900] },
   section: { fontSize: 16, fontWeight: '600', color: Zinc[900] },
   hint: { fontSize: 13, color: Zinc[500] },
-  stockNote: { padding: 12, borderRadius: 14, backgroundColor: Amber[50], borderWidth: 1, borderColor: Amber[200], fontSize: 13, color: Amber[900] },
+  stockNote: { padding: 12, borderRadius: 14, backgroundColor: Amber[50], borderWidth: 1, borderColor: Amber[200] },
+  stockNoteText: { fontSize: 13, color: Amber[900] },
 });

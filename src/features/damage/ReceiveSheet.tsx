@@ -130,9 +130,11 @@ export function ReceiveSheet({ line, employees, onClose }: { line: PendingLine |
         </View>
       </View>
 
-      <Txt style={[styles.effect, back ? styles.effectBack : styles.effectLoss]}>
-        {back ? t.backInStock(formatNumber(shownCount, lang), money(each)) : t.writeOffNote(money(shownCount * each))}
-      </Txt>
+      <View style={[styles.effect, { backgroundColor: back ? Green[50] : Red[50] }]}>
+        <Txt style={[styles.effectText, { color: back ? Green[800] : Red[800] }]}>
+          {back ? t.backInStock(formatNumber(shownCount, lang), money(each)) : t.writeOffNote(money(shownCount * each))}
+        </Txt>
+      </View>
 
       <View style={styles.group}>
         <TextField tone="zinc" label={t.receivedBy} placeholder={t.receivedByPlaceholder} value={receiver} onChangeText={setReceiver} />
@@ -158,8 +160,7 @@ const styles = StyleSheet.create({
   group: { gap: 8 },
   row: { flexDirection: 'row', gap: 8 },
   label: { fontSize: 14, fontWeight: '600', color: Zinc[900] },
-  effect: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12, fontSize: 14 },
-  effectBack: { backgroundColor: Green[50], color: Green[800] },
-  effectLoss: { backgroundColor: Red[50], color: Red[800] },
+  effect: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12 },
+  effectText: { fontSize: 14 },
   actions: { flexDirection: 'row', gap: 10, marginTop: 4 },
 });
