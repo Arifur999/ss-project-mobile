@@ -1,0 +1,40 @@
+import type { UserRole } from './account';
+
+// What the signed-in user may do, so the app only offers actions the server
+// will accept. This decides what to SHOW - the server still decides what is
+// allowed, and refuses anything else with a 403.
+
+/**
+ * Whether a user holding `granted` may do `permission`. Copied verbatim from
+ * Hatim/src/lib/permissions.ts hasPermission, which mirrors requirePermission on
+ * the server: an owner always may, and an empty list means "everything the role
+ * allows". Re-copy rather than edit.
+ */
+export function hasPermission(role: string | undefined, granted: string[] | undefined, permission: string): boolean {
+  if (role === 'owner' || role === 'super_admin') return true;
+  const list = granted ?? [];
+  if (list.length === 0) return true;
+  return list.includes(permission);
+}
+
+/**
+ * The writes the app offers, each with the gate its route puts in front of it
+ * (hatim_Backend .../<module>.route.ts): the roles checkAuth admits, then the
+ * permission requirePermission asks for. Both have to pass.
+ */
+export const ACTIONS = {
+  // product.route.ts: POST / and PATCH /:id
+  'products.write': { roles: ['owner', 'manager'], permission: 'page:products.list' },
+  // product.route.ts: DELETE /:id
+  'products.delete': { roles: ['owner', 'manager'], permission: 'act:products.delete' },
+  // inventory.route.ts: POST /adjust
+  'inventory.adjust': { roles: ['owner', 'manager'], permission: 'page:inventory.stock' },
+} as const satisfies Record<string, { roles: readonly UserRole[]; permission: string }>;
+
+export type Action = keyof typeof ACTIONS;
+
+export function canDo(role: UserRole | undefined, granted: string[] | undefined, action: Action): boolean {
+  const gate = ACTIONS[action];
+  if (!role || !(gate.roles as readonly UserRole[]).includes(role)) return false;
+  return hasPermission(role, granted, gate.permission);
+}
