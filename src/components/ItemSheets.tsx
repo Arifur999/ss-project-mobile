@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { DesignIcon, type IconName } from '@/components/DesignIcon';
+import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { Amber, Red, White, Zinc } from '@/constants/theme';
 
@@ -11,7 +12,9 @@ export type ExtraAction = { label: string; icon: IconName; onPress: () => void }
 
 /**
  * The ⋮ menu's sheet: what was tapped (with an optional amber note under it),
- * then Edit, any extra actions, Delete, then Cancel.
+ * then Edit, any extra actions, Delete, then Cancel. Edit and Delete appear
+ * only when given, so a screen can leave out what the user may not do;
+ * `deleteBusy` spins while a pre-delete check runs.
  */
 export function ActionsSheet({
   open,
@@ -26,6 +29,7 @@ export function ActionsSheet({
   closeLabel,
   onEdit,
   onDelete,
+  deleteBusy,
   children,
 }: {
   open: boolean;
@@ -34,12 +38,13 @@ export function ActionsSheet({
   subtitle: string;
   note?: string;
   extra?: ExtraAction[];
-  editLabel: string;
-  deleteLabel: string;
+  editLabel?: string;
+  deleteLabel?: string;
   cancelLabel: string;
   closeLabel?: string;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  deleteBusy?: boolean;
   /** Anything to show between the title and the actions. */
   children?: ReactNode;
 }) {
@@ -54,20 +59,26 @@ export function ActionsSheet({
       </View>
       {children}
       <View style={styles.list}>
-        <Pressable accessibilityRole="button" onPress={onEdit} style={styles.action}>
-          <DesignIcon name="pencil" size={20} color={Zinc[900]} />
-          <Txt style={styles.actionText}>{editLabel}</Txt>
-        </Pressable>
-        {extra.map((action) => (
-          <Pressable key={action.label} accessibilityRole="button" onPress={action.onPress} style={[styles.action, styles.divider]}>
+        {[
+          ...(onEdit ? [{ label: editLabel ?? '', icon: 'pencil' as IconName, onPress: onEdit }] : []),
+          ...extra,
+        ].map((action, i) => (
+          <Pressable key={action.label} accessibilityRole="button" onPress={action.onPress} style={[styles.action, i > 0 && styles.divider]}>
             <DesignIcon name={action.icon} size={20} color={Zinc[900]} />
             <Txt style={styles.actionText}>{action.label}</Txt>
           </Pressable>
         ))}
-        <Pressable accessibilityRole="button" onPress={onDelete} style={[styles.action, styles.divider]}>
-          <DesignIcon name="trash" size={20} color={Red[700]} />
-          <Txt style={[styles.actionText, { color: Red[700] }]}>{deleteLabel}</Txt>
-        </Pressable>
+        {onDelete ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ busy: !!deleteBusy }}
+            disabled={deleteBusy}
+            onPress={onDelete}
+            style={[styles.action, (onEdit || extra.length > 0) && styles.divider]}>
+            {deleteBusy ? <Spinner color={Red[700]} size={20} /> : <DesignIcon name="trash" size={20} color={Red[700]} />}
+            <Txt style={[styles.actionText, { color: Red[700] }]}>{deleteLabel}</Txt>
+          </Pressable>
+        ) : null}
       </View>
       <Button title={cancelLabel} variant="pillOutline" onPress={onClose} />
     </BottomSheet>
