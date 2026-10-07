@@ -1,4 +1,4 @@
-import { useInfiniteQuery, type QueryKey } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, type QueryKey } from '@tanstack/react-query';
 
 import { api, type ApiEnvelope } from '@/lib/httpClient';
 
@@ -25,13 +25,16 @@ export async function getPage(endpoint: string, query: Query): Promise<{ data: u
 
 /**
  * An infinite list over `fetchPage(page)`: the next page is asked for only
- * while fewer rows are loaded than the server says match.
+ * while fewer rows are loaded than the server says match. While a new search
+ * or filter loads, the previous results stay on screen instead of blanking to
+ * a spinner at every pause in typing.
  */
 export function usePagedQuery<P extends Page<unknown>>(queryKey: QueryKey, fetchPage: (page: number) => Promise<P>) {
   return useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam }) => fetchPage(pageParam),
     initialPageParam: 1,
+    placeholderData: keepPreviousData,
     getNextPageParam: (last, pages) => {
       const loaded = pages.reduce((sum, page) => sum + page.rows.length, 0);
       return last.rows.length > 0 && loaded < last.total ? pages.length + 1 : undefined;
