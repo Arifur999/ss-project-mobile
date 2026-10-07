@@ -48,6 +48,7 @@ export function ActionsSheet({
   /** Anything to show between the title and the actions. */
   children?: ReactNode;
 }) {
+  const actions: ExtraAction[] = [...(onEdit ? [{ label: editLabel ?? '', icon: 'pencil' as IconName, onPress: onEdit }] : []), ...extra];
   return (
     <BottomSheet open={open} onClose={onClose} closeLabel={closeLabel}>
       <View style={styles.head}>
@@ -58,28 +59,27 @@ export function ActionsSheet({
         {note ? <Txt style={styles.note}>{note}</Txt> : null}
       </View>
       {children}
-      <View style={styles.list}>
-        {[
-          ...(onEdit ? [{ label: editLabel ?? '', icon: 'pencil' as IconName, onPress: onEdit }] : []),
-          ...extra,
-        ].map((action, i) => (
-          <Pressable key={action.label} accessibilityRole="button" onPress={action.onPress} style={[styles.action, i > 0 && styles.divider]}>
-            <DesignIcon name={action.icon} size={20} color={Zinc[900]} />
-            <Txt style={styles.actionText}>{action.label}</Txt>
-          </Pressable>
-        ))}
-        {onDelete ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ busy: !!deleteBusy }}
-            disabled={deleteBusy}
-            onPress={onDelete}
-            style={[styles.action, (onEdit || extra.length > 0) && styles.divider]}>
-            {deleteBusy ? <Spinner color={Red[700]} size={20} /> : <DesignIcon name="trash" size={20} color={Red[700]} />}
-            <Txt style={[styles.actionText, { color: Red[700] }]}>{deleteLabel}</Txt>
-          </Pressable>
-        ) : null}
-      </View>
+      {actions.length > 0 || onDelete ? (
+        <View style={styles.list}>
+          {actions.map((action, i) => (
+            <Pressable key={action.label} accessibilityRole="button" onPress={action.onPress} style={[styles.action, i > 0 && styles.divider]}>
+              <DesignIcon name={action.icon} size={20} color={Zinc[900]} />
+              <Txt style={styles.actionText}>{action.label}</Txt>
+            </Pressable>
+          ))}
+          {onDelete ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ busy: !!deleteBusy }}
+              disabled={deleteBusy}
+              onPress={onDelete}
+              style={[styles.action, actions.length > 0 && styles.divider]}>
+              {deleteBusy ? <Spinner color={Red[700]} size={20} /> : <DesignIcon name="trash" size={20} color={Red[700]} />}
+              <Txt style={[styles.actionText, { color: Red[700] }]}>{deleteLabel}</Txt>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
       <Button title={cancelLabel} variant="pillOutline" onPress={onClose} />
     </BottomSheet>
   );
