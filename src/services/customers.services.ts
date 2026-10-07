@@ -21,7 +21,7 @@ export type Customer = {
 export type CustomerData = {
   /** By name, as the website lists them. */
   customers: Customer[];
-  /** Completed sales only, with their lines - the ones every customer figure counts. */
+  /** Completed sales only, with their lines, payments and deliveries - the ones every customer figure counts, and the Sales tab's invoices. */
   sales: Row[];
   payments: Row[];
   accounts: Account[];
@@ -31,7 +31,7 @@ export type CustomerData = {
   receivers: string[];
 };
 
-/** Everything the four Customers screens read, fetched once and shared - the website's customer pages' loads. */
+/** Everything the Customers and Sales screens read, fetched once and shared - the website's customer and sales pages' loads. */
 export async function loadCustomerData(): Promise<CustomerData> {
   const [customers, sales, payments, accounts, categories, employees] = await Promise.all([
     fetchList('/customers'),

@@ -20,9 +20,9 @@ export default function AppLayout() {
             const event = navigation.emit({ type: 'tabPress', target: route?.key, canPreventDefault: true });
             // Tapping the tab you are on returns it to its first screen, as
             // every tab bar does: More pops back to the menu from Balance,
-            // Customers back to its overview from a form.
+            // Customers and Sales back to their first screen from a form.
             if (!event.defaultPrevented) {
-              if (focused && (key === 'more' || key === 'customers')) navigation.navigate(key, { screen: 'index' });
+              if (focused && (key === 'more' || key === 'customers' || key === 'sales')) navigation.navigate(key, { screen: 'index' });
               else navigation.navigate(key);
             }
           }}
