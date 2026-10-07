@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, type InfiniteData, type QueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { http } from '@/lib/httpClient';
@@ -41,6 +41,22 @@ export function useProducts(search: string) {
     const { data, total } = await getPage('/products', { page, limit: PAGE_SIZE, search: search || undefined });
     return { rows: Array.isArray(data) ? (data as Product[]) : [], total };
   });
+}
+
+/**
+ * A product the catalogue has already loaded. There is no GET /products/:id,
+ * and the form is only ever opened from a row on screen, so the list's cache
+ * always has it.
+ */
+export function cachedProduct(queryClient: QueryClient, id: string): Product | null {
+  const lists = queryClient.getQueriesData<InfiniteData<Page<Product>>>({ queryKey: [...PRODUCTS_KEY, 'list'] });
+  for (const [, data] of lists) {
+    for (const page of data?.pages ?? []) {
+      const found = page.rows.find((row) => row.id === id);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 /** Every category in use, for the form's suggestions. */
