@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   name: { fontSize: 15, fontWeight: '600', lineHeight: 20, color: Zinc[900] },
   meta: { fontSize: 13, color: Zinc[600] },
   supplier: { fontSize: 12, color: Zinc[500] },
-  muted: { fontStyle: 'italic' },
+  muted: { color: Zinc[400] },
   prices: { flexShrink: 0, maxWidth: '38%', alignItems: 'flex-end', gap: 3 },
   mrp: { fontSize: 15, fontWeight: '700', color: Zinc[900] },
   off: { paddingHorizontal: 6, borderRadius: 999, backgroundColor: Green[100] },
