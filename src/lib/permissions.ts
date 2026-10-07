@@ -37,6 +37,20 @@ export const ACTIONS = {
   'damage.money': { roles: ['owner', 'manager'], permission: 'page:damage.transactions' },
   // damage.route.ts: DELETE /:id
   'damage.delete': { roles: ['owner', 'manager'], permission: 'act:damage.delete' },
+  // supplier.route.ts: POST / and PATCH /:id
+  'supplier.write': { roles: ['owner', 'manager'], permission: 'page:supplier.list' },
+  // supplier.route.ts: DELETE /:id
+  'supplier.delete': { roles: ['owner', 'manager'], permission: 'act:supplier.delete' },
+  // supplierPayment.route.ts: POST / and PATCH /:id
+  'supplierPayment.write': { roles: ['owner', 'manager'], permission: 'page:supplier.payments' },
+  // supplierPayment.route.ts: DELETE /:id - the owner alone, no permission asked.
+  'supplierPayment.delete': { roles: ['owner'], permission: 'page:supplier.payments' },
+  // otherIncome.route.ts: POST / (an accountant may add)
+  'otherIncome.create': { roles: ['owner', 'manager', 'accountant'], permission: 'page:supplier.other-income' },
+  // otherIncome.route.ts: PATCH /:id
+  'otherIncome.update': { roles: ['owner', 'manager'], permission: 'page:supplier.other-income' },
+  // otherIncome.route.ts: DELETE /:id - the owner alone.
+  'otherIncome.delete': { roles: ['owner'], permission: 'page:supplier.other-income' },
 } as const satisfies Record<string, { roles: readonly UserRole[]; permission: string }>;
 
 export type Action = keyof typeof ACTIONS;
