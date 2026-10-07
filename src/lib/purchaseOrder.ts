@@ -1,3 +1,4 @@
+import { docNumber } from './docNumber';
 import { roundTaka } from './money';
 import { actualDp, purchaseDeposit, purchaseItemDeposit, spAmountFor } from './purchaseAmounts';
 
@@ -21,13 +22,8 @@ export type OrderLine = {
   deposit_amount: number;
 };
 
-/** "PO-2610-4821": the website's generateSINo. The server moves past a number already taken. */
-export function generateSINo(now = new Date()): string {
-  const yy = now.getFullYear().toString().slice(-2);
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const rand = Math.floor(Math.random() * 9000) + 1000;
-  return `PO-${yy}${mm}-${rand}`;
-}
+/** "PO-2610-4821": the website's generateSINo. */
+export const generateSINo = (now = new Date()) => docNumber('PO', now);
 
 /** The incentive on a line from the order's one SP percentage - always derived, never typed. */
 export function applySpPercent(line: OrderLine, percent: number): OrderLine {
