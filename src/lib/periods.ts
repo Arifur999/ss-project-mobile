@@ -11,6 +11,9 @@ export type DashboardPeriod = 'today' | 'week' | 'month' | 'last' | 'year';
 /** The ledger's and transfer list's chips. 'all' has no bounds. */
 export type ListPeriod = 'all' | 'thisMonth' | 'lastMonth' | 'thisYear';
 
+/** The list periods in the order the period chips show them. */
+export const LIST_PERIODS: ListPeriod[] = ['all', 'thisMonth', 'lastMonth', 'thisYear'];
+
 /**
  * The window a dashboard period covers. The week runs Saturday to Friday, the
  * working week in Bangladesh, as the design's "26 Sep – 2 Oct 2026" does for a
