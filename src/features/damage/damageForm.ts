@@ -41,8 +41,6 @@ export function damageFormErrors(form: DamageForm): DamageFormErrors {
   return errors;
 }
 
-export const hasErrors = (errors: DamageFormErrors) => Boolean(errors.supplier || errors.items || Object.keys(errors.lines).length);
-
 /**
  * The payload. A blank or zero unit cost is left out, so the server draws the
  * real FIFO cost off the batches - the normal case; a typed one wins, and is
