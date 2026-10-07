@@ -13,8 +13,6 @@ import { MenuGrid, MenuTile } from '@/features/menu/MenuTile';
 import { whatsAppLink } from '@/lib/support';
 import { useSupportNumber } from '@/services/support.services';
 
-// The support line the website falls back to when platform settings carry none.
-
 const COPY = {
   en: {
     title: 'Menu',
