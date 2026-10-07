@@ -1,14 +1,13 @@
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { DesignIcon } from '@/components/DesignIcon';
-import { Initial } from '@/components/Initial';
+import { ContactCard } from '@/components/ContactCard';
 import { ActionsSheet, ConfirmDeleteSheet } from '@/components/ItemSheets';
 import { SearchField } from '@/components/SearchField';
 import { Txt } from '@/components/Txt';
 import { SIDE_LOOK } from '@/constants/side';
-import { Blue, White, Zinc } from '@/constants/theme';
+import { Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -71,55 +70,27 @@ export default function SupplierListScreen() {
       ) : (
         suppliers.map((s) => {
           const name = supplierLabel(s);
-          const phone = String(s.phone || '').trim();
           const side = s.due_type === 'pawna' ? 'pawna' : 'dena';
           const look = SIDE_LOOK[side];
           return (
-            <View key={s.id} style={styles.card}>
-              <View style={styles.top}>
-                <Initial name={name} size={40} tone="soft" />
-                <View style={styles.who}>
-                  <View style={styles.nameRow}>
-                    <Txt style={styles.name} numberOfLines={2}>
-                      {name}
-                    </Txt>
-                    {s.is_active === false ? (
-                      <View style={styles.inactive}>
-                        <Txt style={styles.inactiveText}>{t.inactive}</Txt>
-                      </View>
-                    ) : null}
-                  </View>
-                  {s.person_name ? <Txt style={styles.person}>{s.person_name}</Txt> : null}
-                  {phone ? (
-                    <Pressable
-                      accessibilityRole="link"
-                      accessibilityLabel={t.call(name, phone)}
-                      onPress={() => Linking.openURL(`tel:${phone}`).catch(() => {})}
-                      style={styles.phone}>
-                      <DesignIcon name="phone" size={14} color={Blue[700]} strokeWidth={2} />
-                      <Txt style={styles.phoneText}>{phone}</Txt>
-                    </Pressable>
-                  ) : null}
-                </View>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={name}
-                  onPress={() => {
-                    setSelected(s);
-                    setSheet('actions');
-                  }}
-                  style={styles.more}>
-                  <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-                </Pressable>
-              </View>
-              <View style={styles.opening}>
-                <Txt style={styles.openingLabel}>{t.opening}</Txt>
-                <Txt style={[styles.openingValue, { color: look.amount }]}>{money(Math.abs(Number(s.opening_due || 0)))}</Txt>
-                <View style={[styles.chip, { backgroundColor: look.chipBg }]}>
-                  <Txt style={[styles.chipText, { color: look.chipInk }]}>{t.side[side]}</Txt>
-                </View>
-              </View>
-            </View>
+            <ContactCard
+              key={s.id}
+              name={name}
+              badge={s.is_active === false ? t.inactive : null}
+              lines={[s.person_name]}
+              phone={s.phone}
+              callLabel={t.call(name, String(s.phone || '').trim())}
+              onMore={() => {
+                setSelected(s);
+                setSheet('actions');
+              }}
+              footer={{
+                label: t.opening,
+                value: money(Math.abs(Number(s.opening_due || 0))),
+                color: look.amount,
+                chip: { label: t.side[side], bg: look.chipBg, ink: look.chipInk },
+              }}
+            />
           );
         })
       )}
@@ -156,29 +127,4 @@ const styles = StyleSheet.create({
   count: { fontSize: 13, fontWeight: '500', color: Zinc[500] },
   empty: { paddingVertical: 28, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', borderColor: Zinc[300] },
   emptyText: { textAlign: 'center', fontSize: 14, color: Zinc[600] },
-  card: { borderRadius: 18, borderWidth: 1, borderColor: Zinc[200], backgroundColor: White, overflow: 'hidden' },
-  top: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingTop: 14, paddingRight: 4, paddingBottom: 10, paddingLeft: 14 },
-  who: { flex: 1, minWidth: 0, gap: 1 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  name: { flexShrink: 1, fontSize: 15, fontWeight: '600', lineHeight: 21, color: Zinc[900] },
-  inactive: { paddingHorizontal: 8, borderRadius: 999, backgroundColor: Zinc[100] },
-  inactiveText: { fontSize: 11, fontWeight: '600', color: Zinc[600] },
-  person: { fontSize: 13, color: Zinc[600] },
-  phone: { alignSelf: 'flex-start', minHeight: 30, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  phoneText: { fontSize: 14, fontWeight: '500', color: Blue[700] },
-  more: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  opening: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderTopWidth: 1,
-    borderTopColor: Zinc[100],
-    backgroundColor: Zinc[50],
-  },
-  openingLabel: { flex: 1, fontSize: 12, color: Zinc[500] },
-  openingValue: { fontSize: 15, fontWeight: '600' },
-  chip: { paddingHorizontal: 8, borderRadius: 999 },
-  chipText: { fontSize: 12, fontWeight: '600' },
 });
