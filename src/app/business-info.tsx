@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DesignIcon } from '@/components/DesignIcon';
+import { FormFooter } from '@/components/FormFooter';
 import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
@@ -157,16 +158,11 @@ export default function BusinessInfoScreen() {
           )}
         </ScrollView>
 
-        {query.isSuccess ? (
+        {query.isSuccess && editing ? (
+          <FormFooter cancelLabel={t.cancel} onCancel={cancel} saveLabel={saving ? t.saving : t.save} onSave={submit} saving={saving} />
+        ) : query.isSuccess ? (
           <View style={styles.footer}>
-            {editing ? (
-              <View style={styles.footerRow}>
-                <Button title={t.cancel} variant="pillOutline" onPress={cancel} disabled={saving} />
-                <Button title={saving ? t.saving : t.save} variant="pill" onPress={submit} busy={saving} style={styles.grow} />
-              </View>
-            ) : (
-              <Button title={t.edit} variant="pill" onPress={startEdit} icon="pencil" />
-            )}
+            <Button title={t.edit} variant="pill" onPress={startEdit} icon="pencil" />
           </View>
         ) : null}
       </KeyboardAvoidingView>
@@ -226,6 +222,4 @@ const styles = StyleSheet.create({
   uploadText: { fontSize: 14, fontWeight: '600', color: Zinc[900] },
   fileHint: { fontSize: 13, color: Zinc[600], textAlign: 'center' },
   footer: { paddingTop: 12, paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: Zinc[200], backgroundColor: White },
-  footerRow: { flexDirection: 'row', gap: 10 },
-  grow: { flex: 1 },
 });
