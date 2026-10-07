@@ -84,3 +84,12 @@ export function rangeLabel(startISO: string, endISO: string, lang: Lang): string
   if (a.getFullYear() === b.getFullYear()) return `${day(a, a.getDate() < 10)} ${mon(a)} – ${day(b, false)} ${mon(b)} ${yr(b)}`;
   return `${day(a, true)} ${mon(a)} ${yr(a)} – ${day(b, true)} ${mon(b)} ${yr(b)}`;
 }
+
+/** "9:30 AM" / "৯:৩০ AM" from a stored "09:30"; '' when there is none. */
+export function timeLabel(hhmm: string, lang: Lang): string {
+  const match = /^(\d{1,2}):(\d{2})/.exec(String(hhmm || ''));
+  if (!match) return '';
+  const hour = Number(match[1]);
+  const text = `${hour % 12 || 12}:${match[2]} ${hour < 12 ? 'AM' : 'PM'}`;
+  return lang === 'bn' ? bnDigits(text) : text;
+}
