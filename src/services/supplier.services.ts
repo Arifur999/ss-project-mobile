@@ -65,7 +65,7 @@ export const supplierLabel = (s: { name?: unknown; company_name?: unknown } | nu
 const newestFirst = (a: Row, b: Row) =>
   String(b.date || '').localeCompare(String(a.date || '')) || String(b.created_at || '').localeCompare(String(a.created_at || ''));
 
-/** Everything the four Supplier screens read, fetched once and shared - the website's supplier pages' loads. */
+/** Everything the Supplier and Purchase screens read, fetched once and shared - the website's supplier pages' loads. */
 export async function loadSupplierData(): Promise<SupplierData> {
   const [suppliers, purchases, payments, incomes, accounts] = await Promise.all([
     fetchList('/suppliers'),
