@@ -90,6 +90,7 @@ const ROUTES: Partial<Record<ItemKey, Href>> = {
   purchase: '/more/purchase',
   employees: '/more/employees',
   target: '/more/reports',
+  support: '/more/support',
   inventory: '/inventory',
   sales: '/sales',
   customers: '/customers',
