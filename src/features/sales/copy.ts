@@ -77,7 +77,7 @@ export const SALES_COPY = {
     sorts: {
       date_desc: 'Newest first',
       date_asc: 'Oldest first',
-      name_asc: 'Product A–Z',
+      name_asc: 'Customer A–Z',
       amount_desc: 'Highest amount',
       amount_asc: 'Lowest amount',
     },
@@ -209,7 +209,7 @@ export const SALES_COPY = {
     sorts: {
       date_desc: 'নতুন আগে',
       date_asc: 'পুরনো আগে',
-      name_asc: 'পণ্যের নাম অনুযায়ী',
+      name_asc: 'কাস্টমারের নাম অনুযায়ী',
       amount_desc: 'বেশি টাকা আগে',
       amount_asc: 'কম টাকা আগে',
     },
