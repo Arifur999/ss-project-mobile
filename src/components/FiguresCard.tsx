@@ -50,19 +50,26 @@ export function FiguresCard({
           {sub}
         </Txt>
       ) : null}
-      <View style={styles.figures}>
-        {figures.map((f) => (
-          <View key={f.label} style={styles.figure}>
-            <Txt style={styles.figLabel} numberOfLines={1}>
-              {f.label}
-            </Txt>
-            <Txt style={[styles.figValue, f.strong && styles.strong]} numberOfLines={1} adjustsFontSizeToFit>
-              {f.value}
-            </Txt>
-          </View>
-        ))}
-      </View>
+      <FigureRow figures={figures} />
     </Pressable>
+  );
+}
+
+/** A row of small labelled figures under a hairline - a line's quantities or prices. */
+export function FigureRow({ figures }: { figures: Figure[] }) {
+  return (
+    <View style={styles.figures}>
+      {figures.map((f) => (
+        <View key={f.label} style={styles.figure}>
+          <Txt style={styles.figLabel} numberOfLines={1}>
+            {f.label}
+          </Txt>
+          <Txt style={[styles.figValue, f.strong && styles.strong]} numberOfLines={1} adjustsFontSizeToFit>
+            {f.value}
+          </Txt>
+        </View>
+      ))}
+    </View>
   );
 }
 
