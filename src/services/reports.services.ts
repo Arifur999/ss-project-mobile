@@ -120,3 +120,16 @@ export function useTargetWrite() {
     [queryClient],
   );
 }
+
+/**
+ * A report as it reads on screen - every figure already formatted - mailed to
+ * the owner. The server picks the address itself, so it can reach no other.
+ */
+export type EmailReport = {
+  title: string;
+  period: string;
+  summary: { label: string; value: string }[];
+  tables: { title: string; columns: string[]; rows: string[][] }[];
+};
+
+export const emailReport = (report: EmailReport) => http.post<{ sent: boolean; email: string }>('/reports/email', report);
