@@ -58,6 +58,25 @@ export function buildLoanBalanceSms(input: SmsBusiness & { customerName: string;
 }
 
 /**
+ * Sent right after a sale: the invoice number, the bill (with any previous due
+ * collected on it), what was paid and what is still owed - in Bangla.
+ */
+export function buildInvoiceSms(input: SmsBusiness & { invoiceNo: string; grandTotal: number; paid: number; due: number }): string {
+  const helpline = helplineNumber(input.businessPhone);
+  return [
+    `${input.businessName} থেকে আপনার কেনাকাটা সম্পন্ন হয়েছে।`,
+    `ইনভয়েস নম্বর: ${input.invoiceNo}`,
+    `মোট বিল: ${smsAmount(input.grandTotal)} টাকা`,
+    `পরিশোধিত: ${smsAmount(input.paid)} টাকা`,
+    `বকেয়া: ${smsAmount(input.due)} টাকা`,
+    helpline ? `হেল্পলাইন: ${helpline}` : '',
+    'ধন্যবাদ আমাদের সাথে থাকার জন্য!',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+/**
  * The due reminder, in Bangla: only what is owed, no invoice lines. Bangla
  * bills at 70 characters a segment instead of 160, so every line costs.
  */
