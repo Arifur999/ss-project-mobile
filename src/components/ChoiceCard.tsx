@@ -2,12 +2,16 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DesignIcon, type IconName } from '@/components/DesignIcon';
 import { Txt } from '@/components/Txt';
-import { Red, White, Zinc } from '@/constants/theme';
+import { Green, Red, White, Zinc } from '@/constants/theme';
 
 export type ChoiceLook = { border: string; bg: string; ink: string; sub: string };
 
 /** Chosen: filled black, as the design marks a picked category or opening side. */
 export const PICKED_DARK: ChoiceLook = { border: Zinc[900], bg: Zinc[900], ink: White, sub: 'rgba(255, 255, 255, 0.75)' };
+/** Chosen money in (Received, a refund): green. */
+export const PICKED_IN: ChoiceLook = { border: Green[600], bg: Green[50], ink: Green[800], sub: Green[700] };
+/** Chosen money out (Paid, a repair cost): red. */
+export const PICKED_OUT: ChoiceLook = { border: Red[600], bg: Red[50], ink: Red[800], sub: Red[700] };
 const IDLE: ChoiceLook = { border: Zinc[200], bg: White, ink: Zinc[900], sub: Zinc[500] };
 
 /**

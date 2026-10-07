@@ -4,14 +4,14 @@ import { StyleSheet, View } from 'react-native';
 import { AlertBanner } from '@/components/AlertBanner';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
-import { ChoiceCard, type ChoiceLook } from '@/components/ChoiceCard';
+import { ChoiceCard, PICKED_IN, PICKED_OUT } from '@/components/ChoiceCard';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { SelectField } from '@/components/SelectField';
 import { InlineSwitch } from '@/components/SwitchRow';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
-import { Amber, Green, Red, Zinc } from '@/constants/theme';
+import { Amber, Red, Zinc } from '@/constants/theme';
 import { useCopy } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { LOAN_COPY } from '@/features/loans/copy';
@@ -39,9 +39,6 @@ type Form = {
   account_id: string;
   notes: string;
 };
-
-const RECEIVED: ChoiceLook = { border: Green[600], bg: Green[50], ink: Green[800], sub: Green[700] };
-const PAID: ChoiceLook = { border: Red[600], bg: Red[50], ink: Red[800], sub: Red[700] };
 
 function formFor(record: Row | null, lenders: Row[]): Form {
   if (!record) {
@@ -222,7 +219,7 @@ export function LoanTxnFormSheet({ open, onClose, editing }: { open: boolean; on
             icon="arrowDownLeft"
             title={t.received}
             sub={t.moneyCameIn}
-            picked={RECEIVED}
+            picked={PICKED_IN}
             invalid={!!shown.type}
             selected={form.transaction_type === 'receive'}
             onPress={() => set({ transaction_type: 'receive' })}
@@ -231,7 +228,7 @@ export function LoanTxnFormSheet({ open, onClose, editing }: { open: boolean; on
             icon="arrowUpRight"
             title={t.paid}
             sub={t.moneyWentOut}
-            picked={PAID}
+            picked={PICKED_OUT}
             invalid={!!shown.type}
             selected={form.transaction_type === 'payment'}
             onPress={() => set({ transaction_type: 'payment' })}
