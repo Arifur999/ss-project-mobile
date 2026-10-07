@@ -1,8 +1,7 @@
 import type { PaymentRow } from '@/components/PaymentRowFields';
 import type { Account } from '@/lib/balance';
-import { customerCurrentDue } from '@/lib/customerDue';
 import { parseAmount, roundTaka } from '@/lib/money';
-import type { CustomerData, CustomerPaymentInput } from '@/services/customers.services';
+import type { CustomerPaymentInput } from '@/services/customers.services';
 import type { Category, ExpenseInput } from '@/services/expenses.services';
 
 // The Receive due form as typed, and what saving it writes - lifted from
@@ -50,20 +49,6 @@ export const receivingNow = (form: ReceiptForm) => form.rows.reduce((sum, row) =
 
 /** The discount written off; a blank one is none. */
 export const discountOf = (form: ReceiptForm) => (form.discount.trim() === '' ? 0 : parseAmount(form.discount));
-
-/** What the customer owes before this collection - the dashboard's rule, never shown below zero. */
-export function previousDueFor(customerId: string, data: CustomerData | undefined): number {
-  const customer = data?.customers.find((c) => c.id === customerId);
-  if (!customer || !data) return 0;
-  return Math.max(
-    0,
-    customerCurrentDue(
-      customer.opening_due,
-      data.sales.filter((sale) => sale.customer_id === customerId),
-      data.payments.filter((payment) => payment.customer_id === customerId),
-    ),
-  );
-}
 
 export function receiptFormErrors(form: ReceiptForm, previousDue: number): ReceiptFormErrors {
   const errors: ReceiptFormErrors = { lines: {} };

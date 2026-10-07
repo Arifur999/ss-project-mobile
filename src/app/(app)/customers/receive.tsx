@@ -26,7 +26,6 @@ import {
   discountExpense,
   discountOf,
   paymentInputs,
-  previousDueFor,
   receiptFormErrors,
   receivingNow,
   type ReceiptForm,
@@ -37,6 +36,7 @@ import { useLeaveGuard } from '@/hooks/useLeaveGuard';
 import { todayISO } from '@/lib/dates';
 import { hasErrors } from '@/lib/formErrors';
 import { errorMessage } from '@/lib/httpClient';
+import { previousDueFor } from '@/lib/previousDue';
 import { formatNumber } from '@/lib/money';
 import { isValidBdPhone, phoneDigits } from '@/lib/phone';
 import { buildDuePaymentSms, smsBusiness } from '@/lib/smsTexts';
