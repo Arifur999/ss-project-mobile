@@ -49,8 +49,8 @@ export function damageMoney(rows: Money[]) {
 }
 
 /** One row per line still owing something - an entry can have three products of which one is back. */
-export function pendingLines<I extends Item, E extends Entry<I>>(entries: E[]) {
-  const rows: { entry: E; item: I; outstanding: number }[] = [];
+export function pendingLines<E extends Entry>(entries: E[]) {
+  const rows: { entry: E; item: E['damage_items'][number]; outstanding: number }[] = [];
   for (const entry of entries) {
     for (const item of entry.damage_items) {
       const outstanding = outstandingQty(item);
