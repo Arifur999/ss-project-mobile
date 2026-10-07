@@ -10,9 +10,10 @@ import { Red, White, Zinc } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useCopy } from '@/context/LanguageContext';
 import { MenuGrid, MenuTile } from '@/features/menu/MenuTile';
+import { whatsAppLink } from '@/lib/support';
+import { useSupportNumber } from '@/services/support.services';
 
 // The support line the website falls back to when platform settings carry none.
-const SUPPORT_NUMBER = '01719731884';
 
 const COPY = {
   en: {
@@ -100,13 +101,14 @@ export default function MenuScreen() {
   const { account, signOut } = useAuth();
   const name = account?.profile?.full_name?.trim() || account?.user.email || '';
   const role = account?.profile?.role;
+  const supportNumber = useSupportNumber();
 
   // Admin is the platform owner's alone, and billing the workspace owner's.
   const visible = (key: ItemKey) => (key === 'admin' ? role === 'super_admin' : key === 'billing' ? role === 'owner' : true);
 
   const open = (key: ItemKey) => {
     if (key === 'whatsapp') {
-      Linking.openURL(`https://wa.me/88${SUPPORT_NUMBER}`).catch(() => {});
+      Linking.openURL(whatsAppLink(supportNumber)).catch(() => {});
       return;
     }
     const route = ROUTES[key];
