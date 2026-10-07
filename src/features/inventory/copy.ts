@@ -38,6 +38,7 @@ export const INVENTORY_COPY = {
     history: 'Stock history',
     noHistory: 'No movements yet.',
     historyError: 'Could not load the history.',
+    showMore: 'Show more',
     after: (shown: string) => `Stock ${shown}`,
     moves: {
       opening_stock: 'Opening stock',
@@ -113,6 +114,7 @@ export const INVENTORY_COPY = {
     history: 'স্টকের ইতিহাস',
     noHistory: 'এখনো কোনো আনা-নেওয়া নেই।',
     historyError: 'ইতিহাস আনা যায়নি।',
+    showMore: 'আরও দেখুন',
     after: (shown: string) => `স্টক ${shown}`,
     moves: {
       opening_stock: 'প্রারম্ভিক স্টক',
