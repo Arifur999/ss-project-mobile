@@ -7,7 +7,7 @@ import { Amber, Blue, Green, Red, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { LOAN_COPY } from '@/features/loans/copy';
-import { SIDE_LOOK, sideOf } from '@/features/loans/side';
+import { SIDE_LOOK, sideOf } from '@/constants/side';
 import type { Lender } from '@/services/loans.services';
 
 /** One lender's running totals, as buildLoanSummary returns them. */

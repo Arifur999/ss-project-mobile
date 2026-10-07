@@ -5,7 +5,7 @@ import { Amber, Green, Red, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { LOAN_COPY } from '@/features/loans/copy';
-import { SIDE_LOOK, sideOf } from '@/features/loans/side';
+import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { dateLabel } from '@/lib/dates';
 import type { LenderStatement } from '@/services/loans.services';
 

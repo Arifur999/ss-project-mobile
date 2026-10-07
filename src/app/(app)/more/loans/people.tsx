@@ -13,7 +13,7 @@ import { useToast } from '@/context/ToastContext';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { LenderFormSheet } from '@/features/loans/LenderFormSheet';
 import { LoanShell } from '@/features/loans/LoanShell';
-import { SIDE_LOOK, sideOf } from '@/features/loans/side';
+import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { errorMessage } from '@/lib/httpClient';
 import { lenderKey, lenderKeyFromLoan } from '@/lib/loans';
 import { deleteLender, useLoanData, useLoanWrite, type Lender } from '@/services/loans.services';

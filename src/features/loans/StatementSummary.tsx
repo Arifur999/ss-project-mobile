@@ -6,7 +6,7 @@ import { Amber, Green, Red, White, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { LOAN_COPY } from '@/features/loans/copy';
-import { SIDE_LOOK, sideOf } from '@/features/loans/side';
+import { SIDE_LOOK, sideOf } from '@/constants/side';
 import type { StatementFigures } from '@/features/loans/statement';
 
 /** Who the statement is for, then opening, closing, paid and received, and the profit set apart. */

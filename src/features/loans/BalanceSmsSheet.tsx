@@ -12,7 +12,7 @@ import { useCopy } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { summaryPhone, type LoanSummary } from '@/features/loans/OutstandingCard';
-import { SIDE_LOOK, sideOf } from '@/features/loans/side';
+import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { buildLoanBalanceSms, smsBusiness } from '@/lib/loanSms';
 import { useBusinessSettings } from '@/services/business.services';
 import { sendSms, smsFailureMessage } from '@/services/sms.services';

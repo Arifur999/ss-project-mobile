@@ -15,7 +15,7 @@ import { BalanceSmsSheet } from '@/features/loans/BalanceSmsSheet';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { LoanShell } from '@/features/loans/LoanShell';
 import { OutstandingCard, summaryPhone, type LoanSummary } from '@/features/loans/OutstandingCard';
-import { SIDE_LOOK, sideOf } from '@/features/loans/side';
+import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { buildLoanSummary } from '@/lib/loans';
 import { useLoanData } from '@/services/loans.services';
 

@@ -1,6 +1,7 @@
 import { Green, Red, Zinc } from '@/constants/theme';
 
-// Which side of a loan a balance is on, and how every loan screen colours it.
+// Which side of an account a balance is on - a loan, a supplier - and how
+// every screen colours it.
 // Signed as the website signs it (loanUtils.loanBalanceLabel): positive is
 // Pawna - they owe us - negative is Dena - we owe them.
 
