@@ -7,7 +7,7 @@ import { Green, White, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { PRODUCT_COPY } from '@/features/products/copy';
-import { actualDp } from '@/lib/prices';
+import { actualDp } from '@/lib/purchaseAmounts';
 import { supplierName, type Product } from '@/services/products.services';
 
 /**

@@ -8,7 +8,7 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { PRODUCT_COPY } from '@/features/products/copy';
 import { formatNumber } from '@/lib/money';
-import { actualDp } from '@/lib/prices';
+import { actualDp } from '@/lib/purchaseAmounts';
 import { supplierName, type Product } from '@/services/products.services';
 
 /**

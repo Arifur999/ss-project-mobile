@@ -7,7 +7,7 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { PRODUCT_COPY } from '@/features/products/copy';
 import { parseAmount } from '@/lib/money';
-import { actualDp } from '@/lib/prices';
+import { actualDp } from '@/lib/purchaseAmounts';
 
 /**
  * A price and its percentage discount side by side, with the price after the
