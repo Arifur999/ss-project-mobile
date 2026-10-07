@@ -23,8 +23,9 @@ type QueryState = {
 export type Section<K extends string> = { key: K; label: string; route: string };
 
 /**
- * The frame of a More-menu section with sub-screens (Balance, Shareholders,
- * Loans, Expenses): a header back to the menu with room for icon buttons,
+ * The frame of a section with sub-screens (Balance, Shareholders, Loans,
+ * Expenses, the Customers tab): a header - back to the menu for a More-menu
+ * section, none for a tab, which the tab bar leaves - with room for icon buttons,
  * the section chips, pull to refresh, loading and failure handled once, and an
  * optional floating "New …" button.
  */
@@ -42,7 +43,8 @@ export function SectionShell<K extends string>({
   children,
 }: {
   title: string;
-  backLabel: string;
+  /** Shown as the back arrow's label; without one the header has no back arrow. */
+  backLabel?: string;
   sections: Section<K>[];
   current: K;
   query: QueryState;
@@ -60,7 +62,7 @@ export function SectionShell<K extends string>({
       <ScrollView
         contentContainerStyle={{ paddingBottom: fab ? 96 : 24 }}
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => query.refetch()} tintColor={Zinc[900]} />}>
-        <ScreenHeader title={title} onBack={() => router.navigate('/more')} backLabel={backLabel} right={right} />
+        <ScreenHeader title={title} onBack={backLabel ? () => router.navigate('/more') : undefined} backLabel={backLabel} right={right} />
 
         <ScrollView ref={chipsRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
           {sections.map((section) => {
