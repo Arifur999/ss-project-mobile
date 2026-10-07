@@ -17,19 +17,21 @@ import { useProducts, type Product } from '@/services/products.services';
 /**
  * Choosing one product from the whole catalogue: a search box searched on the
  * server as the user pauses, and the matches with photo, name and code -
- * forty at a time. For any form that needs a product (damage, and sales and
- * purchases to come).
+ * forty at a time, and an optional line of the form's own under each (a sale
+ * shows the price). For any form that needs a product.
  */
 export function ProductPickerSheet({
   open,
   title,
   onClose,
   onPick,
+  detail,
 }: {
   open: boolean;
   title: string;
   onClose: () => void;
   onPick: (product: Product) => void;
+  detail?: (product: Product) => string;
 }) {
   const t = useCopy(PRODUCT_COPY);
   const [search, setSearch] = useState('');
@@ -74,6 +76,11 @@ export function ProductPickerSheet({
               <Txt style={styles.code} numberOfLines={1}>
                 {[product.product_code, product.category].filter(Boolean).join(' · ')}
               </Txt>
+              {detail ? (
+                <Txt style={styles.detail} numberOfLines={1}>
+                  {detail(product)}
+                </Txt>
+              ) : null}
             </View>
           </Pressable>
         ))
@@ -105,4 +112,5 @@ const styles = StyleSheet.create({
   body: { flex: 1, minWidth: 0 },
   name: { fontSize: 15, fontWeight: '600', color: Zinc[900] },
   code: { fontSize: 13, color: Zinc[500] },
+  detail: { fontSize: 13, fontWeight: '600', color: Zinc[900] },
 });
