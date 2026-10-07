@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { DesignIcon } from '@/components/DesignIcon';
 import { FigureCard } from '@/components/FigureCard';
 import { FilterChips } from '@/components/FilterChips';
+import { MoneyLine } from '@/components/MoneyLine';
 import { SearchField } from '@/components/SearchField';
 import { Txt } from '@/components/Txt';
 import { Green, Red, Zinc } from '@/constants/theme';
@@ -17,11 +17,12 @@ import { damageMoney } from '@/lib/damageSummary';
 import { matches } from '@/lib/search';
 import { dateLabel } from '@/lib/dates';
 import { inRange, LIST_PERIODS, listRange, type ListPeriod } from '@/lib/periods';
-import { useDamageData, type DamageMoney } from '@/services/damage.services';
+import { useDamageData } from '@/services/damage.services';
 
 /** The money either side of a breakage - Hatim's Damage Transactions: repairs paid, refunds, write-offs. */
 export default function DamageTransactionsScreen() {
   const t = useCopy(DAMAGE_COPY);
+  const { lang } = useLang();
   const can = useCan();
   const { money } = useAmountShield();
   const { data } = useDamageData();
@@ -56,7 +57,15 @@ export default function DamageTransactionsScreen() {
       ) : (
         <View style={styles.list}>
           {rows.map((row, i) => (
-            <MoneyRow key={`${row.direction}:${row.id}`} row={row} doc={docNo.get(row.entry_id) ?? ''} first={i === 0} />
+            <MoneyLine
+              key={`${row.direction}:${row.id}`}
+              direction={row.direction}
+              title={row.label || (row.direction === 'out' ? t.writtenOff : t.recovered)}
+              meta={[docNo.get(row.entry_id), dateLabel(row.date, lang), row.account_name || t.noCash].filter(Boolean).join(' · ')}
+              note={row.notes}
+              amount={money(row.amount)}
+              first={i === 0}
+            />
           ))}
         </View>
       )}
@@ -65,45 +74,9 @@ export default function DamageTransactionsScreen() {
   );
 }
 
-function MoneyRow({ row, doc, first }: { row: DamageMoney; doc: string; first: boolean }) {
-  const t = useCopy(DAMAGE_COPY);
-  const { lang } = useLang();
-  const { money } = useAmountShield();
-  const out = row.direction === 'out';
-  return (
-    <View style={[styles.item, !first && styles.divider]}>
-      <View style={[styles.mark, { backgroundColor: out ? Red[50] : Green[50] }]}>
-        <DesignIcon name={out ? 'arrowUpRight' : 'arrowDownLeft'} size={18} color={out ? Red[700] : Green[700]} strokeWidth={2.2} />
-      </View>
-      <View style={styles.body}>
-        <Txt style={styles.label} numberOfLines={1}>
-          {row.label || (out ? t.writtenOff : t.recovered)}
-        </Txt>
-        <Txt style={styles.meta} numberOfLines={1}>
-          {[doc, dateLabel(row.date, lang), row.account_name || t.noCash].filter(Boolean).join(' · ')}
-        </Txt>
-        {row.notes ? (
-          <Txt style={styles.notes} numberOfLines={2}>
-            {row.notes}
-          </Txt>
-        ) : null}
-      </View>
-      <Txt style={[styles.amount, { color: out ? Red[600] : Green[700] }]}>{`${out ? '−' : '+'}${money(row.amount)}`}</Txt>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 12 },
   empty: { paddingVertical: 28, paddingHorizontal: 16, borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', borderColor: Zinc[300] },
   emptyText: { textAlign: 'center', fontSize: 14, color: Zinc[600] },
   list: { borderRadius: 16, borderWidth: 1, borderColor: Zinc[200], overflow: 'hidden' },
-  item: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14 },
-  divider: { borderTopWidth: 1, borderTopColor: Zinc[100] },
-  mark: { width: 36, height: 36, borderRadius: 999, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  body: { flex: 1, minWidth: 0, gap: 1 },
-  label: { fontSize: 15, fontWeight: '600', color: Zinc[900] },
-  meta: { fontSize: 13, color: Zinc[600] },
-  notes: { fontSize: 12, color: Zinc[500] },
-  amount: { flexShrink: 0, fontSize: 15, fontWeight: '600' },
 });
