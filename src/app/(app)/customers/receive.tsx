@@ -8,6 +8,7 @@ import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
+import { PaymentRowFields, type PaymentRow } from '@/components/PaymentRowFields';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
 import { Spinner } from '@/components/Spinner';
@@ -21,7 +22,6 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { CUSTOMER_COPY } from '@/features/customers/copy';
-import { PaymentRowFields } from '@/features/customers/PaymentRowFields';
 import {
   discountExpense,
   discountOf,
@@ -29,7 +29,6 @@ import {
   previousDueFor,
   receiptFormErrors,
   receivingNow,
-  type PaymentRow,
   type ReceiptForm,
   type ReceiptFormErrors,
 } from '@/features/customers/receiptForm';
@@ -99,6 +98,7 @@ export default function ReceiveDueScreen() {
   const shown: ReceiptFormErrors = submitted ? errors : { lines: {} };
   // A discount is booked as an expense, so it is offered only to whoever may write one.
   const mayDiscount = can('expense.create') && (data?.categories.length ?? 0) > 0;
+  const rowLabels = { account: t.account, chooseAccount: t.chooseAccount, amount: t.amount, remove: t.removeRow, close: t.close, errAccount: t.errAccount, errAmount: t.errAmount };
 
   const textReceipt = async () => {
     const phone = String(customer?.phone || '');
@@ -194,6 +194,7 @@ export default function ReceiveDueScreen() {
                   onChange={(patch) => setRow(row.key, patch)}
                   onRemove={form.rows.length > 1 ? () => set({ rows: form.rows.filter((r) => r.key !== row.key) }) : undefined}
                   errors={shown.lines[row.key]}
+                  labels={rowLabels}
                 />
               ))}
               {form.rows.length < accounts.length && !(discount > 0) ? (

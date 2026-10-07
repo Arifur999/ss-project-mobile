@@ -1,3 +1,4 @@
+import type { PaymentRow } from '@/components/PaymentRowFields';
 import type { Account } from '@/lib/balance';
 import { customerCurrentDue } from '@/lib/customerDue';
 import { parseAmount, roundTaka } from '@/lib/money';
@@ -14,8 +15,6 @@ import type { Category, ExpenseInput } from '@/services/expenses.services';
 // The website writes the discount into every row's notes, and every reader of
 // those notes counts it once per row, so a split collection with a discount
 // takes the discount off the customer's due twice or more.
-
-export type PaymentRow = { key: string; account_id: string; amount: string };
 
 export type ReceiptForm = {
   date: string;

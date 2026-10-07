@@ -4,26 +4,37 @@ import { SelectField } from '@/components/SelectField';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
 import { Red } from '@/constants/theme';
-import { useCopy } from '@/context/LanguageContext';
-import { CUSTOMER_COPY } from '@/features/customers/copy';
-import type { PaymentRow } from '@/features/customers/receiptForm';
 import type { Account } from '@/lib/balance';
 
-/** One part of a collection: the account it went into and how much - with Remove once it is split. */
+/** One part of a payment as typed: which account and how much. */
+export type PaymentRow = { key: string; account_id: string; amount: string };
+
+export type PaymentRowLabels = {
+  account: string;
+  chooseAccount: string;
+  amount: string;
+  remove: string;
+  close: string;
+  errAccount: string;
+  errAmount: string;
+};
+
+/** One part of a payment - a due collection, a sale: the account it went into and how much, with Remove once it is split. */
 export function PaymentRowFields({
   row,
   accounts,
   onChange,
   onRemove,
   errors,
+  labels: t,
 }: {
   row: PaymentRow;
   accounts: Account[];
   onChange: (patch: Partial<PaymentRow>) => void;
   onRemove?: () => void;
   errors?: { account?: true; amount?: true };
+  labels: PaymentRowLabels;
 }) {
-  const t = useCopy(CUSTOMER_COPY);
   return (
     <View style={styles.row}>
       <View style={styles.account}>
@@ -51,8 +62,8 @@ export function PaymentRowFields({
         />
       </View>
       {onRemove ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={t.removeRow} onPress={onRemove} style={styles.remove}>
-          <Txt style={styles.removeText}>{t.removeRow}</Txt>
+        <Pressable accessibilityRole="button" accessibilityLabel={t.remove} onPress={onRemove} style={styles.remove}>
+          <Txt style={styles.removeText}>{t.remove}</Txt>
         </Pressable>
       ) : null}
     </View>
