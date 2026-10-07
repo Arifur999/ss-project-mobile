@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { api, http } from '@/lib/httpClient';
+import { http } from '@/lib/httpClient';
 
 /** The workspace's business details, as /business-settings stores them. */
 export interface BusinessSettings {
@@ -60,18 +60,6 @@ export const getBusinessSettings = () => http.get<BusinessSettings | null>('/bus
 
 export const saveBusinessSettings = (settings: BusinessSettings) =>
   http.put<BusinessSettings>('/business-settings', settings);
-
-/** Uploads an image picked on the phone and returns its hosted URL. */
-export async function uploadImage(uri: string, mimeType = 'image/jpeg', fileName = 'logo.jpg'): Promise<string> {
-  const form = new FormData();
-  // React Native's FormData takes a { uri, name, type } file descriptor.
-  form.append('image', { uri, name: fileName, type: mimeType } as unknown as Blob);
-  const res = await api.post<{ data: { url: string } }>('/upload/image', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    timeout: 60000,
-  });
-  return res.data.data.url;
-}
 
 export const BUSINESS_KEY = ['business-settings'] as const;
 

@@ -16,15 +16,8 @@ import { BusinessDetails } from '@/features/business/BusinessDetails';
 import { BusinessForm, businessErrors, type BusinessField } from '@/features/business/BusinessForm';
 import { BUSINESS_COPY } from '@/features/business/copy';
 import { errorMessage } from '@/lib/httpClient';
-import {
-  toBusinessInfo,
-  uploadImage,
-  useBusinessSettings,
-  useSaveBusinessSettings,
-  type BusinessInfo,
-} from '@/services/business.services';
-
-type PickedLogo = { uri: string; name: string; mimeType: string };
+import { toBusinessInfo, useBusinessSettings, useSaveBusinessSettings, type BusinessInfo } from '@/services/business.services';
+import { uploadImage, type LocalImage } from '@/services/upload.services';
 
 /** Business Info: read it, or edit it and the logo, from the account sheet. */
 export default function BusinessInfoScreen() {
@@ -39,7 +32,7 @@ export default function BusinessInfoScreen() {
   const [touched, setTouched] = useState<Partial<Record<BusinessField, boolean>>>({});
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [logo, setLogo] = useState<PickedLogo | null>(null);
+  const [logo, setLogo] = useState<LocalImage | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const all = businessErrors(draft, t);
@@ -87,7 +80,7 @@ export default function BusinessInfoScreen() {
     setError(null);
     try {
       // The picked file is uploaded only now, on save, so cancelling costs nothing.
-      const logoUrl = logo ? await uploadImage(logo.uri, logo.mimeType, logo.name) : draft.logoUrl;
+      const logoUrl = logo ? await uploadImage(logo) : draft.logoUrl;
       await save({ ...draft, logoUrl });
       setEditing(false);
       toast.show(t.saved);
