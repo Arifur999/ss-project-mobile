@@ -76,6 +76,18 @@ export const ACTIONS = {
   'sale.deliver': { roles: ['owner', 'manager', 'sales_staff'], permission: ['page:sales.ledger', 'page:sales.new'] },
   // sale.route.ts: DELETE /:id - the server puts the stock and its FIFO cost back
   'sale.delete': { roles: ['owner', 'manager'], permission: 'act:sales.delete' },
+  // employee.route.ts: POST / and PATCH /:id - join, edit, resign
+  'employee.write': { roles: ['owner', 'manager'], permission: 'page:employees.list' },
+  // employee.route.ts: DELETE /:id
+  'employee.delete': { roles: ['owner'] },
+  // salaryTransaction.route.ts: POST /
+  'salary.create': { roles: ['owner', 'manager', 'accountant'], permission: 'page:employees.transactions' },
+  // salaryTransaction.route.ts: DELETE /:id
+  'salary.delete': { roles: ['owner'] },
+  // attendance.route.ts: PUT /
+  'attendance.write': { roles: ['owner', 'manager'], permission: 'page:employees.attendance' },
+  // attendance.route.ts: DELETE /:id
+  'attendance.delete': { roles: ['owner', 'manager'], permission: 'act:employees.delete' },
 } as const satisfies Record<string, { roles: readonly UserRole[]; permission?: string | readonly string[] }>;
 
 export type Action = keyof typeof ACTIONS;
