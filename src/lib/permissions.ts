@@ -88,6 +88,12 @@ export const ACTIONS = {
   'attendance.write': { roles: ['owner', 'manager'], permission: 'page:employees.attendance' },
   // attendance.route.ts: DELETE /:id
   'attendance.delete': { roles: ['owner', 'manager'], permission: 'act:employees.delete' },
+  // monthlyTarget.route.ts: PUT / and DELETE /:id - the owner's alone
+  'salesTarget.write': { roles: ['owner'] },
+  // purchaseTarget.route.ts: POST / and PATCH /:id
+  'purchaseTarget.write': { roles: ['owner', 'manager'], permission: 'page:reports.purchase-target' },
+  // purchaseTarget.route.ts: DELETE /:id
+  'purchaseTarget.delete': { roles: ['owner', 'manager'], permission: 'act:reports.delete' },
 } as const satisfies Record<string, { roles: readonly UserRole[]; permission?: string | readonly string[] }>;
 
 export type Action = keyof typeof ACTIONS;
