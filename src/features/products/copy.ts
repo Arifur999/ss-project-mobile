@@ -18,6 +18,7 @@ export const PRODUCT_COPY = {
     delete: 'Delete',
     edit: 'Edit',
     optional: 'Optional',
+    showMore: 'Show more',
 
     searchLabel: 'Search products',
     searchPlaceholder: 'Name or code',
@@ -99,6 +100,7 @@ export const PRODUCT_COPY = {
     delete: 'মুছুন',
     edit: 'সম্পাদনা',
     optional: 'ঐচ্ছিক',
+    showMore: 'আরও দেখুন',
 
     searchLabel: 'পণ্য খুঁজুন',
     searchPlaceholder: 'নাম বা কোড',
