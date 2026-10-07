@@ -21,6 +21,7 @@ export const DAMAGE_COPY = {
     periods: { all: 'All time', thisMonth: 'This month', lastMonth: 'Last month', thisYear: 'This year' },
     periodLabel: 'Period',
     pcs: (shown: string) => `${shown} pcs`,
+    showMore: 'Show more',
 
     sources: {
       own_stock: { label: 'Own stock', sub: 'Broke here' },
@@ -146,6 +147,7 @@ export const DAMAGE_COPY = {
     periods: { all: 'সব সময়', thisMonth: 'এই মাস', lastMonth: 'গত মাস', thisYear: 'এই বছর' },
     periodLabel: 'সময়',
     pcs: (shown: string) => `${shown} পিস`,
+    showMore: 'আরও দেখুন',
 
     sources: {
       own_stock: { label: 'নিজের স্টক', sub: 'এখানে নষ্ট হয়েছে' },
