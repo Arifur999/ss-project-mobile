@@ -94,6 +94,11 @@ export const ACTIONS = {
   'purchaseTarget.write': { roles: ['owner', 'manager'], permission: 'page:reports.purchase-target' },
   // purchaseTarget.route.ts: DELETE /:id
   'purchaseTarget.delete': { roles: ['owner', 'manager'], permission: 'act:reports.delete' },
+  // report.route.ts: POST /email - whoever may read a report, to the owner's own address
+  'report.email': {
+    roles: ['owner', 'manager', 'accountant'],
+    permission: ['page:reports.summary', 'page:reports.yearly', 'page:reports.monthly-target', 'page:reports.purchase-target'],
+  },
 } as const satisfies Record<string, { roles: readonly UserRole[]; permission?: string | readonly string[] }>;
 
 export type Action = keyof typeof ACTIONS;
