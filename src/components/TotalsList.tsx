@@ -10,7 +10,7 @@ export function TotalsList({ rows, grand }: { rows: TotalRow[]; grand?: TotalRow
   return (
     <View style={styles.list}>
       {rows.map((row, i) => (
-        <View key={row.label} style={[styles.row, i > 0 && styles.divider]}>
+        <View key={`${i}:${row.label}`} style={[styles.row, i > 0 && styles.divider]}>
           <Txt style={styles.label}>{row.label}</Txt>
           <Txt style={styles.value}>{row.value}</Txt>
         </View>
