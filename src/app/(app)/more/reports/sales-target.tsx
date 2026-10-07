@@ -67,7 +67,6 @@ export default function SalesTargetScreen() {
           <FiguresCard
             key={String(row.id)}
             title={label(row)}
-            meta=""
             figures={[
               { label: t.salesTargetLabel, value: money(row.sales_target), strong: true },
               { label: t.profitTargetLabel, value: money(row.profit_target) },

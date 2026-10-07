@@ -20,7 +20,7 @@ export function FiguresCard({
   onPress,
 }: {
   title: string;
-  meta: string;
+  meta?: string;
   sub?: string;
   figures: Figure[];
   badge?: { label: string; bg: string; ink: string };
@@ -42,9 +42,11 @@ export function FiguresCard({
           </View>
         ) : null}
       </View>
-      <Txt style={styles.meta} numberOfLines={1}>
-        {meta}
-      </Txt>
+      {meta ? (
+        <Txt style={styles.meta} numberOfLines={1}>
+          {meta}
+        </Txt>
+      ) : null}
       {sub ? (
         <Txt style={styles.sub} numberOfLines={1}>
           {sub}
