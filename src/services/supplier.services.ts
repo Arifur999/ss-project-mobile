@@ -59,7 +59,7 @@ export type SupplierData = {
 };
 
 /** How the website names a supplier: the company, else the name. */
-export const supplierLabel = (s: Pick<SupplierRecord, 'name' | 'company_name'> | null | undefined) =>
+export const supplierLabel = (s: { name?: unknown; company_name?: unknown } | null | undefined) =>
   String(s?.company_name || s?.name || '').trim();
 
 const newestFirst = (a: Row, b: Row) =>
