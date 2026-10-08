@@ -1,6 +1,9 @@
+import { useLocalSearchParams } from 'expo-router';
+
 import { SaleFormScreen } from '@/features/sales/SaleFormScreen';
 
-/** A new sale. */
+/** A new sale - or, given ?draft=, a parked one carried on. */
 export default function NewSaleScreen() {
-  return <SaleFormScreen />;
+  const { draft } = useLocalSearchParams<{ draft?: string }>();
+  return <SaleFormScreen draftId={draft || undefined} />;
 }
