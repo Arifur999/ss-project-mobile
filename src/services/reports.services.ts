@@ -5,6 +5,7 @@ import { toISODate } from '@/lib/dates';
 import { http } from '@/lib/httpClient';
 import { inRange, reportRange, type ReportPeriod } from '@/lib/periods';
 import { buildReport, targetSpan, type ReportData } from '@/lib/reportSummary';
+import { buildYearlyReport, type YearlyReport } from '@/lib/yearlyReport';
 import { fetchListOrDenied } from '@/services/list.services';
 
 type Row = Record<string, any>;
@@ -58,6 +59,44 @@ export const REPORT_KEY = ['reports'] as const;
 /** A period's report; the last one stays on screen while the next loads. */
 export function useReport(period: ReportPeriod) {
   return useQuery({ queryKey: [...REPORT_KEY, period], queryFn: () => loadReport(period), placeholderData: keepPreviousData });
+}
+
+/**
+ * What the Yearly report reads, fetched as the website's loadData does: the
+ * year's sales, expenses, withdrawals and other income, every purchase (a
+ * buying target counts its own months, which may run past the year), and the
+ * targets and products. Anything the user may not read counts as nothing.
+ */
+export async function loadYearlyReport(year: number): Promise<YearlyReport> {
+  const range = { from: `${year}-01-01`, to: `${year}-12-31` };
+  const [sales, purchases, expenses, targets, withdrawals, otherIncomes, products, purchaseTargets] = await Promise.all([
+    fetchListOrDenied('/sales', range),
+    fetchListOrDenied('/purchases'),
+    fetchListOrDenied('/expenses', range),
+    fetchListOrDenied('/monthly-targets'),
+    fetchListOrDenied('/profit-withdrawals', range),
+    fetchListOrDenied('/other-incomes', range),
+    fetchListOrDenied('/products'),
+    fetchListOrDenied('/purchase-targets'),
+  ]);
+  const within = (rows: Row[]) => rows.filter((row) => inRange(row.date, range));
+  return buildYearlyReport({
+    year,
+    sales: within(completed(sales.rows)),
+    purchases: within(purchases.rows),
+    allPurchases: purchases.rows,
+    expenses: within(expenses.rows),
+    targets: targets.rows,
+    withdrawals: within(withdrawals.rows),
+    otherIncomes: within(otherIncomes.rows),
+    products: products.rows,
+    purchaseTargets: purchaseTargets.rows,
+  });
+}
+
+/** A year's report, under the report key so every write that refetches reports refetches it. */
+export function useYearlyReport(year: number) {
+  return useQuery({ queryKey: [...REPORT_KEY, 'yearly', year], queryFn: () => loadYearlyReport(year), placeholderData: keepPreviousData });
 }
 
 export type TargetData = {
