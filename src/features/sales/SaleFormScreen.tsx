@@ -1,4 +1,3 @@
-import { isAxiosError } from 'axios';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -24,6 +23,7 @@ import { useToast } from '@/context/ToastContext';
 import { CustomerFormSheet } from '@/features/customers/CustomerFormSheet';
 import { ProductPickerSheet } from '@/features/products/ProductPickerSheet';
 import { DRAFT_COPY } from '@/features/drafts/copy';
+import { useOpenedDraft, useParking } from '@/features/drafts/useDraftForm';
 import { SALES_COPY } from '@/features/sales/copy';
 import { draftFromForm, formFromDraft, type OpenedDraft } from '@/features/sales/saleDraft';
 import {
@@ -50,7 +50,6 @@ import { previousDueFor } from '@/lib/previousDue';
 import { buildInvoiceSms, smsBusiness } from '@/lib/smsTexts';
 import { useBusinessSettings } from '@/services/business.services';
 import { createCustomerPayment, useCustomerData, type CustomerData } from '@/services/customers.services';
-import { clearDraft, createDraft, updateDraft, useDraft, useDraftWrite } from '@/services/drafts.services';
 import { createSale, updateSale, useSaleWrite } from '@/services/sales.services';
 import { sendSms, smsFailureReason } from '@/services/sms.services';
 
@@ -78,33 +77,23 @@ const rowKey = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
  */
 export function SaleFormScreen({ saleId, draftId }: { saleId?: string; draftId?: string }) {
   const t = useCopy(SALES_COPY);
-  const d = useCopy(DRAFT_COPY);
   const { data } = useCustomerData();
-  const draft = useDraft(draftId ?? null);
-  // undefined until the draft is in; null when it is in a shape this app does not know.
-  const [opened, setOpened] = useState<OpenedDraft | null | undefined>(undefined);
-  if (draftId && opened === undefined && draft.data && data) {
-    const known = new Set(data.customers.map((c) => c.id));
-    setOpened(formFromDraft(draft.data.data, { rowKey, today: todayISO(), isCustomer: (id) => known.has(id) }));
-  }
+  const draft = useOpenedDraft(
+    draftId,
+    data
+      ? (raw) => {
+          const known = new Set(data.customers.map((c) => c.id));
+          return formFromDraft(raw, { rowKey, today: todayISO(), isCustomer: (id) => known.has(id) });
+        }
+      : null,
+  );
 
   const editing = saleId ? (data?.sales.find((sale) => sale.id === saleId) ?? null) : null;
-  const draftMissing = draft.isError && opened === undefined;
-  const draftNotice = !draftId
-    ? null
-    : opened === null
-      ? d.stale
-      : draftMissing
-        ? isAxiosError(draft.error) && draft.error.response?.status === 404
-          ? d.gone
-          : errorMessage(draft.error)
-        : null;
-  const notice = !data ? null : saleId && !editing ? t.notFound : editing && !saleEditable(editing) ? t.editBlocked : draftNotice;
-  const waiting = !!draftId && opened === undefined && !draftMissing;
+  const notice = !data ? null : saleId && !editing ? t.notFound : editing && !saleEditable(editing) ? t.editBlocked : draft.notice;
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={saleId ? t.editTitle : t.formTitle} onBack={() => router.back()} backLabel={t.back} />
-      {!data || waiting ? (
+      {!data || draft.waiting ? (
         <View style={styles.state}>
           <Spinner color={Zinc[900]} size={24} />
         </View>
@@ -113,7 +102,7 @@ export function SaleFormScreen({ saleId, draftId }: { saleId?: string; draftId?:
           <Txt style={styles.notice}>{notice}</Txt>
         </View>
       ) : (
-        <SaleFormBody data={data} editing={editing} draft={draftId && opened ? { id: draftId, opened } : null} />
+        <SaleFormBody data={data} editing={editing} draft={draftId && draft.opened ? { id: draftId, opened: draft.opened } : null} />
       )}
     </SafeAreaView>
   );
@@ -127,7 +116,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
   const toast = useToast();
   const can = useCan();
   const write = useSaleWrite();
-  const writeDraft = useDraftWrite('sale');
+  const parked = useParking('sale', draft?.id ?? null);
   const business = useBusinessSettings();
 
   const accounts = data.accounts;
@@ -153,8 +142,6 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
   const [form, setForm] = useState<SaleForm>(start);
   // What leaving would lose is measured from here: the form as it opened, or as last parked.
   const [baseline, setBaseline] = useState<SaleForm>(start);
-  const [draftId, setDraftId] = useState<string | null>(draft?.id ?? null);
-  const [parking, setParking] = useState(false);
   const [picking, setPicking] = useState(false);
   const [adding, setAdding] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -210,33 +197,19 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
 
   /** Parks the form as it stands - unchecked, as half an invoice is what a draft is for - over the draft it came from. */
   const park = async () => {
-    if (parking || saving) return;
-    setParking(true);
+    if (parked.parking || saving) return;
     setError(null);
-    const body = draftFromForm(form, customer, accounts, totals);
     try {
-      const saved = await writeDraft(async () => {
-        if (!draftId) return createDraft(body);
-        try {
-          return await updateDraft(draftId, body);
-        } catch (e) {
-          // Deleted meanwhile, on another till or the website: park it afresh.
-          if (isAxiosError(e) && e.response?.status === 404) return createDraft(body);
-          throw e;
-        }
-      });
-      setDraftId(String(saved.id));
+      await parked.park(draftFromForm(form, customer, accounts, totals));
       setBaseline(form);
       toast.show(d.saved);
     } catch (e) {
       setError(errorMessage(e));
-    } finally {
-      setParking(false);
     }
   };
 
   const save = async () => {
-    if (saving || parking) return;
+    if (saving || parked.parking) return;
     setSubmitted(true);
     if (hasErrors(errors)) return;
     setSaving(true);
@@ -257,7 +230,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
           }
         }
         // The sale stands whatever happens to the draft it came from.
-        const draftLeft = draftId ? !(await writeDraft(() => clearDraft(draftId))) : false;
+        const draftLeft = !(await parked.clear());
         return { invoiceNo, dueError, draftLeft };
       });
       const sms = form.sms ? await textInvoice(outcome.invoiceNo, plan.finalPaid, plan.finalDue) : '';
@@ -412,7 +385,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
 
           <TextField tone="zinc" label={t.notes} placeholder={t.optional} value={form.notes} onChangeText={(notes) => set({ notes })} minHeight={64} />
           {!editing && can('draft.write') ? (
-            <Button title={draftId ? d.update : d.save} icon="fileText" variant="pillOutline" onPress={park} busy={parking} disabled={saving} />
+            <Button title={parked.draftId ? d.update : d.save} icon="fileText" variant="pillOutline" onPress={park} busy={parked.parking} disabled={saving} />
           ) : null}
           {!editing && can('sms.send') ? <SwitchRow title={t.smsInvoice} hint={t.smsInvoiceSub} value={form.sms} onChange={(sms) => set({ sms })} /> : null}
           <AlertBanner tone="error">{error}</AlertBanner>
