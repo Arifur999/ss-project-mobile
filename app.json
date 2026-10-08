@@ -18,6 +18,7 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
+      "allowBackup": false,
       "package": "agency.softech.furnify"
     },
     "web": {
