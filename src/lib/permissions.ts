@@ -40,6 +40,8 @@ export const ACTIONS = {
   'damage.delete': { roles: ['owner', 'manager'], permission: 'act:damage.delete' },
   // supplier.route.ts: POST / and PATCH /:id
   'supplier.write': { roles: ['owner', 'manager'], permission: 'page:supplier.list' },
+  // The website's Supplier Report page: whoever holds it reads the purchases it adds up
+  'supplierReport.view': { roles: ['owner', 'manager', 'accountant', 'sales_staff'], permission: 'page:supplier.report' },
   // supplier.route.ts: DELETE /:id
   'supplier.delete': { roles: ['owner', 'manager'], permission: 'act:supplier.delete' },
   // supplierPayment.route.ts: POST / and PATCH /:id
