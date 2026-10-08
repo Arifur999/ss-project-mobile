@@ -111,6 +111,14 @@ export const CUSTOMER_COPY = {
     partSaved: (saved: string, total: string, error: string) =>
       `${saved} of ${total} payments saved; the rest were not (${error}). Check Due received before trying again.`,
     discountFailed: (error: string) => `Due collection saved, but not its discount expense (${error}). Add it in Expenses.`,
+    editReceipt: 'Edit collection',
+    editTitle: 'Edit due received',
+    receiptGone: 'This collection is no longer here.',
+    splitNoEdit: 'A collection split across accounts cannot be edited - delete it and take it again.',
+    discountKept: (amount: string) => `The ${amount} discount stays as it was. To change it, delete this collection and take it again.`,
+    customerLocked: 'Collected against an invoice, so its customer stays.',
+    owesBesides: (amount: string) => `Owes ${amount} besides this collection`,
+    updated: 'Due received updated',
     smsSkipped: 'Receipt SMS skipped - the customer has no valid phone number.',
     smsSent: 'Receipt sent by SMS',
 
@@ -264,6 +272,14 @@ export const CUSTOMER_COPY = {
     partSaved: (saved: string, total: string, error: string) =>
       `${total}টির মধ্যে ${saved}টি পেমেন্ট সেভ হয়েছে; বাকিগুলো হয়নি (${error})। আবার চেষ্টার আগে বাকি আদায় তালিকা দেখে নিন।`,
     discountFailed: (error: string) => `বাকি আদায় সেভ হয়েছে, কিন্তু ছাড়ের খরচ লেখা যায়নি (${error})। খরচ থেকে যোগ করুন।`,
+    editReceipt: 'আদায় এডিট করুন',
+    editTitle: 'বাকি আদায় সম্পাদনা',
+    receiptGone: 'এই আদায়টি আর নেই।',
+    splitNoEdit: 'একাধিক অ্যাকাউন্টে ভাগ করা আদায় এডিট করা যায় না - মুছে আবার নিন।',
+    discountKept: (amount: string) => `${amount} ছাড় যেমন ছিল তেমনই থাকবে। বদলাতে হলে আদায়টি মুছে আবার নিন।`,
+    customerLocked: 'ইনভয়েসের বিপরীতে আদায়, তাই কাস্টমার বদলানো যাবে না।',
+    owesBesides: (amount: string) => `এই আদায় ছাড়া বাকি ${amount}`,
+    updated: 'বাকি আদায় আপডেট হয়েছে',
     smsSkipped: 'রসিদ SMS যায়নি - কাস্টমারের সঠিক ফোন নম্বর নেই।',
     smsSent: 'রসিদ SMS পাঠানো হয়েছে',
 
