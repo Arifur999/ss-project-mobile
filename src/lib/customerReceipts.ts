@@ -103,3 +103,23 @@ export function groupReceipts(payments: Row[], customers: Row[], sales: Row[]): 
   });
   return receipts.reverse();
 }
+
+/**
+ * The expense a receipt's discount was booked as, among a day's expenses: the
+ * same day and amount, written for this customer - as the website finds it,
+ * for the category and to take it away with a deleted collection. There is no
+ * link between the two rows to follow.
+ */
+export function discountTwin(receipt: Row, expenses: Row[]): Row | null {
+  const discount = Number(receipt.discount || 0);
+  if (!(discount > 0)) return null;
+  return (
+    expenses.find(
+      (expense) =>
+        String(expense.date || '').slice(0, 10) === String(receipt.date || '').slice(0, 10) &&
+        Number(expense.amount || 0) === discount &&
+        String(expense.notes || '').startsWith('Automatically generated from Customer Due Discount') &&
+        String(expense.notes || '').includes(receipt.customer_name || ''),
+    ) ?? null
+  );
+}
