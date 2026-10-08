@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
-import { DesignIcon } from '@/components/DesignIcon';
+import { CheckRow } from '@/components/CheckRow';
 import { SearchField } from '@/components/SearchField';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
@@ -88,28 +88,17 @@ export function RecipientSheet({
       {shown.length === 0 ? (
         <Txt style={styles.empty}>{t.noContacts}</Txt>
       ) : (
-        shown.slice(0, limit).map((contact) => {
-          const on = chosen.has(contact.id);
-          return (
-            <Pressable
-              key={contact.id}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: on }}
-              accessibilityLabel={`${contact.name}, ${contact.phone || t.noPhone}`}
-              onPress={() => toggle(contact.id)}
-              style={({ pressed }) => [styles.row, on && styles.rowOn, pressed && styles.pressed]}>
-              <View style={[styles.box, on && styles.boxOn]}>{on ? <DesignIcon name="check" size={14} color={White} strokeWidth={3} /> : null}</View>
-              <View style={styles.body}>
-                <Txt style={styles.name} numberOfLines={1}>
-                  {contact.name}
-                </Txt>
-                <Txt style={[styles.meta, !contact.phone && styles.noPhone]} numberOfLines={1}>
-                  {[contact.phone || t.noPhone, t.types[contact.type], contact.subtitle].filter(Boolean).join(' · ')}
-                </Txt>
-              </View>
-            </Pressable>
-          );
-        })
+        shown.slice(0, limit).map((contact) => (
+          <CheckRow
+            key={contact.id}
+            title={contact.name}
+            meta={[contact.phone || t.noPhone, t.types[contact.type], contact.subtitle].filter(Boolean).join(' · ')}
+            metaMuted={!contact.phone}
+            checked={chosen.has(contact.id)}
+            onPress={() => toggle(contact.id)}
+            label={`${contact.name}, ${contact.phone || t.noPhone}`}
+          />
+        ))
       )}
       {shown.length > limit ? <Button title={t.showMore(formatNumber(shown.length - limit, lang))} variant="pillOutline" onPress={() => setLimit((n) => n + PAGE)} /> : null}
       <Button title={t.done} variant="pill" onPress={onClose} />
@@ -127,24 +116,4 @@ const styles = StyleSheet.create({
   chipTextOn: { fontWeight: '600', color: White },
   chipTextOff: { fontWeight: '500', color: Zinc[700] },
   empty: { paddingVertical: 20, textAlign: 'center', fontSize: 14, color: Zinc[600] },
-  row: {
-    minHeight: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Zinc[200],
-    backgroundColor: White,
-  },
-  rowOn: { borderColor: Zinc[900] },
-  pressed: { backgroundColor: Zinc[50] },
-  box: { width: 22, height: 22, borderRadius: 6, borderWidth: 1.5, borderColor: Zinc[400], alignItems: 'center', justifyContent: 'center' },
-  boxOn: { backgroundColor: Zinc[900], borderColor: Zinc[900] },
-  body: { flex: 1, minWidth: 0 },
-  name: { fontSize: 15, fontWeight: '600', color: Zinc[900] },
-  meta: { fontSize: 12, color: Zinc[500] },
-  noPhone: { color: Zinc[400] },
 });
