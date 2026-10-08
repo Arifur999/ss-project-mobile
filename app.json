@@ -19,6 +19,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "allowBackup": false,
+      "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW"],
       "package": "agency.softech.furnify"
     },
     "web": {
@@ -36,6 +37,14 @@
         }
       ],
       "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to open your photos so you can choose a product photo or your logo.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       "@react-native-community/datetimepicker",
       "expo-sharing"
     ],
