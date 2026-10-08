@@ -27,10 +27,11 @@ export type Draft = {
 export type DraftWithData = Draft & { data: Record<string, unknown> };
 
 export const DRAFTS_KEY = ['drafts'] as const;
+const SALE_DRAFTS_KEY = [...DRAFTS_KEY, 'sale'] as const;
 
 /** The parked sales, last touched first. The list leaves each snapshot out. */
 export function useSaleDrafts() {
-  return useQuery({ queryKey: [...DRAFTS_KEY, 'sale'], queryFn: () => http.get<Draft[]>('/drafts?kind=sale') });
+  return useQuery({ queryKey: SALE_DRAFTS_KEY, queryFn: () => http.get<Draft[]>('/drafts?kind=sale') });
 }
 
 /** One parked sale with its snapshot; fetched fresh each time, as another till may have changed it. */
@@ -56,13 +57,16 @@ export async function clearDraft(id: string): Promise<boolean> {
   }
 }
 
-/** Runs a draft write, then refetches the drafts list. */
+/**
+ * Runs a draft write, then refetches the drafts list - only the list: a form
+ * open on a draft keeps the copy it opened, even once publishing deletes it.
+ */
 export function useDraftWrite() {
   const queryClient = useQueryClient();
   return useCallback(
     async <T,>(write: () => Promise<T>) => {
       const result = await write();
-      await queryClient.invalidateQueries({ queryKey: DRAFTS_KEY });
+      await queryClient.invalidateQueries({ queryKey: SALE_DRAFTS_KEY });
       return result;
     },
     [queryClient],
