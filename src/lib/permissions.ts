@@ -26,6 +26,8 @@ export function hasPermission(role: string | undefined, granted: string[] | unde
 export const ACTIONS = {
   // product.route.ts: POST / and PATCH /:id
   'products.write': { roles: ['owner', 'manager'], permission: 'page:products.list' },
+  // product.route.ts: POST /bulk-update-prices and /price-updates
+  'products.updatePrice': { roles: ['owner', 'manager'], permission: 'page:products.update-price' },
   // product.route.ts: DELETE /:id
   'products.delete': { roles: ['owner', 'manager'], permission: 'act:products.delete' },
   // inventory.route.ts: POST /adjust
