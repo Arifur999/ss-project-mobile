@@ -92,6 +92,8 @@ export const ACTIONS = {
   'saleDraft.list': { roles: ['owner', 'manager', 'sales_staff'], permission: 'page:sales.drafts' },
   // sale.route.ts: POST /:id/deliveries
   'sale.deliver': { roles: ['owner', 'manager', 'sales_staff'], permission: ['page:sales.ledger', 'page:sales.new'] },
+  // sale.route.ts: POST /items/:itemId/manual-cost - the server re-costs the line's stock at the rate
+  'sale.cost': { roles: ['owner', 'manager', 'sales_staff'], permission: ['page:sales.ledger', 'page:sales.new'] },
   // sale.route.ts: DELETE /:id - the server puts the stock and its FIFO cost back
   'sale.delete': { roles: ['owner', 'manager'], permission: 'act:sales.delete' },
   // employee.route.ts: POST / and PATCH /:id - join, edit, resign
