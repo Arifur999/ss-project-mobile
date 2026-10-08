@@ -124,7 +124,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
   const toast = useToast();
   const can = useCan();
   const write = useSaleWrite();
-  const writeDraft = useDraftWrite();
+  const writeDraft = useDraftWrite('sale');
   const business = useBusinessSettings();
 
   const accounts = data.accounts;

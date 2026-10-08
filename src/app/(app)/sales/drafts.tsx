@@ -14,7 +14,7 @@ import { SalesShell } from '@/features/sales/SalesShell';
 import { useCan } from '@/hooks/useCan';
 import { dateLabel } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
-import { deleteDraft, useDraftWrite, useSaleDrafts, type Draft } from '@/services/drafts.services';
+import { deleteDraft, useDraftWrite, useDrafts, type Draft } from '@/services/drafts.services';
 
 /**
  * The parked invoices - the website's Draft Sales: each one's customer,
@@ -27,8 +27,8 @@ export default function SaleDraftsScreen() {
   const { money } = useAmountShield();
   const toast = useToast();
   const can = useCan();
-  const write = useDraftWrite();
-  const query = useSaleDrafts();
+  const write = useDraftWrite('sale');
+  const query = useDrafts('sale');
   const [selected, setSelected] = useState<Draft | null>(null);
   const [sheet, setSheet] = useState<'actions' | 'delete' | null>(null);
   const [deleting, setDeleting] = useState(false);

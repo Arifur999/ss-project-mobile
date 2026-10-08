@@ -3,18 +3,19 @@ import { isAxiosError } from 'axios';
 import { useCallback } from 'react';
 
 import { http } from '@/lib/httpClient';
-import type { DraftBody } from '@/lib/draftPayload';
+import type { DraftBody, DraftKind } from '@/lib/draftPayload';
 
-// Parked invoices, shared with the website's Draft Sales: one list per
-// workspace, whoever parked them. A draft reaches no stock, due or account
-// until it is opened and saved as a sale.
+// Parked invoices and purchase orders, shared with the website's Draft Sales
+// and Draft Purchase: one list of each kind per workspace, whoever parked
+// them. A draft reaches no stock, due or account until it is opened and saved
+// as a sale or an order.
 
 export type Draft = {
   id: string;
-  kind: 'sale' | 'purchase_order';
-  /** The customer. */
+  kind: DraftKind;
+  /** The customer or supplier. */
   title: string;
-  /** The invoice number. */
+  /** The invoice or SI number. */
   subtitle: string;
   amount: number;
   payload_version: number;
@@ -27,14 +28,14 @@ export type Draft = {
 export type DraftWithData = Draft & { data: Record<string, unknown> };
 
 export const DRAFTS_KEY = ['drafts'] as const;
-const SALE_DRAFTS_KEY = [...DRAFTS_KEY, 'sale'] as const;
+const listKey = (kind: DraftKind) => [...DRAFTS_KEY, 'list', kind] as const;
 
-/** The parked sales, last touched first. The list leaves each snapshot out. */
-export function useSaleDrafts() {
-  return useQuery({ queryKey: SALE_DRAFTS_KEY, queryFn: () => http.get<Draft[]>('/drafts?kind=sale') });
+/** One kind's parked forms, last touched first. The list leaves each snapshot out. */
+export function useDrafts(kind: DraftKind) {
+  return useQuery({ queryKey: listKey(kind), queryFn: () => http.get<Draft[]>(`/drafts?kind=${kind}`) });
 }
 
-/** One parked sale with its snapshot; fetched fresh each time, as another till may have changed it. */
+/** One parked form with its snapshot; fetched fresh each time, as another till may have changed it. */
 export function useDraft(id: string | null) {
   return useQuery({ queryKey: [...DRAFTS_KEY, 'one', id], queryFn: () => http.get<DraftWithData>(`/drafts/${id}`), enabled: !!id, staleTime: 0, gcTime: 0 });
 }
@@ -58,17 +59,17 @@ export async function clearDraft(id: string): Promise<boolean> {
 }
 
 /**
- * Runs a draft write, then refetches the drafts list - only the list: a form
+ * Runs a draft write, then refetches that kind's list - only the list: a form
  * open on a draft keeps the copy it opened, even once publishing deletes it.
  */
-export function useDraftWrite() {
+export function useDraftWrite(kind: DraftKind) {
   const queryClient = useQueryClient();
   return useCallback(
     async <T,>(write: () => Promise<T>) => {
       const result = await write();
-      await queryClient.invalidateQueries({ queryKey: SALE_DRAFTS_KEY });
+      await queryClient.invalidateQueries({ queryKey: listKey(kind) });
       return result;
     },
-    [queryClient],
+    [queryClient, kind],
   );
 }
