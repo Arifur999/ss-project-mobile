@@ -26,7 +26,8 @@ type Row = Record<string, any>;
  * A sale opened from the ledger - the website's invoice view: each line priced
  * and how much of it has gone out (with Deliver on what has not, for whoever
  * may), the invoice's totals with the previous due and the current due, where
- * the money went, its cost and profit - then Share PDF, Print and Delete.
+ * the money went, its cost and profit - then Edit, Share PDF, Print and
+ * Delete. When it cannot be edited, `editNote` says why.
  */
 export function SaleSheet({
   sale,
@@ -34,6 +35,8 @@ export function SaleSheet({
   paidInto,
   onClose,
   onDeliver,
+  onEdit,
+  editNote,
   onShare,
   onPrint,
   onDelete,
@@ -43,6 +46,8 @@ export function SaleSheet({
   paidInto: string;
   onClose: () => void;
   onDeliver?: (item: Row) => void;
+  onEdit?: () => void;
+  editNote?: string;
   onShare: () => void;
   onPrint: () => void;
   onDelete?: () => void;
@@ -64,6 +69,9 @@ export function SaleSheet({
       subtitle={[sale?.customer_name || t.walkIn, sale?.customer_phone, dateLabel(String(sale?.date || ''), lang)].filter(Boolean).join(' · ')}
       cancelLabel={t.close}
       closeLabel={t.close}
+      note={editNote}
+      editLabel={t.editSale}
+      onEdit={onEdit}
       deleteLabel={t.deleteSale}
       onDelete={onDelete}
       extra={[
