@@ -21,7 +21,7 @@ export const BILLING_COPY = {
     history: 'All purchases',
     kinds: { all: 'All', plan: 'Plans', sms: 'SMS packages' },
     kindLabel: 'Type',
-    planItem: (plan: string) => (plan === 'yearly' ? 'Yearly plan' : plan === 'monthly' ? 'Monthly plan' : 'Plan'),
+    planItem: (plan: string): string => (plan === 'yearly' ? 'Yearly plan' : plan === 'monthly' ? 'Monthly plan' : 'Plan'),
     smsItem: 'SMS package',
     smsDetail: (n: string) => `${n} SMS credits`,
     paymentStatuses: { paid: 'Paid', pending: 'Pending', rejected: 'Rejected' } as Record<string, string>,
