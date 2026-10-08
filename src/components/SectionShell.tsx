@@ -10,6 +10,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
+import { SECTION_SWITCH } from '@/lib/stackOptions';
 
 /** The state of whatever query feeds the section. */
 type QueryState = {
@@ -72,7 +73,7 @@ export function SectionShell<K extends string>({
                 key={section.key}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}
-                onPress={() => !on && router.replace(section.route as never)}
+                onPress={() => !on && router.replace({ pathname: section.route, params: SECTION_SWITCH } as never)}
                 // The last sections sit past the screen edge; bring the current one into view.
                 onLayout={on ? (e) => chipsRef.current?.scrollTo({ x: Math.max(0, e.nativeEvent.layout.x - 20), animated: false }) : undefined}
                 style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
