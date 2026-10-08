@@ -13,17 +13,22 @@ import { dateLabel } from '@/lib/dates';
 /**
  * A due collection opened from the list - the website's receipt view: the due
  * before, each account the money went into, any discount, the due after, who
- * took it and why - then Share PDF, Print and, for whoever may, Delete.
+ * took it and why - then Edit, Share PDF, Print and, for whoever may,
+ * Delete. When it cannot be edited, `editNote` says why.
  */
 export function ReceiptSheet({
   receipt,
   onClose,
+  onEdit,
+  editNote,
   onShare,
   onPrint,
   onDelete,
 }: {
   receipt: Receipt | null;
   onClose: () => void;
+  onEdit?: () => void;
+  editNote?: string;
   onShare: () => void;
   onPrint: () => void;
   onDelete?: () => void;
@@ -47,6 +52,9 @@ export function ReceiptSheet({
       subtitle={receipt ? `${receiptNo(receipt)} · ${dateLabel(String(receipt.date || ''), lang)}` : ''}
       cancelLabel={t.close}
       closeLabel={t.close}
+      note={editNote}
+      editLabel={t.editReceipt}
+      onEdit={onEdit}
       deleteLabel={t.deleteReceipt}
       onDelete={onDelete}
       extra={[
