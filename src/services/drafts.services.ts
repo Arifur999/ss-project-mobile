@@ -3,7 +3,7 @@ import { isAxiosError } from 'axios';
 import { useCallback } from 'react';
 
 import { http } from '@/lib/httpClient';
-import type { SaleDraftBody } from '@/features/sales/saleDraft';
+import type { DraftBody } from '@/lib/draftPayload';
 
 // Parked invoices, shared with the website's Draft Sales: one list per
 // workspace, whoever parked them. A draft reaches no stock, due or account
@@ -39,8 +39,8 @@ export function useDraft(id: string | null) {
   return useQuery({ queryKey: [...DRAFTS_KEY, 'one', id], queryFn: () => http.get<DraftWithData>(`/drafts/${id}`), enabled: !!id, staleTime: 0, gcTime: 0 });
 }
 
-export const createDraft = (body: SaleDraftBody) => http.post<DraftWithData>('/drafts', body);
-export const updateDraft = (id: string, body: SaleDraftBody) => http.patch<DraftWithData>(`/drafts/${id}`, body);
+export const createDraft = (body: DraftBody) => http.post<DraftWithData>('/drafts', body);
+export const updateDraft = (id: string, body: DraftBody) => http.patch<DraftWithData>(`/drafts/${id}`, body);
 export const deleteDraft = (id: string) => http.delete(`/drafts/${id}`);
 
 /**

@@ -1,4 +1,13 @@
 import type { Account } from '@/lib/balance';
+import {
+  DRAFT_LINE_MAX,
+  isProductId,
+  isSnapshot,
+  snapshotDate,
+  snapshotNumber as number,
+  snapshotText as text,
+  type DraftBody,
+} from '@/lib/draftPayload';
 import { parseAmount } from '@/lib/money';
 import type { Customer } from '@/services/customers.services';
 
@@ -15,39 +24,14 @@ import { priceLine, type DiscountMode, type SaleForm, type SaleLine, type SaleTo
 
 export const SALE_DRAFT_VERSION = 1;
 
-export type SaleDraftBody = {
-  kind: 'sale';
-  /** The customer, for the drafts list. */
-  title: string;
-  /** The invoice number. */
-  subtitle: string;
-  amount: number;
-  payload_version: number;
-  data: Record<string, unknown>;
-};
-
-// The server's limit for the list columns.
-const LINE_MAX = 200;
-// The website's isUuid: only a real product id reaches a sale line.
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-type Row = Record<string, unknown>;
-
-const isObject = (value: unknown): value is Row => typeof value === 'object' && value !== null && !Array.isArray(value);
-const text = (value: unknown) => (value === null || value === undefined ? '' : String(value));
-const number = (value: unknown) => {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
-};
-
 /** The form as the website's saveAsDraft parks it: the invoice's fields, its lines priced, and its payment rows. */
-export function draftFromForm(form: SaleForm, customer: Customer | undefined, accounts: Account[], totals: SaleTotals): SaleDraftBody {
+export function draftFromForm(form: SaleForm, customer: Customer | undefined, accounts: Account[], totals: SaleTotals): DraftBody {
   const name = customer ? String(customer.name || '') : form.customer_name.trim();
   const phone = customer ? String(customer.phone || '') : form.customer_phone.trim();
   return {
     kind: 'sale',
-    title: (name || phone || 'No customer chosen').slice(0, LINE_MAX),
-    subtitle: form.invoice_no.trim().slice(0, LINE_MAX),
+    title: (name || phone || 'No customer chosen').slice(0, DRAFT_LINE_MAX),
+    subtitle: form.invoice_no.trim().slice(0, DRAFT_LINE_MAX),
     amount: totals.grandTotal,
     payload_version: SALE_DRAFT_VERSION,
     data: {
@@ -104,18 +88,18 @@ export type OpenedDraft = {
  * customer no longer on the books becomes the walk-in the names describe.
  */
 export function formFromDraft(data: unknown, options: { rowKey: () => string; today: string; isCustomer: (id: string) => boolean }): OpenedDraft | null {
-  if (!isObject(data) || data.v !== SALE_DRAFT_VERSION || !isObject(data.form) || !Array.isArray(data.items)) return null;
+  if (!isSnapshot(data) || data.v !== SALE_DRAFT_VERSION || !isSnapshot(data.form) || !Array.isArray(data.items)) return null;
   const saved = data.form;
 
   const seen = new Set<string>();
   let dropped = 0;
   const lines: SaleLine[] = [];
   for (const item of data.items) {
-    if (!isObject(item)) continue;
+    if (!isSnapshot(item)) continue;
     // The website's itemHasSaleValue: a row never filled in is no line at all.
     if (!(text(item.product_name || item.product_code).trim() || number(item.selling_price) > 0 || number(item.total_amount) > 0)) continue;
     const id = text(item.product_id);
-    if (!UUID.test(id) || seen.has(id)) {
+    if (!isProductId(id) || seen.has(id)) {
       dropped += 1;
       continue;
     }
@@ -139,15 +123,14 @@ export function formFromDraft(data: unknown, options: { rowKey: () => string; to
   }
 
   const rows = (Array.isArray(data.paymentRows) ? data.paymentRows : [])
-    .filter(isObject)
+    .filter(isSnapshot)
     .map((row) => ({ key: options.rowKey(), account_id: text(row.account_id), amount: number(row.amount) > 0 ? String(number(row.amount)) : '' }));
   const customerId = text(saved.customer_id);
-  const date = text(saved.date);
 
   return {
     form: {
       invoice_no: text(saved.invoice_no),
-      date: /^\d{4}-\d{2}-\d{2}/.test(date) ? date.slice(0, 10) : options.today,
+      date: snapshotDate(saved.date, options.today),
       customer_id: customerId && options.isCustomer(customerId) ? customerId : '',
       customer_name: text(saved.customer_name),
       customer_phone: text(saved.customer_phone),
