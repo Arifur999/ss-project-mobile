@@ -10,6 +10,7 @@ import { Red, White, Zinc } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useCopy } from '@/context/LanguageContext';
 import { MenuGrid, MenuTile } from '@/features/menu/MenuTile';
+import { WEBSITE_URL } from '@/lib/config';
 import { whatsAppLink } from '@/lib/support';
 import { useSupportNumber } from '@/services/support.services';
 
@@ -35,6 +36,7 @@ const COPY = {
       supplier: 'Supplier', purchase: 'Purchase', sales: 'Sales', customers: 'Customers',
       target: 'Target & Report', marketing: 'Marketing', employees: 'Employees',
       billing: 'Billing & Plan', support: 'Support', admin: 'Admin',
+      privacy: 'Privacy policy', deleteAccount: 'Delete account',
       profile: 'Profile',
     },
   },
@@ -59,6 +61,7 @@ const COPY = {
       supplier: 'সাপ্লায়ার', purchase: 'ক্রয়', sales: 'বিক্রি', customers: 'কাস্টমার',
       target: 'টার্গেট ও রিপোর্ট', marketing: 'মার্কেটিং', employees: 'কর্মচারী',
       billing: 'বিল ও প্ল্যান', support: 'সাপোর্ট', admin: 'অ্যাডমিন',
+      privacy: 'গোপনীয়তা নীতি', deleteAccount: 'অ্যাকাউন্ট মুছুন',
       profile: 'প্রোফাইল',
     },
   },
@@ -73,7 +76,16 @@ const SECTIONS: Section[] = [
   { key: 'stock', items: [{ key: 'products', icon: 'sofa' }, { key: 'inventory', icon: 'warehouse' }, { key: 'damage', icon: 'wrench' }] },
   { key: 'trade', items: [{ key: 'supplier', icon: 'truck' }, { key: 'purchase', icon: 'cart' }, { key: 'sales', icon: 'bag' }, { key: 'customers', icon: 'users' }] },
   { key: 'growth', items: [{ key: 'target', icon: 'chartLine' }, { key: 'marketing', icon: 'megaphone' }, { key: 'employees', icon: 'idCard' }] },
-  { key: 'account', items: [{ key: 'billing', icon: 'creditCard' }, { key: 'support', icon: 'headset' }, { key: 'admin', icon: 'userCog' }] },
+  {
+    key: 'account',
+    items: [
+      { key: 'billing', icon: 'creditCard' },
+      { key: 'support', icon: 'headset' },
+      { key: 'admin', icon: 'userCog' },
+      { key: 'privacy', icon: 'fileText' },
+      { key: 'deleteAccount', icon: 'trash' },
+    ],
+  },
 ];
 
 /** Where each designed destination lives; everything else opens /soon. */
@@ -93,6 +105,7 @@ const ROUTES: Partial<Record<ItemKey, Href>> = {
   support: '/more/support',
   marketing: '/more/marketing',
   billing: '/more/billing',
+  deleteAccount: '/more/delete-account',
   inventory: '/inventory',
   sales: '/sales',
   customers: '/customers',
@@ -112,6 +125,10 @@ export default function MenuScreen() {
   const open = (key: ItemKey) => {
     if (key === 'whatsapp') {
       Linking.openURL(whatsAppLink(supportNumber)).catch(() => {});
+      return;
+    }
+    if (key === 'privacy') {
+      Linking.openURL(`${WEBSITE_URL}/privacy`).catch(() => {});
       return;
     }
     const route = ROUTES[key];
