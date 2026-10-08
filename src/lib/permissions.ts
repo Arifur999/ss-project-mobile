@@ -78,6 +78,10 @@ export const ACTIONS = {
   'sale.edit': { roles: ['owner', 'manager', 'sales_staff'], permission: ['page:sales.ledger', 'page:sales.new'] },
   // draft.route.ts: POST, PATCH and DELETE / - no page permission, as publishing keeps its own gate
   'draft.write': { roles: ['owner', 'manager', 'sales_staff'] },
+  // draft.service.ts: sales staff may park an invoice but not a purchase order
+  'purchaseDraft.write': { roles: ['owner', 'manager'] },
+  // The website's Draft Purchase page
+  'purchaseDraft.list': { roles: ['owner', 'manager'], permission: 'page:purchase.drafts' },
   // The website's Draft Sales page: whoever may park one, holding its page
   'saleDraft.list': { roles: ['owner', 'manager', 'sales_staff'], permission: 'page:sales.drafts' },
   // sale.route.ts: POST /:id/deliveries
