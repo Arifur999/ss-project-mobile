@@ -16,6 +16,7 @@ import { SALES_COPY } from '@/features/sales/copy';
 import { DeliverySheet, type SaleLine } from '@/features/sales/DeliverySheet';
 import { invoiceTable } from '@/features/sales/invoicePrint';
 import { SaleCard } from '@/features/sales/SaleCard';
+import { saleEditable } from '@/features/sales/saleForm';
 import { SalesShell } from '@/features/sales/SalesShell';
 import { SaleSheet } from '@/features/sales/SaleSheet';
 import { useCan } from '@/hooks/useCan';
@@ -35,7 +36,7 @@ type Row = Record<string, any>;
 // Drawn a slice at a time, as the website's useProgressiveRows does.
 const PAGE = 40;
 
-/** Every sale - Hatim's Sales Ledger: search, date and delivery filters, the invoice, deliveries, print, delete. */
+/** Every sale - Hatim's Sales Ledger: search, date and delivery filters, the invoice, deliveries, edit, print, delete. */
 export default function SalesLedgerScreen() {
   const t = useCopy(SALES_COPY);
   const { lang } = useLang();
@@ -61,6 +62,7 @@ export default function SalesLedgerScreen() {
   const total = rows.reduce((sum, sale) => sum + saleSubtotalAfterDiscount(sale), 0);
   const previousDue = selected && data ? previousDueForSale(selected, data.sales, data.customers, data.payments) : 0;
   const paidInto = selected ? saleAccountDisplay(selected, accounts) : '';
+  const editable = !!selected && saleEditable(selected);
 
   const reset = () => setLimit(PAGE);
 
@@ -152,6 +154,15 @@ export default function SalesLedgerScreen() {
               }
             : undefined
         }
+        onEdit={
+          can('sale.edit') && editable && selected
+            ? () => {
+                setSheet(null);
+                router.push({ pathname: '/sales/edit/[id]', params: { id: String(selected.id) } });
+              }
+            : undefined
+        }
+        editNote={can('sale.edit') && selected && !editable ? t.editBlocked : undefined}
         onShare={() => output(true)}
         onPrint={() => output(false)}
         onDelete={can('sale.delete') ? () => setSheet('delete') : undefined}
