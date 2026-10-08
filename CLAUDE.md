@@ -23,7 +23,11 @@ npm run typecheck        # tsc --noEmit
 npx expo lint
 npx expo install <pkg>   # never plain npm install for a package - picks the SDK-compatible version
 npx expo export --platform android --output-dir <tmp>   # full bundle check without a phone
+npx eas-cli@latest build -p android --profile preview      # installable APK (link + QR on expo.dev)
+npx eas-cli@latest build -p android --profile production   # Play Store AAB, version code bumped on EAS
 ```
+
+Builds run on EAS (project `@arifur_naxified/furnify`, ID in `app.json`). EAS generated and holds the Android signing keystore - it is the key the Play listing will be tied to, so never delete it from expo.dev. A local Gradle build is not set up: this machine has no JDK or Android SDK, and Windows Smart App Control blocks `hermesc.exe`, which a release build needs.
 
 The API defaults to the live server (`src/lib/config.ts`). Override with `EXPO_PUBLIC_API_BASE_URL` in `.env.local` (see `.env.example`); a local backend must be addressed by the computer's LAN IP, not `localhost`.
 
