@@ -16,6 +16,7 @@ import { CustomerAccountCard } from '@/features/customers/CustomerAccountCard';
 import { CustomerAccountSheet } from '@/features/customers/CustomerAccountSheet';
 import { CustomersShell } from '@/features/customers/CustomersShell';
 import { DueReminderSheet } from '@/features/customers/DueReminderSheet';
+import { canRemind } from '@/features/customers/dueSms';
 import { useCan } from '@/hooks/useCan';
 import { buildCustomerDashboard, type CustomerDashboardRow } from '@/lib/customerDue';
 import { CUSTOMER_SORTS, customerRows, DUE_FILTERS, type CustomerSort, type DueFilter } from '@/lib/customerOverview';
@@ -26,7 +27,7 @@ import { useCustomerData } from '@/services/customers.services';
 // Drawn a slice at a time, as the website's useProgressiveRows does.
 const PAGE = 40;
 
-/** What every customer bought, paid and still owes - Hatim's Customer Dashboard. */
+/** What every customer bought, paid and still owes - Hatim's Customer Dashboard, with the due SMS to many for the owner. */
 export default function CustomerOverviewScreen() {
   const t = useCopy(CUSTOMER_COPY);
   const { lang } = useLang();
@@ -43,6 +44,7 @@ export default function CustomerOverviewScreen() {
   const { stats, customerList } = buildCustomerDashboard(data?.customers ?? [], data?.sales ?? [], data?.payments ?? []);
   const shown = customerRows(customerList, search, due, sort);
   const owing = customerList.filter((c) => c.currentDue > 0).length;
+  const remindable = can('sms.send') && customerList.some(canRemind);
 
   const open = (customer: CustomerDashboardRow) => {
     setSelected(customer);
@@ -73,6 +75,8 @@ export default function CustomerOverviewScreen() {
         <FigureCard label={t.discount} value={money(stats.totalDiscount)} />
         <FigureCard label={t.openingDue} value={money(stats.openingDue)} />
       </View>
+
+      {remindable ? <Button title={t.bulkSms} icon="message" variant="pillOutline" onPress={() => router.push('/customers/due-sms')} /> : null}
 
       <Txt accessibilityRole="header" style={styles.title}>
         {t.balances}
