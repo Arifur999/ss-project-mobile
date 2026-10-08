@@ -6,3 +6,7 @@
 // at bundle time.
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL?.replace(/\/+$/, '') || 'https://furnify.softech.agency/api/v1';
+
+// The website, for the pages the app links out to (the privacy policy, account
+// deletion). Its own setting, since a local API is not a local website.
+export const WEBSITE_URL = process.env.EXPO_PUBLIC_WEBSITE_URL?.replace(/\/+$/, '') || 'https://furnify.softech.agency';
