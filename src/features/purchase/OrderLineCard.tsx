@@ -12,9 +12,10 @@ import type { DraftLine, LineErrors } from '@/features/purchase/orderForm';
 import type { OrderLine } from '@/lib/purchaseOrder';
 
 /**
- * One product on a new purchase order: how many, its DP and DP discount as
- * typed, and under them what the website's row works out - the actual DP, the
- * total, the SP incentive and the deposit owed.
+ * One product on a purchase order: how many, its DP and DP discount as typed,
+ * and under them what the website's row works out - the actual DP, the total,
+ * the SP incentive and the deposit owed. An edited invoice's line can say what
+ * has arrived of it, and has no Remove once anything has.
  */
 export function OrderLineCard({
   line,
@@ -22,17 +23,22 @@ export function OrderLineCard({
   onChange,
   onRemove,
   errors,
+  errorText,
+  notes = [],
 }: {
   line: DraftLine;
   priced: OrderLine;
   onChange: (patch: Partial<DraftLine>) => void;
-  onRemove: () => void;
+  onRemove?: () => void;
   errors?: LineErrors;
+  /** In place of the quantity's own words, when it is wrong for a reason of its own. */
+  errorText?: string;
+  notes?: string[];
 }) {
   const t = useCopy(PURCHASE_COPY);
   const { money } = useAmountShield();
   // Three narrow fields share the row, so each only turns red and the words go once beneath them.
-  const messages = [errors?.qty && t.errQty, errors?.dp && t.errDp, errors?.discount && t.errDiscount].filter(Boolean);
+  const messages = [errors?.qty && (errorText || t.errQty), errors?.dp && t.errDp, errors?.discount && t.errDiscount].filter(Boolean);
   return (
     <View style={styles.card}>
       <View style={styles.head}>
@@ -42,9 +48,11 @@ export function OrderLineCard({
           </Txt>
           <Txt style={styles.code}>{line.product_code}</Txt>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
-          <Txt style={styles.removeText}>{t.removeLine}</Txt>
-        </Pressable>
+        {onRemove ? (
+          <Pressable accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
+            <Txt style={styles.removeText}>{t.removeLine}</Txt>
+          </Pressable>
+        ) : null}
       </View>
       <View style={styles.fields}>
         <View style={styles.narrow}>
@@ -84,6 +92,11 @@ export function OrderLineCard({
         </View>
       </View>
       {messages.length ? <FieldError plain>{messages.join(' · ')}</FieldError> : null}
+      {notes.map((note) => (
+        <Txt key={note} style={styles.note}>
+          {note}
+        </Txt>
+      ))}
       <FigureRow
         figures={[
           { label: t.actualDp, value: money(priced.actual_dp) },
@@ -108,4 +121,5 @@ const styles = StyleSheet.create({
   narrow: { flex: 1, minWidth: 0 },
   wide: { flex: 1.5, minWidth: 0 },
   figure: { fontWeight: '600' },
+  note: { fontSize: 13, color: Zinc[600] },
 });
