@@ -19,7 +19,7 @@ import { CustomersShell } from '@/features/customers/CustomersShell';
 import { ReceiptSheet } from '@/features/customers/ReceiptSheet';
 import { receiptTable } from '@/features/customers/receiptPrint';
 import { useCan } from '@/hooks/useCan';
-import { groupReceipts, receiptNo, type Receipt } from '@/lib/customerReceipts';
+import { discountTwin, groupReceipts, receiptNo, type Receipt } from '@/lib/customerReceipts';
 import { dateLabel } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
 import { formatNumber } from '@/lib/money';
@@ -29,6 +29,8 @@ import { matches } from '@/lib/search';
 import { smsBusiness } from '@/lib/smsTexts';
 import { useBusinessSettings } from '@/services/business.services';
 import { deleteCustomerPayment, useCustomerData, useCustomerWrite } from '@/services/customers.services';
+import { deleteExpense } from '@/services/expenses.services';
+import { fetchList } from '@/services/list.services';
 
 // Drawn a slice at a time, as the website's useProgressiveRows does.
 const PAGE = 40;
@@ -82,15 +84,25 @@ export default function DueReceivedScreen() {
     }
   };
 
-  // Every part of a split collection goes, one request each, as the website deletes them.
+  // Every part of a split collection goes, one request each, as the website deletes them -
+  // and its discount's expense with it, which nothing else would take away.
   const confirmDelete = async () => {
     if (!selected) return;
     setDeleting(true);
     try {
-      await write(async () => {
+      const expenseLeft = await write(async () => {
         for (const id of selected.payment_ids) await deleteCustomerPayment(id);
+        if (!(selected.discount > 0)) return false;
+        try {
+          const day = String(selected.date || '').slice(0, 10);
+          const twin = discountTwin(selected, await fetchList('/expenses', { from: day, to: day }));
+          if (twin) await deleteExpense(String(twin.id));
+          return false;
+        } catch {
+          return true;
+        }
       });
-      toast.show(t.receiptDeleted);
+      toast.show(expenseLeft ? t.discountNotRemoved : t.receiptDeleted);
     } catch (e) {
       toast.show(errorMessage(e));
     } finally {
