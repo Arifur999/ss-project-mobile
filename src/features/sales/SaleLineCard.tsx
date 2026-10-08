@@ -8,14 +8,16 @@ import { Toggle } from '@/components/Toggle';
 import { Txt } from '@/components/Txt';
 import { Red, White, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
-import { useCopy } from '@/context/LanguageContext';
+import { useCopy, useLang } from '@/context/LanguageContext';
 import { SALES_COPY } from '@/features/sales/copy';
 import { priceLine, type DiscountMode, type SaleLine } from '@/features/sales/saleForm';
+import { formatNumber } from '@/lib/money';
 
 /**
- * One product on a new sale: how many and at what price, a discount in taka
- * or percent, whether it goes out now, and under them what each comes to after
- * the discount and the line's total - priced as the website prices it.
+ * One product on a sale: how many and at what price, a discount in taka or
+ * percent, whether it goes out now (or, on an edited line, how much already
+ * has), and under them what each comes to after the discount and the line's
+ * total - priced as the website prices it.
  */
 export function SaleLineCard({
   line,
@@ -29,6 +31,7 @@ export function SaleLineCard({
   errors?: { qty?: true; price?: true; discount?: true };
 }) {
   const t = useCopy(SALES_COPY);
+  const { lang } = useLang();
   const { money } = useAmountShield();
   const priced = priceLine(line);
   // Narrow fields share the rows, so each only turns red and the words go once beneath them.
@@ -102,7 +105,13 @@ export function SaleLineCard({
       {messages.length ? <FieldError plain>{messages.join(' · ')}</FieldError> : null}
       <View style={styles.delivery}>
         <Toggle value={line.delivered} onChange={(delivered) => onChange({ delivered })} label={t.deliveredNow} />
-        <Txt style={styles.deliveryText}>{line.delivered ? t.deliveredNow : t.deliveredLater}</Txt>
+        <Txt style={styles.deliveryText}>
+          {line.delivered
+            ? t.deliveredNow
+            : line.alreadyDelivered > 0
+              ? t.alreadyDelivered(formatNumber(Math.min(line.alreadyDelivered, priced.qty), lang), formatNumber(priced.qty, lang))
+              : t.deliveredLater}
+        </Txt>
       </View>
       <FigureRow
         figures={[
