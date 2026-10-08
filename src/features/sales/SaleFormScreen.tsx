@@ -23,6 +23,7 @@ import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { CustomerFormSheet } from '@/features/customers/CustomerFormSheet';
 import { ProductPickerSheet } from '@/features/products/ProductPickerSheet';
+import { DRAFT_COPY } from '@/features/drafts/copy';
 import { SALES_COPY } from '@/features/sales/copy';
 import { draftFromForm, formFromDraft, type OpenedDraft } from '@/features/sales/saleDraft';
 import {
@@ -77,6 +78,7 @@ const rowKey = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
  */
 export function SaleFormScreen({ saleId, draftId }: { saleId?: string; draftId?: string }) {
   const t = useCopy(SALES_COPY);
+  const d = useCopy(DRAFT_COPY);
   const { data } = useCustomerData();
   const draft = useDraft(draftId ?? null);
   // undefined until the draft is in; null when it is in a shape this app does not know.
@@ -91,10 +93,10 @@ export function SaleFormScreen({ saleId, draftId }: { saleId?: string; draftId?:
   const draftNotice = !draftId
     ? null
     : opened === null
-      ? t.draftStale
+      ? d.stale
       : draftMissing
         ? isAxiosError(draft.error) && draft.error.response?.status === 404
-          ? t.draftGone
+          ? d.gone
           : errorMessage(draft.error)
         : null;
   const notice = !data ? null : saleId && !editing ? t.notFound : editing && !saleEditable(editing) ? t.editBlocked : draftNotice;
@@ -119,6 +121,7 @@ export function SaleFormScreen({ saleId, draftId }: { saleId?: string; draftId?:
 
 function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: Row | null; draft: { id: string; opened: OpenedDraft } | null }) {
   const t = useCopy(SALES_COPY);
+  const d = useCopy(DRAFT_COPY);
   const { lang } = useLang();
   const { money } = useAmountShield();
   const toast = useToast();
@@ -224,7 +227,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
       });
       setDraftId(String(saved.id));
       setBaseline(form);
-      toast.show(t.draftSaved);
+      toast.show(d.saved);
     } catch (e) {
       setError(errorMessage(e));
     } finally {
@@ -259,7 +262,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
       });
       const sms = form.sms ? await textInvoice(outcome.invoiceNo, plan.finalPaid, plan.finalDue) : '';
       toast.show(
-        [editing ? t.updated(outcome.invoiceNo) : t.saved(outcome.invoiceNo), outcome.dueError ? t.dueFailed(outcome.dueError) : '', outcome.draftLeft ? t.draftNotCleared : '', sms]
+        [editing ? t.updated(outcome.invoiceNo) : t.saved(outcome.invoiceNo), outcome.dueError ? t.dueFailed(outcome.dueError) : '', outcome.draftLeft ? d.notCleared : '', sms]
           .filter(Boolean)
           .join(' '),
       );
@@ -347,7 +350,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
             <Txt accessibilityRole="header" style={styles.section}>
               {t.products}
             </Txt>
-            {draft && draft.opened.dropped > 0 ? <Txt style={styles.dropped}>{t.draftDropped(formatNumber(draft.opened.dropped, lang))}</Txt> : null}
+            {draft && draft.opened.dropped > 0 ? <Txt style={styles.dropped}>{d.dropped(formatNumber(draft.opened.dropped, lang))}</Txt> : null}
             {form.lines.map((line) => (
               <SaleLineCard
                 key={line.product_id}
@@ -409,7 +412,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
 
           <TextField tone="zinc" label={t.notes} placeholder={t.optional} value={form.notes} onChangeText={(notes) => set({ notes })} minHeight={64} />
           {!editing && can('draft.write') ? (
-            <Button title={draftId ? t.updateDraft : t.saveDraft} icon="fileText" variant="pillOutline" onPress={park} busy={parking} disabled={saving} />
+            <Button title={draftId ? d.update : d.save} icon="fileText" variant="pillOutline" onPress={park} busy={parking} disabled={saving} />
           ) : null}
           {!editing && can('sms.send') ? <SwitchRow title={t.smsInvoice} hint={t.smsInvoiceSub} value={form.sms} onChange={(sms) => set({ sms })} /> : null}
           <AlertBanner tone="error">{error}</AlertBanner>

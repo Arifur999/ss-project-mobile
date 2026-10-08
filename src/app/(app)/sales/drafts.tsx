@@ -9,7 +9,7 @@ import { Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
-import { SALES_COPY } from '@/features/sales/copy';
+import { DRAFT_COPY } from '@/features/drafts/copy';
 import { SalesShell } from '@/features/sales/SalesShell';
 import { useCan } from '@/hooks/useCan';
 import { dateLabel } from '@/lib/dates';
@@ -22,7 +22,7 @@ import { deleteDraft, useDraftWrite, useDrafts, type Draft } from '@/services/dr
  * on (by whoever may make a sale) or thrown away.
  */
 export default function SaleDraftsScreen() {
-  const t = useCopy(SALES_COPY);
+  const t = useCopy(DRAFT_COPY);
   const { lang } = useLang();
   const { money } = useAmountShield();
   const toast = useToast();
@@ -34,14 +34,14 @@ export default function SaleDraftsScreen() {
   const [deleting, setDeleting] = useState(false);
   const drafts = query.data ?? [];
 
-  const edited = (draft: Draft) => t.draftEdited(draft.updated_by_name || draft.created_by_name, dateLabel(String(draft.updated_at).slice(0, 10), lang));
+  const edited = (draft: Draft) => t.edited(draft.updated_by_name || draft.created_by_name, dateLabel(String(draft.updated_at).slice(0, 10), lang));
 
   const confirmDelete = async () => {
     if (!selected) return;
     setDeleting(true);
     try {
       await write(() => deleteDraft(selected.id));
-      toast.show(t.draftDeleted);
+      toast.show(t.deleted);
     } catch (e) {
       toast.show(errorMessage(e));
     } finally {
@@ -52,7 +52,7 @@ export default function SaleDraftsScreen() {
 
   return (
     <SalesShell section="drafts" query={query}>
-      <Txt style={styles.intro}>{t.draftsIntro}</Txt>
+      <Txt style={styles.intro}>{t.intro.sale}</Txt>
       {drafts.length === 0 ? (
         <View style={styles.empty}>
           <Txt style={styles.emptyText}>{t.noDrafts}</Txt>
@@ -61,10 +61,10 @@ export default function SaleDraftsScreen() {
         drafts.map((draft) => (
           <FiguresCard
             key={draft.id}
-            title={draft.title || t.walkIn}
+            title={draft.title || t.untitled.sale}
             meta={draft.subtitle}
             sub={edited(draft)}
-            figures={[{ label: t.payable, value: money(draft.amount), strong: true }]}
+            figures={[{ label: t.amount.sale, value: money(draft.amount), strong: true }]}
             onPress={() => {
               setSelected(draft);
               setSheet('actions');
@@ -76,7 +76,7 @@ export default function SaleDraftsScreen() {
       <ActionsSheet
         open={sheet === 'actions'}
         onClose={() => setSheet(null)}
-        title={selected?.title || t.walkIn}
+        title={selected?.title || t.untitled.sale}
         subtitle={selected ? [selected.subtitle, edited(selected)].filter(Boolean).join(' · ') : ''}
         cancelLabel={t.close}
         closeLabel={t.close}
@@ -84,7 +84,7 @@ export default function SaleDraftsScreen() {
           can('sale.create') && selected
             ? [
                 {
-                  label: t.openDraft,
+                  label: t.open,
                   icon: 'pencil',
                   onPress: () => {
                     setSheet(null);
@@ -100,8 +100,8 @@ export default function SaleDraftsScreen() {
       <ConfirmDeleteSheet
         open={sheet === 'delete'}
         onClose={() => setSheet(null)}
-        title={t.deleteDraftTitle}
-        text={t.deleteDraftText(selected?.title || t.walkIn)}
+        title={t.deleteTitle}
+        text={t.deleteText(selected?.title || t.untitled.sale)}
         cancelLabel={t.cancel}
         deleteLabel={t.delete}
         closeLabel={t.close}
