@@ -2,6 +2,7 @@ import { useQuery, useQueryClient, type InfiniteData, type QueryClient } from '@
 import { useCallback } from 'react';
 
 import { http } from '@/lib/httpClient';
+import type { PriceRow, PriceUpdateResult } from '@/lib/priceFile';
 import { fetchList } from '@/services/list.services';
 import { getPage, PAGE_SIZE, usePagedQuery, type Page } from '@/services/paged.services';
 
@@ -101,6 +102,32 @@ export const updateProduct = (id: string, input: ProductInput) => http.patch<Pro
 export const deleteProduct = (id: string) => http.delete(`/products/${id}`);
 
 /** How many sale and purchase lines use a product; one that is used is not deleted. */
+/**
+ * Prices only, matched on product code - never a new product, unlike a
+ * product import. A dry run does every lookup and writes nothing, saying what
+ * would change, what already matches and which codes are not in the catalogue.
+ */
+export const updatePrices = (prices: PriceRow[], dryRun: boolean) => http.post<PriceUpdateResult>('/products/bulk-update-prices', { prices, dry_run: dryRun });
+
+export type PriceUpdateRun = {
+  id: string;
+  file_name: string;
+  updated_count: number;
+  skipped_count: number;
+  unchanged_count: number;
+  status: string;
+  created_at: string;
+};
+
+/** Filed once for a whole run, after its batches, with what the server reported. */
+export const recordPriceUpdate = (run: { file_name: string; updated_count: number; skipped_count: number; unchanged_count: number; status: 'completed' | 'partial' }) =>
+  http.post<PriceUpdateRun>('/products/price-updates', run);
+
+/** Every price update run, newest first. */
+export function usePriceUpdates() {
+  return useQuery({ queryKey: [...PRODUCTS_KEY, 'price-updates'], queryFn: () => http.get<PriceUpdateRun[]>('/products/price-updates') });
+}
+
 export const getProductUsage = (id: string) => http.get<{ sales: number; purchases: number }>(`/products/${id}/usage`);
 
 /**
