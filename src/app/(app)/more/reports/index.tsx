@@ -8,7 +8,7 @@ import { TotalsList } from '@/components/TotalsList';
 import { Txt } from '@/components/Txt';
 import { Amber, Green, Red, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
-import { bnDigits, useCopy, useLang } from '@/context/LanguageContext';
+import { useCopy, useLang } from '@/context/LanguageContext';
 import { BREAKDOWN_TABS, BreakdownList, breakdownRows, type BreakdownTab } from '@/features/reports/BreakdownList';
 import { CompanyWays } from '@/features/reports/CompanyWays';
 import { REPORT_COPY } from '@/features/reports/copy';
@@ -16,7 +16,7 @@ import { DailyTargetRow } from '@/features/reports/DailyTargetRow';
 import { ReportsShell } from '@/features/reports/ReportsShell';
 import { TargetProgressCard } from '@/features/reports/TargetProgressCard';
 import { TodayTargetCard } from '@/features/reports/TodayTargetCard';
-import { monthName, toISODate } from '@/lib/dates';
+import { fullMonthYearLabel, toISODate } from '@/lib/dates';
 import { REPORT_PERIODS, type ReportPeriod } from '@/lib/periods';
 import { useReport } from '@/services/reports.services';
 
@@ -104,7 +104,7 @@ export default function ReportSummaryScreen() {
           {report.monthlyPurchaseRows.length > 0 ? (
             <View style={styles.group}>
               <Txt accessibilityRole="header" style={styles.title}>
-                {t.buyingTargets(`${monthName(m, lang)} ${lang === 'bn' ? bnDigits(String(y)) : y}`)}
+                {t.buyingTargets(fullMonthYearLabel(y, m, lang))}
               </Txt>
               <TotalsList
                 rows={report.monthlyPurchaseRows.map((row) => ({

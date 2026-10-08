@@ -63,6 +63,12 @@ export function weekdayDateLabel(iso: string, lang: Lang): string {
 export const monthYearLabel = (year: number, month: number, lang: Lang) =>
   `${monthShort(month, lang)} ${digits(year, lang)}`;
 
+/** A year in the language's digits: 2026, ২০২৬. */
+export const yearLabel = (year: number, lang: Lang) => digits(year, lang);
+
+/** A month written out with its year: March 2026, মার্চ ২০২৬. */
+export const fullMonthYearLabel = (year: number, month: number, lang: Lang) => `${monthName(month, lang)} ${digits(year, lang)}`;
+
 /**
  * A span, collapsed the way the design writes it:
  *   same day      "30 Sep 2026"
