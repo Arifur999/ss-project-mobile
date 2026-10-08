@@ -4,6 +4,7 @@ import { docNumber } from '@/lib/docNumber';
 import { parseAmount, roundTaka } from '@/lib/money';
 import { isValidBdPhone } from '@/lib/phone';
 import { actualDp } from '@/lib/purchaseAmounts';
+import { deliveredQty, pendingQty } from '@/lib/saleFigures';
 import type { Customer, CustomerPaymentInput } from '@/services/customers.services';
 import type { Product } from '@/services/products.services';
 import type { SaleInput } from '@/services/sales.services';
@@ -15,9 +16,11 @@ import type { SaleInput } from '@/services/sales.services';
 // money applied to this invoice first and anything beyond it booked as a
 // collection against the old due. Pure, so testable.
 //
-// One departure: every line is a product from the catalogue. The website also
-// takes a typed "Manual Item", but POST /sales refuses a line without a
-// product id, so such a line could never be saved.
+// Two departures. Every line is a product from the catalogue: the website also
+// takes a typed "Manual Item", but the server refuses a line without a product
+// id, so such a line could never be saved. And an edited line keeps what had
+// already gone out of it: the website re-saves a part-delivered line as not
+// delivered at all, because the server rewrites every line on an edit.
 
 export type DiscountMode = 'amount' | 'pct';
 
@@ -33,6 +36,8 @@ export type SaleLine = {
   discount: string;
   mode: DiscountMode;
   delivered: boolean;
+  /** Edited lines only: what had already gone out, kept when the line is not marked delivered in full. */
+  alreadyDelivered: number;
 };
 
 export type SaleForm = {
@@ -81,6 +86,7 @@ export function lineForProduct(product: Product): SaleLine {
     discount: '',
     mode: 'amount',
     delivered: true,
+    alreadyDelivered: 0,
   };
 }
 
@@ -243,7 +249,7 @@ export function salePlan(form: SaleForm, customer: Customer | undefined, totals:
           qty: priced.qty,
           total_amount: priced.total_amount,
           cost_price: line.cost_price,
-          delivered_qty: line.delivered ? priced.qty : 0,
+          delivered_qty: line.delivered ? priced.qty : Math.min(priced.qty, line.alreadyDelivered),
         };
       }),
       payments: invoiceRows.map((row) => ({ date: form.date, account_id: row.account_id, account_name: '', amount: row.amount })),
@@ -251,6 +257,64 @@ export function salePlan(form: SaleForm, customer: Customer | undefined, totals:
     dueRows,
     finalPaid,
     finalDue,
+  };
+}
+
+type Row = Record<string, any>;
+
+/**
+ * Whether the form can edit a saved sale: every line must be a catalogue
+ * product (the server refuses any other), and each product on it once, as the
+ * form keys its lines by product.
+ */
+export function saleEditable(sale: Row): boolean {
+  const ids: string[] = (sale.sale_items || []).map((item: Row) => String(item.product_id || ''));
+  return ids.length > 0 && ids.every(Boolean) && new Set(ids).size === ids.length;
+}
+
+/**
+ * A saved sale back in the form, as the website's editSale fills it: each line
+ * at its price with its discount in taka, delivered when nothing of it is
+ * still to go; the money as it was split across accounts (or, on an older
+ * sale, all of it on its one account); the old due is not collected again.
+ */
+export function formFromSale(sale: Row, rowKey: (index: number) => string): SaleForm {
+  const payments: { account_id: string; amount: number }[] = (sale.sale_payments || [])
+    .map((payment: Row) => ({ account_id: String(payment.account_id || ''), amount: Math.max(0, Number(payment.amount || 0)) }))
+    .filter((payment: { amount: number }) => payment.amount > 0);
+  const paid = Math.max(0, Number(sale.paid_amount || 0));
+  const split = payments.length > 0 ? payments : paid > 0 ? [{ account_id: String(sale.account_id || ''), amount: paid }] : [];
+  return {
+    invoice_no: String(sale.invoice_no || ''),
+    date: String(sale.date || '').slice(0, 10),
+    customer_id: String(sale.customer_id || ''),
+    customer_name: String(sale.customer_name || ''),
+    customer_phone: String(sale.customer_phone || ''),
+    customer_address: String(sale.customer_address || ''),
+    lines: (sale.sale_items || []).map((item: Row): SaleLine => {
+      const selling = Number(item.selling_price || 0);
+      const discount = Math.max(0, selling - Number(item.actual_price || 0));
+      const delivered = pendingQty(item) === 0;
+      return {
+        product_id: String(item.product_id),
+        product_code: String(item.product_code || ''),
+        product_name: String(item.product_name || ''),
+        cost_price: Number(item.cost_price || 0),
+        qty: String(Number(item.qty || 0)),
+        price: String(selling),
+        discount: discount > 0 ? String(discount) : '',
+        mode: 'amount',
+        delivered,
+        alreadyDelivered: delivered ? 0 : deliveredQty(item),
+      };
+    }),
+    rows: split.length > 0 ? split.map((row, i) => ({ key: rowKey(i), account_id: row.account_id, amount: String(row.amount) })) : [{ key: rowKey(0), account_id: '', amount: '' }],
+    // The "Due Sell" mark is put back, or taken off, by what is paid on saving.
+    notes: String(sale.notes || '')
+      .split('\n')
+      .filter((line) => line.trim().toLowerCase() !== 'due sell')
+      .join('\n'),
+    sms: false,
   };
 }
 
