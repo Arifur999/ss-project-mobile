@@ -25,7 +25,7 @@ type Row = Record<string, any>;
 /**
  * A sale opened from the ledger - the website's invoice view: each line priced
  * and how much of it has gone out (with Deliver on what has not, for whoever
- * may), the invoice's totals with the previous due and the current due, where
+ * may), its purchase rate (with Change, for whoever may while amounts show), the invoice's totals with the previous due and the current due, where
  * the money went, its cost and profit - then Edit, Share PDF, Print and
  * Delete. When it cannot be edited, `editNote` says why.
  */
@@ -35,6 +35,7 @@ export function SaleSheet({
   paidInto,
   onClose,
   onDeliver,
+  onRate,
   onEdit,
   editNote,
   onShare,
@@ -46,6 +47,7 @@ export function SaleSheet({
   paidInto: string;
   onClose: () => void;
   onDeliver?: (item: Row) => void;
+  onRate?: (item: Row) => void;
   onEdit?: () => void;
   editNote?: string;
   onShare: () => void;
@@ -99,6 +101,20 @@ export function SaleSheet({
                     onPress={() => onDeliver(item)}
                     style={styles.deliver}>
                     <Txt style={styles.deliverText}>{t.deliver}</Txt>
+                  </Pressable>
+                ) : null}
+              </View>
+              <View style={styles.deliveryRow}>
+                <Txt style={[styles.delivered, !(Number(item.cost_price) > 0) && styles.pending]}>
+                  {Number(item.cost_price) > 0 ? t.rateOf(money(item.cost_price)) : t.noRate}
+                </Txt>
+                {onRate ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t.rateTitle} ${item.product_name}`}
+                    onPress={() => onRate(item)}
+                    style={styles.deliver}>
+                    <Txt style={styles.deliverText}>{t.changeRate}</Txt>
                   </Pressable>
                 ) : null}
               </View>
