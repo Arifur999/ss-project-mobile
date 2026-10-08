@@ -54,6 +54,8 @@ export const ACTIONS = {
   'otherIncome.delete': { roles: ['owner'], permission: 'page:supplier.other-income' },
   // purchase.route.ts: POST /
   'purchase.create': { roles: ['owner', 'manager'], permission: 'page:purchase.orders' },
+  // purchase.route.ts: PATCH /:id, PATCH /items/:itemId and POST /:id/items - taking a line off is purchase.delete's
+  'purchase.edit': { roles: ['owner', 'manager'], permission: ['page:purchase.orders', 'page:purchase.drafts'] },
   // purchase.route.ts: POST /:id/receive and /:id/receive-all
   'purchase.receive': { roles: ['owner', 'manager'], permission: 'page:purchase.received' },
   // purchase.route.ts: DELETE /:id
