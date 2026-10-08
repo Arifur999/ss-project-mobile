@@ -7,8 +7,8 @@ import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
 import { FigureCard } from '@/components/FigureCard';
+import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { Green, Red, White, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
@@ -86,9 +86,7 @@ export default function DayHistoryScreen() {
         <Txt style={styles.note}>{t.historyNote}</Txt>
 
         {query.isPending ? (
-          <View style={styles.state}>
-            <Spinner color={Zinc[900]} size={24} />
-          </View>
+          <LoadingState minHeight={200} />
         ) : query.isError ? (
           <View style={styles.state}>
             <AlertBanner tone="error">{t.loadError}</AlertBanner>

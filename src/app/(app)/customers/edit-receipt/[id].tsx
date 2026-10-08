@@ -7,10 +7,10 @@ import { AlertBanner } from '@/components/AlertBanner';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
+import { LoadingState } from '@/components/LoadingState';
 import { PaymentRowFields, type PaymentRow } from '@/components/PaymentRowFields';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
-import { Spinner } from '@/components/Spinner';
 import { SuggestionChips } from '@/components/SuggestionChips';
 import { TextField } from '@/components/TextField';
 import { TotalsList } from '@/components/TotalsList';
@@ -53,9 +53,7 @@ export default function EditReceiptScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.editTitle} onBack={() => router.back()} backLabel={t.back} />
       {!data ? (
-        <View style={styles.state}>
-          <Spinner color={Zinc[900]} size={24} />
-        </View>
+        <LoadingState fill />
       ) : notice || !receipt ? (
         <View style={styles.state}>
           <Txt style={styles.notice}>{notice}</Txt>

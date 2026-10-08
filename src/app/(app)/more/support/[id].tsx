@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
+import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { Spinner } from '@/components/Spinner';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
@@ -77,7 +77,7 @@ export default function TicketThreadScreen() {
       <ScreenHeader title={ticket?.subject || t.noSubject} onBack={() => router.back()} backLabel={t.back} />
       {!ticket ? (
         <View style={styles.state}>
-          {query.isPending ? <Spinner color={Zinc[900]} size={24} /> : <AlertBanner tone="error">{t.loadError}</AlertBanner>}
+          {query.isPending ? <LoadingState /> : <AlertBanner tone="error">{t.loadError}</AlertBanner>}
         </View>
       ) : (
         <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>

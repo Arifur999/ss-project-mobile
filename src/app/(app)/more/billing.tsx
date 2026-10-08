@@ -8,8 +8,8 @@ import { Button } from '@/components/Button';
 import { DesignIcon } from '@/components/DesignIcon';
 import { FigureCard } from '@/components/FigureCard';
 import { FilterChips } from '@/components/FilterChips';
+import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { PROGRESS_LOOK } from '@/constants/progress';
 import { Green, Red, White, Zinc } from '@/constants/theme';
@@ -114,9 +114,7 @@ export default function BillingScreen() {
           </Txt>
           <FilterChips label={t.kindLabel} selected={kind} onSelect={setKind} options={KINDS.map((key) => ({ key, label: t.kinds[key] }))} />
           {history.isPending ? (
-            <View style={styles.state}>
-              <Spinner color={Zinc[900]} size={24} />
-            </View>
+            <LoadingState minHeight={160} />
           ) : history.isError ? (
             <View style={styles.state}>
               <AlertBanner tone="error">{t.loadError}</AlertBanner>

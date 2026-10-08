@@ -6,8 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DesignIcon } from '@/components/DesignIcon';
+import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
 import { SECTION_SWITCH } from '@/lib/stackOptions';
@@ -85,9 +85,7 @@ export function SectionShell<K extends string>({
 
         <View style={[styles.body, { gap }]}>
           {query.isPending ? (
-            <View style={styles.state}>
-              <Spinner color={Zinc[900]} size={24} />
-            </View>
+            <LoadingState minHeight={280} />
           ) : query.isError ? (
             <View style={styles.state}>
               <AlertBanner tone="error">{errorText}</AlertBanner>

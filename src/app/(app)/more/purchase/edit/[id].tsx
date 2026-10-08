@@ -8,9 +8,9 @@ import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
+import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
-import { Spinner } from '@/components/Spinner';
 import { TextField } from '@/components/TextField';
 import { TotalsList } from '@/components/TotalsList';
 import { Txt } from '@/components/Txt';
@@ -61,9 +61,7 @@ export default function EditPurchaseScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.editTitle} onBack={() => router.back()} backLabel={t.back} />
       {!data ? (
-        <View style={styles.state}>
-          <Spinner color={Zinc[900]} size={24} />
-        </View>
+        <LoadingState fill />
       ) : !purchase ? (
         <View style={styles.state}>
           <Txt style={styles.notice}>{t.notFound}</Txt>

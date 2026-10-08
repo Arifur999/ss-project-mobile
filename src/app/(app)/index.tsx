@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { ChoiceSheet } from '@/components/ChoiceSheet';
-import { Spinner } from '@/components/Spinner';
+import { LoadingState } from '@/components/LoadingState';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
@@ -65,9 +65,7 @@ export default function DashboardScreen() {
             <Button title={t.retry} variant="pillOutline" onPress={() => query.refetch()} />
           </View>
         ) : !data ? (
-          <View style={styles.state}>
-            <Spinner color={Zinc[900]} size={24} />
-          </View>
+          <LoadingState minHeight={280} />
         ) : (
           <>
             {data.denied.length > 0 ? <Txt style={styles.note}>{t.denied}</Txt> : null}

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
+import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Fab } from '@/components/SectionShell';
 import { Spinner } from '@/components/Spinner';
@@ -75,9 +76,7 @@ export function ListScreen<T>({
   };
 
   const status = query.isPending ? (
-    <View style={styles.state}>
-      <Spinner color={Zinc[900]} size={24} />
-    </View>
+    <LoadingState minHeight={240} />
   ) : query.isError && rows.length === 0 ? (
     <View style={styles.state}>
       <AlertBanner tone="error">{errorText(query.error)}</AlertBanner>

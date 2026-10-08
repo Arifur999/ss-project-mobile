@@ -7,7 +7,7 @@ import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DesignIcon } from '@/components/DesignIcon';
 import { FormFooter } from '@/components/FormFooter';
-import { Spinner } from '@/components/Spinner';
+import { LoadingState } from '@/components/LoadingState';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
 import { useCopy } from '@/context/LanguageContext';
@@ -111,9 +111,7 @@ export default function BusinessInfoScreen() {
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           {query.isPending ? (
-            <View style={styles.loading}>
-              <Spinner color={Zinc[900]} size={24} />
-            </View>
+            <LoadingState minHeight={240} />
           ) : query.isError ? (
             <View style={styles.loading}>
               <AlertBanner tone="error">{t.loadError}</AlertBanner>

@@ -10,9 +10,9 @@ import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
 import { ConfirmSheet } from '@/components/ItemSheets';
+import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
-import { Spinner } from '@/components/Spinner';
 import { TextField } from '@/components/TextField';
 import { TotalsList } from '@/components/TotalsList';
 import { Txt } from '@/components/Txt';
@@ -76,9 +76,7 @@ export default function NewPurchaseScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.formTitle} onBack={() => router.back()} backLabel={t.back} />
       {!data || draft.waiting ? (
-        <View style={styles.state}>
-          <Spinner color={Zinc[900]} size={24} />
-        </View>
+        <LoadingState fill />
       ) : draft.notice ? (
         <View style={styles.state}>
           <Txt style={styles.notice}>{draft.notice}</Txt>

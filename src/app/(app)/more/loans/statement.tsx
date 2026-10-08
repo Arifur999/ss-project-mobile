@@ -6,9 +6,9 @@ import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
 import { FilterChips } from '@/components/FilterChips';
+import { LoadingState } from '@/components/LoadingState';
 import { PromptCard } from '@/components/PromptCard';
 import { SelectField } from '@/components/SelectField';
-import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { Red, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
@@ -164,9 +164,7 @@ export default function LoanStatementScreen() {
       {!lender ? (
         <PromptCard icon="fileText" text={t.noPersonText} />
       ) : rangeError ? null : statement.isPending ? (
-        <View style={styles.state}>
-          <Spinner color={Zinc[900]} size={24} />
-        </View>
+        <LoadingState minHeight={200} />
       ) : statement.isError || !statement.data ? (
         <View style={styles.state}>
           <AlertBanner tone="error">{errorMessage(statement.error)}</AlertBanner>

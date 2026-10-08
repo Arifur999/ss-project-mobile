@@ -5,10 +5,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
+import { LoadingState } from '@/components/LoadingState';
 import { PromptCard } from '@/components/PromptCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Fab } from '@/components/SectionShell';
-import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
 import { useCopy } from '@/context/LanguageContext';
@@ -42,9 +42,7 @@ export default function SupportScreen() {
           <Button title={t.whatsApp} icon="message" variant="pillOutline" onPress={() => Linking.openURL(whatsAppLink(supportNumber)).catch(() => {})} />
 
           {query.isPending ? (
-            <View style={styles.state}>
-              <Spinner color={Zinc[900]} size={24} />
-            </View>
+            <LoadingState minHeight={200} />
           ) : query.isError ? (
             <View style={styles.state}>
               <AlertBanner tone="error">{t.loadError}</AlertBanner>

@@ -8,10 +8,10 @@ import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
+import { LoadingState } from '@/components/LoadingState';
 import { PaymentRowFields, type PaymentRow } from '@/components/PaymentRowFields';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
-import { Spinner } from '@/components/Spinner';
 import { SwitchRow } from '@/components/SwitchRow';
 import { TextField } from '@/components/TextField';
 import { TotalsList } from '@/components/TotalsList';
@@ -94,9 +94,7 @@ export function SaleFormScreen({ saleId, draftId }: { saleId?: string; draftId?:
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={saleId ? t.editTitle : t.formTitle} onBack={() => router.back()} backLabel={t.back} />
       {!data || draft.waiting ? (
-        <View style={styles.state}>
-          <Spinner color={Zinc[900]} size={24} />
-        </View>
+        <LoadingState fill />
       ) : notice ? (
         <View style={styles.state}>
           <Txt style={styles.notice}>{notice}</Txt>

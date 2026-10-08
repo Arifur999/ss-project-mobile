@@ -8,10 +8,10 @@ import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
+import { LoadingState } from '@/components/LoadingState';
 import { PaymentRowFields, type PaymentRow } from '@/components/PaymentRowFields';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
-import { Spinner } from '@/components/Spinner';
 import { SuggestionChips } from '@/components/SuggestionChips';
 import { SwitchRow } from '@/components/SwitchRow';
 import { TextField } from '@/components/TextField';
@@ -157,9 +157,7 @@ export default function ReceiveDueScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.formTitle} onBack={() => router.back()} backLabel={t.back} />
       {!data ? (
-        <View style={styles.state}>
-          <Spinner color={Zinc[900]} size={24} />
-        </View>
+        <LoadingState fill />
       ) : (
         <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">

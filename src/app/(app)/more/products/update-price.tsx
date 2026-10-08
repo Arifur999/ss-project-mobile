@@ -9,6 +9,7 @@ import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DesignIcon } from '@/components/DesignIcon';
 import { FigureCard } from '@/components/FigureCard';
+import { LoadingState } from '@/components/LoadingState';
 import { PromptCard } from '@/components/PromptCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Spinner } from '@/components/Spinner';
@@ -222,7 +223,7 @@ export default function UpdatePriceScreen() {
                 {t.historyTitle}
               </Txt>
               {history.isPending ? (
-                <Spinner color={Zinc[900]} size={20} />
+                <LoadingState minHeight={120} />
               ) : (history.data ?? []).length === 0 ? (
                 <Txt style={styles.intro}>{t.historyEmpty}</Txt>
               ) : (

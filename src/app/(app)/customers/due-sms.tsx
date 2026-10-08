@@ -7,10 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { CheckRow } from '@/components/CheckRow';
 import { ConfirmSheet } from '@/components/ItemSheets';
+import { LoadingState } from '@/components/LoadingState';
 import { PromptCard } from '@/components/PromptCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SearchField } from '@/components/SearchField';
-import { Spinner } from '@/components/Spinner';
 import { Txt } from '@/components/Txt';
 import { Red, White, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
@@ -109,9 +109,7 @@ export default function DueSmsScreen() {
           <PromptCard icon="message" text={t.smsOwnerOnly} />
         </View>
       ) : !data ? (
-        <View style={styles.state}>
-          <Spinner color={Zinc[900]} size={24} />
-        </View>
+        <LoadingState fill />
       ) : (
         <>
           <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
