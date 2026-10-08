@@ -79,6 +79,8 @@ export const deleteCustomer = (id: string) => http.delete(`/customers/${id}`);
 
 /** One row per account a collection went into. */
 export const createCustomerPayment = (input: CustomerPaymentInput) => http.post('/customer-payments', input);
+/** One collection's own row, changed in place; a linked invoice's paid and due follow its amount on the server. */
+export const updateCustomerPayment = (id: string, input: CustomerPaymentInput) => http.patch(`/customer-payments/${id}`, input);
 export const deleteCustomerPayment = (id: string) => http.delete(`/customer-payments/${id}`);
 
 /**
