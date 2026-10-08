@@ -72,6 +72,8 @@ export const ACTIONS = {
   'sms.send': { roles: ['owner'] },
   // sale.route.ts: POST /
   'sale.create': { roles: ['owner', 'manager', 'sales_staff'], permission: 'page:sales.new' },
+  // sale.route.ts: PUT /:id - the server rolls the old lines' stock and FIFO cost back and writes the new ones
+  'sale.edit': { roles: ['owner', 'manager', 'sales_staff'], permission: ['page:sales.ledger', 'page:sales.new'] },
   // sale.route.ts: POST /:id/deliveries
   'sale.deliver': { roles: ['owner', 'manager', 'sales_staff'], permission: ['page:sales.ledger', 'page:sales.new'] },
   // sale.route.ts: DELETE /:id - the server puts the stock and its FIFO cost back
