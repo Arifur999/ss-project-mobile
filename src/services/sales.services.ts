@@ -63,6 +63,13 @@ export const createSale = (input: SaleInput) => http.post<Row>('/sales', input);
  */
 export const updateSale = (saleId: string, input: SaleInput) => http.put<Row>(`/sales/${saleId}`, input);
 
+/**
+ * A sale line's purchase rate set by hand, in one transaction: its FIFO cost
+ * layers are released and its pieces taken again at this rate, so its profit
+ * is worked out from it.
+ */
+export const setSaleItemCost = (itemId: string, unitCost: number) => http.post(`/sales/items/${itemId}/manual-cost`, { unit_cost: unitCost });
+
 /** Records a delivery, moves the line's delivered count and the sale's delivery status, in one transaction. */
 export const addSaleDelivery = (saleId: string, input: DeliveryInput) => http.post(`/sales/${saleId}/deliveries`, input);
 
