@@ -75,10 +75,12 @@ function RootNavigator() {
   // navigated to, and expo-router sends the user to the first allowed one. So
   // signing in lands on "Welcome back!", dismissing it lands inside the app (or
   // on the locked screen), and signing out lands on sign-in - no navigate calls.
+  // Those swaps fade: sliding, the sign-in screen and its spinner were seen
+  // being pushed off to one side as the app took over.
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
       <Stack.Protected guard={inside}>
-        <Stack.Screen name="(app)" />
+        <Stack.Screen name="(app)" options={{ animation: 'fade' }} />
         <Stack.Screen name="soon" />
         <Stack.Screen name="business-info" />
       </Stack.Protected>
@@ -86,10 +88,10 @@ function RootNavigator() {
         <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
       </Stack.Protected>
       <Stack.Protected guard={locked}>
-        <Stack.Screen name="locked" />
+        <Stack.Screen name="locked" options={{ animation: 'fade' }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
-        <Stack.Screen name="login" />
+        <Stack.Screen name="login" options={{ animation: 'fade' }} />
         <Stack.Screen name="verify-otp" />
         <Stack.Screen name="register" />
         <Stack.Screen name="register-verify" />
