@@ -23,7 +23,18 @@ import { useToast } from '@/context/ToastContext';
 import { CustomerFormSheet } from '@/features/customers/CustomerFormSheet';
 import { ProductPickerSheet } from '@/features/products/ProductPickerSheet';
 import { SALES_COPY } from '@/features/sales/copy';
-import { dueCollections, newInvoiceNo, saleFormErrors, salePlan, saleTotals, withProduct, type SaleForm, type SaleLine } from '@/features/sales/saleForm';
+import {
+  dueCollections,
+  formFromSale,
+  newInvoiceNo,
+  saleEditable,
+  saleFormErrors,
+  salePlan,
+  saleTotals,
+  withProduct,
+  type SaleForm,
+  type SaleLine,
+} from '@/features/sales/saleForm';
 import { SaleLineCard } from '@/features/sales/SaleLineCard';
 import { useCan } from '@/hooks/useCan';
 import { useLeaveGuard } from '@/hooks/useLeaveGuard';
@@ -36,8 +47,10 @@ import { previousDueFor } from '@/lib/previousDue';
 import { buildInvoiceSms, smsBusiness } from '@/lib/smsTexts';
 import { useBusinessSettings } from '@/services/business.services';
 import { createCustomerPayment, useCustomerData, type CustomerData } from '@/services/customers.services';
-import { createSale, useSaleWrite } from '@/services/sales.services';
+import { createSale, updateSale, useSaleWrite } from '@/services/sales.services';
 import { sendSms, smsFailureReason } from '@/services/sms.services';
+
+type Row = Record<string, any>;
 
 const rowKey = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
@@ -49,25 +62,35 @@ const rowKey = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
  * cost in one transaction; money beyond the invoice is collected against the
  * old due, as the website does. The form starts once the customers and
  * accounts are in, so what it starts from is never missing them.
+ *
+ * Given a sale's id it edits that sale instead, as the website's editSale
+ * does: the server puts the old lines' stock back and writes the new ones,
+ * the old due is not collected again, and no invoice SMS goes out.
  */
-export function SaleFormScreen() {
+export function SaleFormScreen({ saleId }: { saleId?: string }) {
   const t = useCopy(SALES_COPY);
   const { data } = useCustomerData();
+  const editing = saleId ? (data?.sales.find((sale) => sale.id === saleId) ?? null) : null;
+  const notice = !data ? null : saleId && !editing ? t.notFound : editing && !saleEditable(editing) ? t.editBlocked : null;
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title={t.formTitle} onBack={() => router.back()} backLabel={t.back} />
-      {data ? (
-        <SaleFormBody data={data} />
-      ) : (
+      <ScreenHeader title={saleId ? t.editTitle : t.formTitle} onBack={() => router.back()} backLabel={t.back} />
+      {!data ? (
         <View style={styles.state}>
           <Spinner color={Zinc[900]} size={24} />
         </View>
+      ) : notice ? (
+        <View style={styles.state}>
+          <Txt style={styles.notice}>{notice}</Txt>
+        </View>
+      ) : (
+        <SaleFormBody data={data} editing={editing} />
       )}
     </SafeAreaView>
   );
 }
 
-function SaleFormBody({ data }: { data: CustomerData }) {
+function SaleFormBody({ data, editing }: { data: CustomerData; editing: Row | null }) {
   const t = useCopy(SALES_COPY);
   const { money } = useAmountShield();
   const toast = useToast();
@@ -76,19 +99,23 @@ function SaleFormBody({ data }: { data: CustomerData }) {
   const business = useBusinessSettings();
 
   const accounts = data.accounts;
-  const [start] = useState<SaleForm>(() => ({
-    invoice_no: newInvoiceNo(),
-    date: todayISO(),
-    customer_id: '',
-    customer_name: '',
-    customer_phone: '',
-    customer_address: '',
-    lines: [],
-    // A shop with one account need not pick it every time.
-    rows: [{ key: rowKey(), account_id: accounts.length === 1 ? accounts[0].id : '', amount: '' }],
-    notes: '',
-    sms: false,
-  }));
+  const [start] = useState<SaleForm>(() =>
+    editing
+      ? formFromSale(editing, rowKey)
+      : {
+          invoice_no: newInvoiceNo(),
+          date: todayISO(),
+          customer_id: '',
+          customer_name: '',
+          customer_phone: '',
+          customer_address: '',
+          lines: [],
+          // A shop with one account need not pick it every time.
+          rows: [{ key: rowKey(), account_id: accounts.length === 1 ? accounts[0].id : '', amount: '' }],
+          notes: '',
+          sms: false,
+        },
+  );
   const [form, setForm] = useState<SaleForm>(start);
   const [picking, setPicking] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -106,9 +133,11 @@ function SaleFormBody({ data }: { data: CustomerData }) {
     setForm((f) => ({ ...f, rows: f.rows.map((row) => (row.key === key ? { ...row, ...patch } : row)) }));
 
   const customer = data.customers.find((c) => c.id === form.customer_id);
-  const owed = previousDueFor(form.customer_id, data);
+  // An edited invoice is left out of what is owed besides it.
+  const owed = previousDueFor(form.customer_id, data, editing?.id);
   // The old due is collected with the sale only by whoever may record a collection.
-  const collectable = can('customerPayment.create') ? owed : 0;
+  // Never while editing: the old due collected with this sale is already its own record.
+  const collectable = !editing && can('customerPayment.create') ? owed : 0;
   const totals = saleTotals(form, collectable);
   const errors = saleFormErrors(form, totals);
   const shown = submitted ? errors : { lines: {}, rows: {} };
@@ -150,7 +179,7 @@ function SaleFormBody({ data }: { data: CustomerData }) {
     const plan = salePlan(form, customer, totals);
     try {
       const outcome = await write(async () => {
-        const sale = await createSale(plan.sale);
+        const sale = editing ? await updateSale(String(editing.id), plan.sale) : await createSale(plan.sale);
         // The number the server saved, which may have moved past one already taken.
         const invoiceNo = String(sale?.invoice_no || plan.sale.invoice_no);
         let dueError: string | null = null;
@@ -165,7 +194,7 @@ function SaleFormBody({ data }: { data: CustomerData }) {
         return { invoiceNo, dueError };
       });
       const sms = form.sms ? await textInvoice(outcome.invoiceNo, plan.finalPaid, plan.finalDue) : '';
-      toast.show([t.saved(outcome.invoiceNo), outcome.dueError ? t.dueFailed(outcome.dueError) : '', sms].filter(Boolean).join(' '));
+      toast.show([editing ? t.updated(outcome.invoiceNo) : t.saved(outcome.invoiceNo), outcome.dueError ? t.dueFailed(outcome.dueError) : '', sms].filter(Boolean).join(' '));
       guard.finish();
     } catch (e) {
       setError(errorMessage(e));
@@ -204,7 +233,7 @@ function SaleFormBody({ data }: { data: CustomerData }) {
               placeholder={t.chooseCustomer}
               closeLabel={t.close}
               value={form.customer_id}
-              options={data.customers.filter((c) => c.is_active !== false).map((c) => ({ key: c.id, label: [c.name, c.phone].filter(Boolean).join(' - ') }))}
+              options={data.customers.filter((c) => c.is_active !== false || c.id === form.customer_id).map((c) => ({ key: c.id, label: [c.name, c.phone].filter(Boolean).join(' - ') }))}
               onChange={(customer_id) => set({ customer_id })}
               error={shown.customer ? t.errCustomer : undefined}
               searchPlaceholder={t.searchCustomers}
@@ -213,7 +242,9 @@ function SaleFormBody({ data }: { data: CustomerData }) {
             {customer ? (
               <>
                 {customer.phone || customer.address ? <Txt style={styles.hint}>{[customer.phone, customer.address].filter(Boolean).join(' · ')}</Txt> : null}
-                {owed > 0 ? <Txt style={styles.owed}>{collectable > 0 ? t.owesBefore(money(owed)) : t.owesBeforeInfo(money(owed))}</Txt> : null}
+                {owed > 0 ? (
+                  <Txt style={styles.owed}>{editing ? t.owesOnEdit(money(owed)) : collectable > 0 ? t.owesBefore(money(owed)) : t.owesBeforeInfo(money(owed))}</Txt>
+                ) : null}
                 <Pressable accessibilityRole="button" onPress={() => set({ customer_id: '' })} style={styles.link}>
                   <Txt style={styles.linkText}>{t.walkIn}</Txt>
                 </Pressable>
@@ -308,7 +339,7 @@ function SaleFormBody({ data }: { data: CustomerData }) {
           </View>
 
           <TextField tone="zinc" label={t.notes} placeholder={t.optional} value={form.notes} onChangeText={(notes) => set({ notes })} minHeight={64} />
-          {can('sms.send') ? <SwitchRow title={t.smsInvoice} hint={t.smsInvoiceSub} value={form.sms} onChange={(sms) => set({ sms })} /> : null}
+          {!editing && can('sms.send') ? <SwitchRow title={t.smsInvoice} hint={t.smsInvoiceSub} value={form.sms} onChange={(sms) => set({ sms })} /> : null}
           <AlertBanner tone="error">{error}</AlertBanner>
         </ScrollView>
         <FormFooter cancelLabel={t.cancel} onCancel={() => router.back()} saveLabel={saving ? t.saving : t.save} onSave={save} saving={saving} />
@@ -330,7 +361,8 @@ function SaleFormBody({ data }: { data: CustomerData }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: White },
   flex: { flex: 1 },
-  state: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  state: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  notice: { textAlign: 'center', fontSize: 15, color: Zinc[600] },
   body: { padding: 20, gap: 18 },
   group: { gap: 8 },
   pair: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
