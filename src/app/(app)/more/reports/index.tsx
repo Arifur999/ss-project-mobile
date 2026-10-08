@@ -10,6 +10,7 @@ import { Amber, Green, Red, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { bnDigits, useCopy, useLang } from '@/context/LanguageContext';
 import { BREAKDOWN_TABS, BreakdownList, breakdownRows, type BreakdownTab } from '@/features/reports/BreakdownList';
+import { CompanyWays } from '@/features/reports/CompanyWays';
 import { REPORT_COPY } from '@/features/reports/copy';
 import { DailyTargetRow } from '@/features/reports/DailyTargetRow';
 import { ReportsShell } from '@/features/reports/ReportsShell';
@@ -98,14 +99,7 @@ export default function ReportSummaryScreen() {
             {breakdownRows(report, tab).length > limit ? <Button title={t.showMore} variant="pillOutline" onPress={() => setLimit((n) => n + PAGE)} /> : null}
           </View>
 
-          {report.companyWayRows.length > 0 ? (
-            <View style={styles.group}>
-              <Txt accessibilityRole="header" style={styles.title}>
-                {t.companies}
-              </Txt>
-              <TotalsList rows={report.companyWayRows.map((row) => ({ label: row.company, value: t.companyFigures(money(row.purchase), money(row.sales)) }))} />
-            </View>
-          ) : null}
+          <CompanyWays rows={report.companyWayRows} />
 
           {report.monthlyPurchaseRows.length > 0 ? (
             <View style={styles.group}>
