@@ -37,7 +37,7 @@ const ALL = '__all';
 // Drawn a slice at a time, as the website's useProgressiveRows does.
 const PAGE = 40;
 
-/** Every purchase invoice - Hatim's Purchase Ledger: search, filter, the voucher, receive, print, delete. */
+/** Every purchase invoice - Hatim's Purchase Ledger: search, filter, the voucher, edit, receive, print, delete. */
 export default function PurchaseLedgerScreen() {
   const t = useCopy(PURCHASE_COPY);
   const { lang } = useLang();
@@ -131,6 +131,14 @@ export default function PurchaseLedgerScreen() {
         purchase={sheet === 'invoice' ? selected : null}
         supplier={selected ? nameOf(selected) : ''}
         onClose={() => setSheet(null)}
+        onEdit={
+          can('purchase.edit') && selected
+            ? () => {
+                setSheet(null);
+                router.push({ pathname: '/more/purchase/edit/[id]', params: { id: String(selected.id) } });
+              }
+            : undefined
+        }
         onReceiveAll={can('purchase.receive') ? () => setSheet('receive') : undefined}
         onShare={() => output(true)}
         onPrint={() => output(false)}
