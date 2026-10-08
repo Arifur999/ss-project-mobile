@@ -56,6 +56,13 @@ export type DeliveryInput = { sale_item_id: string; delivery_date: string; deliv
  */
 export const createSale = (input: SaleInput) => http.post<Row>('/sales', input);
 
+/**
+ * Rewrites a sale in one transaction: its old lines' stock and FIFO cost go
+ * back, the new lines go out, and its payments are replaced. Collections
+ * against the customer's old due are their own records and stay as they are.
+ */
+export const updateSale = (saleId: string, input: SaleInput) => http.put<Row>(`/sales/${saleId}`, input);
+
 /** Records a delivery, moves the line's delivered count and the sale's delivery status, in one transaction. */
 export const addSaleDelivery = (saleId: string, input: DeliveryInput) => http.post(`/sales/${saleId}/deliveries`, input);
 
