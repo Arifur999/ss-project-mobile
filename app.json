@@ -19,7 +19,9 @@
       },
       "predictiveBackGestureEnabled": false,
       "allowBackup": false,
-      "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW"],
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
       "package": "agency.softech.furnify"
     },
     "web": {
@@ -51,6 +53,13 @@
     "experiments": {
       "typedRoutes": false,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0ccc303a-e54b-4199-8b65-52d984fec529"
+      }
+    },
+    "owner": "arifur_naxified"
   }
 }
