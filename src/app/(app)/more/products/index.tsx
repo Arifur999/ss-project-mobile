@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 
+import { Button } from '@/components/Button';
 import { ConfirmDeleteSheet } from '@/components/ItemSheets';
 import { ListScreen } from '@/components/ListScreen';
 import { SearchField } from '@/components/SearchField';
@@ -10,6 +11,7 @@ import { Zinc } from '@/constants/theme';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { PRODUCT_COPY } from '@/features/products/copy';
+import { PRICE_COPY } from '@/features/products/priceCopy';
 import { ProductCard } from '@/features/products/ProductCard';
 import { ProductDetailSheet } from '@/features/products/ProductDetailSheet';
 import { useCan } from '@/hooks/useCan';
@@ -22,6 +24,7 @@ import { deleteProduct, getProductUsage, useProductWrite, useProducts, type Prod
 /** The catalogue - Hatim's Product List: search, every product a page at a time, add, edit, delete. */
 export default function ProductListScreen() {
   const t = useCopy(PRODUCT_COPY);
+  const price = useCopy(PRICE_COPY);
   const { lang } = useLang();
   const toast = useToast();
   const can = useCan();
@@ -90,6 +93,9 @@ export default function ProductListScreen() {
       backLabel={t.backToMenu}
       header={
         <>
+          {can('products.updatePrice') ? (
+            <Button title={price.entry} icon="percent" variant="pillOutline" onPress={() => router.push('/more/products/update-price')} />
+          ) : null}
           <SearchField value={search} onChangeText={setSearch} placeholder={t.searchPlaceholder} label={t.searchLabel} height={50} />
           {query.isSuccess ? <Txt style={styles.count}>{t.count(total, formatNumber(total, lang))}</Txt> : null}
         </>
