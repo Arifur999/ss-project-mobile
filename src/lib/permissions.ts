@@ -60,6 +60,8 @@ export const ACTIONS = {
   'purchase.edit': { roles: ['owner', 'manager'], permission: ['page:purchase.orders', 'page:purchase.drafts'] },
   // purchase.route.ts: POST /:id/receive and /:id/receive-all
   'purchase.receive': { roles: ['owner', 'manager'], permission: 'page:purchase.received' },
+  // The website's Product History page (purchase history)
+  'purchaseHistory.view': { roles: ['owner', 'manager', 'accountant', 'sales_staff'], permission: 'page:purchase.history' },
   // purchase.route.ts: DELETE /:id
   'purchase.delete': { roles: ['owner', 'manager'], permission: 'act:purchase.delete' },
   // customer.route.ts: POST / and PATCH /:id
