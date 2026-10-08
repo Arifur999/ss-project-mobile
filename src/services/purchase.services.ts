@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { http } from '@/lib/httpClient';
+import type { PurchaseEditPlan } from '@/features/purchase/editForm';
+import { errorMessage, http } from '@/lib/httpClient';
 import { INVENTORY_KEY } from '@/services/inventory.services';
 import { SUPPLIER_KEY } from '@/services/supplier.services';
 
@@ -59,6 +60,42 @@ export const receiveWholePurchase = (purchaseId: string, input: { receive_date: 
 
 /** To the recycle bin, its received stock taken back out - refused once any of it is sold. */
 export const deletePurchase = (purchaseId: string) => http.delete(`/purchases/${purchaseId}`);
+
+/** An edit that failed after some of its writes had gone through - the invoice is no longer as the form opened it. */
+export class PartlySavedError extends Error {
+  constructor(cause: unknown) {
+    super(errorMessage(cause));
+    this.name = 'PartlySavedError';
+  }
+}
+
+/**
+ * Saves an edited invoice as the website's Purchase Ledger does, one request
+ * at a time: new lines (each re-totals the purchase and its status), changed
+ * lines, removed lines (refused once anything on them arrived), and the
+ * header last, so its total and due stand. The server has no single request
+ * for this, so a failure part-way says so.
+ */
+export async function saveEditedPurchase(purchaseId: string, plan: PurchaseEditPlan): Promise<void> {
+  let wrote = false;
+  try {
+    for (const item of plan.add) {
+      await http.post(`/purchases/${purchaseId}/items`, item);
+      wrote = true;
+    }
+    for (const { id, patch } of plan.update) {
+      await http.patch(`/purchases/items/${id}`, patch);
+      wrote = true;
+    }
+    for (const id of plan.remove) {
+      await http.delete(`/purchases/items/${id}`);
+      wrote = true;
+    }
+    await http.patch(`/purchases/${purchaseId}`, plan.header);
+  } catch (error) {
+    throw wrote ? new PartlySavedError(error) : error;
+  }
+}
 
 /** Runs a write, then refetches purchases and suppliers, the stock it moves, and the dashboard's incentive. */
 export function usePurchaseWrite() {
