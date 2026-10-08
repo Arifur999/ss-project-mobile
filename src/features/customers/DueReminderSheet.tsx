@@ -4,10 +4,10 @@ import { ConfirmSheet } from '@/components/ItemSheets';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { CUSTOMER_COPY } from '@/features/customers/copy';
+import { dueReminderText, reminderNumber } from '@/features/customers/dueSms';
 import type { CustomerDashboardRow } from '@/lib/customerDue';
 import { formatNumber } from '@/lib/money';
-import { phoneDigits } from '@/lib/phone';
-import { buildDueSms, segmentsFor, smsBusiness } from '@/lib/smsTexts';
+import { segmentsFor, smsBusiness } from '@/lib/smsTexts';
 import { useBusinessSettings } from '@/services/business.services';
 import { sendSms, smsFailureReason } from '@/services/sms.services';
 
@@ -23,10 +23,8 @@ export function DueReminderSheet({ customer, onClose }: { customer: CustomerDash
   const business = useBusinessSettings();
   const [sending, setSending] = useState(false);
 
-  const phone = phoneDigits(customer?.phone || '');
-  const message = customer
-    ? buildDueSms({ ...smsBusiness(business.data), customerName: customer.name || 'গ্রাহক', due: Number(customer.currentDue || 0) })
-    : '';
+  const phone = customer ? reminderNumber(customer) : '';
+  const message = customer ? dueReminderText(smsBusiness(business.data), customer) : '';
 
   const send = async () => {
     if (!customer || sending) return;
