@@ -15,13 +15,14 @@ type Row = Record<string, any>;
 
 /**
  * A purchase invoice opened from the ledger - the website's voucher: each
- * line priced and how much of it has arrived, the ledger's totals, then
- * Receive what is still due (for whoever may), Share PDF, Print and Delete.
+ * line priced and how much of it has arrived, the ledger's totals, then Edit
+ * and Receive what is still due (for whoever may), Share PDF, Print and Delete.
  */
 export function InvoiceSheet({
   purchase,
   supplier,
   onClose,
+  onEdit,
   onReceiveAll,
   onShare,
   onPrint,
@@ -30,6 +31,7 @@ export function InvoiceSheet({
   purchase: Row | null;
   supplier: string;
   onClose: () => void;
+  onEdit?: () => void;
   onReceiveAll?: () => void;
   onShare: () => void;
   onPrint: () => void;
@@ -62,6 +64,8 @@ export function InvoiceSheet({
       subtitle={`${supplier} · ${dateLabel(String(purchase?.date || ''), lang)}`}
       cancelLabel={t.close}
       closeLabel={t.close}
+      editLabel={t.editInvoice}
+      onEdit={onEdit}
       deleteLabel={t.deleteInvoice}
       onDelete={onDelete}
       extra={extra}>
