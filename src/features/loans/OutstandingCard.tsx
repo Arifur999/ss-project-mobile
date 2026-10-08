@@ -1,4 +1,4 @@
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DesignIcon } from '@/components/DesignIcon';
 import { Initial } from '@/components/Initial';
@@ -8,6 +8,7 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
+import { callPhone } from '@/lib/phone';
 import type { Lender } from '@/services/loans.services';
 
 /** One lender's running totals, as buildLoanSummary returns them. */
@@ -53,7 +54,7 @@ export function OutstandingCard({ item, onSms, onStatement }: { item: LoanSummar
             <Pressable
               accessibilityRole="link"
               accessibilityLabel={t.call(item.name, phone)}
-              onPress={() => Linking.openURL(`tel:${phone}`).catch(() => {})}
+              onPress={() => callPhone(phone)}
               style={styles.phone}>
               <Txt style={styles.phoneText}>{phone}</Txt>
             </Pressable>

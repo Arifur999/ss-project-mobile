@@ -1,5 +1,3 @@
-import { Linking } from 'react-native';
-
 import { BalanceBox } from '@/components/BalanceBox';
 import { ActionsSheet, type ExtraAction } from '@/components/ItemSheets';
 import { TotalsList } from '@/components/TotalsList';
@@ -7,6 +5,7 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { CUSTOMER_COPY } from '@/features/customers/copy';
 import type { CustomerDashboardRow } from '@/lib/customerDue';
+import { callPhone } from '@/lib/phone';
 
 /**
  * A customer's account in full, as the website's dashboard row reads it:
@@ -36,7 +35,7 @@ export function CustomerAccountSheet({
     { label: t.viewLedger, icon: 'fileText', onPress: onLedger },
     ...(onRemind ? [{ label: t.sendReminder, icon: 'message' as const, onPress: onRemind }] : []),
     ...(phone
-      ? [{ label: t.call(customer?.name ?? '', phone), icon: 'phone' as const, onPress: () => Linking.openURL(`tel:${phone}`).catch(() => {}) }]
+      ? [{ label: t.call(customer?.name ?? '', phone), icon: 'phone' as const, onPress: () => callPhone(phone) }]
       : []),
   ];
 

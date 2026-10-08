@@ -1,5 +1,3 @@
-import { Linking } from 'react-native';
-
 import { BalanceBox } from '@/components/BalanceBox';
 import { ActionsSheet, type ExtraAction } from '@/components/ItemSheets';
 import { TotalsList } from '@/components/TotalsList';
@@ -8,6 +6,7 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { SUPPLIER_COPY } from '@/features/supplier/copy';
 import type { SupplierAccount } from '@/lib/supplierSummary';
+import { callPhone } from '@/lib/phone';
 import { supplierLabel } from '@/services/supplier.services';
 
 /**
@@ -40,7 +39,7 @@ export function SupplierAccountSheet({
   ];
   const extra: ExtraAction[] = [
     ...(onPay ? [{ label: t.payThem, icon: 'banknote' as const, onPress: onPay }] : []),
-    ...(phone ? [{ label: t.call(name, phone), icon: 'phone' as const, onPress: () => Linking.openURL(`tel:${phone}`).catch(() => {}) }] : []),
+    ...(phone ? [{ label: t.call(name, phone), icon: 'phone' as const, onPress: () => callPhone(phone) }] : []),
   ];
 
   return (

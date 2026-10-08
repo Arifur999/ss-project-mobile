@@ -1,7 +1,7 @@
 import { isAxiosError } from 'axios';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DesignIcon } from '@/components/DesignIcon';
 import { ActionsSheet, ConfirmDeleteSheet } from '@/components/ItemSheets';
@@ -16,6 +16,7 @@ import { LoanShell } from '@/features/loans/LoanShell';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { errorMessage } from '@/lib/httpClient';
 import { lenderKey, lenderKeyFromLoan } from '@/lib/loans';
+import { callPhone } from '@/lib/phone';
 import { deleteLender, useLoanData, useLoanWrite, type Lender } from '@/services/loans.services';
 
 /** Every bank and person the business borrows from or lends to - Hatim's LoanLenderList. */
@@ -99,7 +100,7 @@ export default function LoanPeopleScreen() {
                   <Pressable
                     accessibilityRole="link"
                     accessibilityLabel={t.call(lender.name, phone)}
-                    onPress={() => Linking.openURL(`tel:${phone}`).catch(() => {})}
+                    onPress={() => callPhone(phone)}
                     style={styles.phone}>
                     <DesignIcon name="phone" size={14} color={Blue[700]} strokeWidth={2} />
                     <Txt style={styles.phoneText}>{phone}</Txt>

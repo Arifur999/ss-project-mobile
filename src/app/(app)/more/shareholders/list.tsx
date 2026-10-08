@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DesignIcon } from '@/components/DesignIcon';
 import { Initial } from '@/components/Initial';
@@ -14,6 +14,7 @@ import { SHAREHOLDER_COPY } from '@/features/shareholders/copy';
 import { ShareholderFormSheet } from '@/features/shareholders/ShareholderFormSheet';
 import { ShareholderShell } from '@/features/shareholders/ShareholderShell';
 import { errorMessage } from '@/lib/httpClient';
+import { callPhone } from '@/lib/phone';
 import { totalInvestment } from '@/lib/shareholders';
 import { deleteShareholder, useShareholderData, useShareholderWrite, type Shareholder } from '@/services/shareholders.services';
 
@@ -80,7 +81,7 @@ export default function ShareholderListScreen() {
                   <Pressable
                     accessibilityRole="link"
                     accessibilityLabel={t.call(sh.name, phone)}
-                    onPress={() => Linking.openURL(`tel:${phone}`).catch(() => {})}
+                    onPress={() => callPhone(phone)}
                     style={styles.phone}>
                     <DesignIcon name="phone" size={16} color={Blue[700]} />
                     <Txt style={styles.phoneText}>{phone}</Txt>

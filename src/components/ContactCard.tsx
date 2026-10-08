@@ -1,9 +1,10 @@
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DesignIcon } from '@/components/DesignIcon';
 import { Initial } from '@/components/Initial';
 import { Txt } from '@/components/Txt';
 import { Blue, White, Zinc } from '@/constants/theme';
+import { callPhone } from '@/lib/phone';
 
 export type ContactFooter = { label: string; value: string; color: string; chip?: { label: string; bg: string; ink: string } };
 
@@ -54,7 +55,7 @@ export function ContactCard({
             <Pressable
               accessibilityRole="link"
               accessibilityLabel={callLabel}
-              onPress={() => Linking.openURL(`tel:${number}`).catch(() => {})}
+              onPress={() => callPhone(number)}
               style={styles.phone}>
               <DesignIcon name="phone" size={14} color={Blue[700]} strokeWidth={2} />
               <Txt style={styles.phoneText}>{number}</Txt>
