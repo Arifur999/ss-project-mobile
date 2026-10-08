@@ -14,6 +14,7 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { CUSTOMER_COPY } from '@/features/customers/copy';
+import { receiptEditable } from '@/features/customers/receiptEdit';
 import { CustomersShell } from '@/features/customers/CustomersShell';
 import { ReceiptSheet } from '@/features/customers/ReceiptSheet';
 import { receiptTable } from '@/features/customers/receiptPrint';
@@ -32,7 +33,7 @@ import { deleteCustomerPayment, useCustomerData, useCustomerWrite } from '@/serv
 // Drawn a slice at a time, as the website's useProgressiveRows does.
 const PAGE = 40;
 
-/** Every due collection - Hatim's Due Received list: search, period, the receipt, print, delete. */
+/** Every due collection - Hatim's Due Received list: search, period, the receipt, edit, print, delete. */
 export default function DueReceivedScreen() {
   const t = useCopy(CUSTOMER_COPY);
   const { lang } = useLang();
@@ -154,6 +155,15 @@ export default function DueReceivedScreen() {
       <ReceiptSheet
         receipt={sheet === 'receipt' ? selected : null}
         onClose={() => setSheet(null)}
+        onEdit={
+          can('customerPayment.edit') && selected && receiptEditable(selected)
+            ? () => {
+                setSheet(null);
+                router.push({ pathname: '/customers/edit-receipt/[id]', params: { id: selected.payment_ids[0] } });
+              }
+            : undefined
+        }
+        editNote={can('customerPayment.edit') && selected && !receiptEditable(selected) ? t.splitNoEdit : undefined}
         onShare={() => output(true)}
         onPrint={() => output(false)}
         onDelete={can('customerPayment.delete') ? () => setSheet('delete') : undefined}
