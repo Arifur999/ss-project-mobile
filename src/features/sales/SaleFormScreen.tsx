@@ -159,7 +159,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
 
   const customer = data.customers.find((c) => c.id === form.customer_id);
   // An edited invoice is left out of what is owed besides it.
-  const owed = previousDueFor(form.customer_id, data, editing?.id);
+  const owed = previousDueFor(form.customer_id, data, { saleId: editing?.id });
   // The old due is collected with the sale only by whoever may record a collection.
   // Never while editing: the old due collected with this sale is already its own record.
   const collectable = !editing && can('customerPayment.create') ? owed : 0;
