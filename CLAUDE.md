@@ -39,6 +39,8 @@ The website uses an httpOnly cookie pair. The app cannot rely on cookies, so:
 
 Routing is guarded in `src/app/_layout.tsx` with `Stack.Protected` - there are no navigate calls on sign-in or sign-out. Signed out reaches `login`, `verify-otp`, `register*` and `forgot-password`; a fresh sign-in reaches `welcome` (the AuthContext `welcome` flag, never set on a cold start); after that `(app)` plus `business-info` and `soon`, or `locked` for an owner whose subscription is inactive. Registration verifies the emailed code but deliberately does not sign in. The locked screen must not link to buying a plan - store billing rules forbid steering users to outside payment.
 
+Android hardening lives in `app.json`: `allowBackup` is false (the account hint and cash counter in AsyncStorage stay on the phone), and CAMERA, RECORD_AUDIO and SYSTEM_ALERT_WINDOW are blocked - the image picker's plugin applies itself even when unlisted and would add the microphone, which the privacy policy says the app never reads. Before adding a permission, update the website's `/privacy` page and the Play Data safety form with it. Call buttons go through `callPhone` (`src/lib/phone.ts`), never a raw `tel:` link.
+
 Typed routes are off on purpose (`app.json`) and `.expo/types` is excluded from `tsconfig.json`: on Windows the dev server's watcher writes non-route files into `router.d.ts`, so tsc results depended on whether `expo start` happened to be running.
 
 ## Code shared with the website
