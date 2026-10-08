@@ -66,6 +66,8 @@ export const ACTIONS = {
   'customers.delete': { roles: ['owner', 'manager'], permission: 'act:customers.delete' },
   // customerPayment.route.ts: POST /
   'customerPayment.create': { roles: ['owner', 'manager', 'sales_staff', 'accountant'], permission: 'page:customers.due-received' },
+  // customerPayment.route.ts: PATCH /:id
+  'customerPayment.edit': { roles: ['owner', 'manager'], permission: 'page:customers.due-received' },
   // customerPayment.route.ts: DELETE /:id
   'customerPayment.delete': { roles: ['owner', 'manager'], permission: 'act:customers.delete' },
   // expense.route.ts: POST / - a due discount is written as an expense
