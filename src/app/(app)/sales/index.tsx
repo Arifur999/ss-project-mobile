@@ -15,6 +15,7 @@ import { useToast } from '@/context/ToastContext';
 import { SALES_COPY } from '@/features/sales/copy';
 import { DeliverySheet, type SaleLine } from '@/features/sales/DeliverySheet';
 import { invoiceTable } from '@/features/sales/invoicePrint';
+import { RateSheet } from '@/features/sales/RateSheet';
 import { SaleCard } from '@/features/sales/SaleCard';
 import { saleEditable } from '@/features/sales/saleForm';
 import { SalesShell } from '@/features/sales/SalesShell';
@@ -36,11 +37,11 @@ type Row = Record<string, any>;
 // Drawn a slice at a time, as the website's useProgressiveRows does.
 const PAGE = 40;
 
-/** Every sale - Hatim's Sales Ledger: search, date and delivery filters, the invoice, deliveries, edit, print, delete. */
+/** Every sale - Hatim's Sales Ledger: search, date and delivery filters, the invoice, deliveries, purchase rates, edit, print, delete. */
 export default function SalesLedgerScreen() {
   const t = useCopy(SALES_COPY);
   const { lang } = useLang();
-  const { money } = useAmountShield();
+  const { money, hidden } = useAmountShield();
   const toast = useToast();
   const can = useCan();
   const write = useSaleWrite();
@@ -53,6 +54,7 @@ export default function SalesLedgerScreen() {
   const [selected, setSelected] = useState<Row | null>(null);
   const [sheet, setSheet] = useState<'sale' | 'delete' | null>(null);
   const [delivering, setDelivering] = useState<SaleLine | null>(null);
+  const [rating, setRating] = useState<SaleLine | null>(null);
   const [busy, setBusy] = useState(false);
 
   const accounts = data?.accounts ?? [];
@@ -154,6 +156,15 @@ export default function SalesLedgerScreen() {
               }
             : undefined
         }
+        // A rate is changed only while amounts show, as the website's box is.
+        onRate={
+          can('sale.cost') && !hidden
+            ? (item) => {
+                setSheet(null);
+                if (selected) setRating({ sale: selected, item });
+              }
+            : undefined
+        }
         onEdit={
           can('sale.edit') && editable && selected
             ? () => {
@@ -168,6 +179,7 @@ export default function SalesLedgerScreen() {
         onDelete={can('sale.delete') ? () => setSheet('delete') : undefined}
       />
       <DeliverySheet line={delivering} onClose={() => setDelivering(null)} />
+      <RateSheet line={rating} onClose={() => setRating(null)} />
       <ConfirmDeleteSheet
         open={sheet === 'delete'}
         onClose={() => setSheet(null)}
