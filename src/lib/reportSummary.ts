@@ -98,7 +98,21 @@ export type ReportInputs = {
 
 const amount = (value: unknown) => roundTaka(value);
 const pct = (value: number, target: number) => (target > 0 ? (value / target) * 100 : 0);
-const companyName = (value: string | null | undefined) => String(value || '').trim() || 'Unassigned';
+/** A company's name as the reports file it; no name is "Unassigned". */
+export const companyName = (value: string | null | undefined) => String(value || '').trim() || 'Unassigned';
+
+/** Each product's company, by id and by code - how a sale line is traced to whom it was bought from. */
+export function productCompanies(products: Row[]): Map<string, string> {
+  const companies = new Map<string, string>();
+  for (const product of products) {
+    const relation = product.supplier ?? product.suppliers;
+    const supplier = Array.isArray(relation) ? relation[0] : relation;
+    const name = companyName(supplier?.company_name || supplier?.name);
+    if (product.id) companies.set(product.id, name);
+    if (product.product_code) companies.set(product.product_code, name);
+  }
+  return companies;
+}
 
 function isoDate(date: Date) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -249,14 +263,7 @@ export function buildReport(input: ReportInputs): ReportData {
     .sort((a, b) => b.amount - a.amount);
 
   // Company ways: purchases by their supplier, sales traced through the product to its company.
-  const productCompany = new Map<string, string>();
-  for (const product of input.products) {
-    const relation = product.supplier ?? product.suppliers;
-    const supplier = Array.isArray(relation) ? relation[0] : relation;
-    const name = companyName(supplier?.company_name || supplier?.name);
-    if (product.id) productCompany.set(product.id, name);
-    if (product.product_code) productCompany.set(product.product_code, name);
-  }
+  const productCompany = productCompanies(input.products);
   const companyMap: Record<string, CompanyWayRow> = {};
   for (const purchase of purchases) {
     const company = companyName(purchase.supplier_name);
