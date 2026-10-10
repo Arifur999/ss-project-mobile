@@ -1,33 +1,33 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Check, Clock } from 'lucide-react-native';
+import { Check, Gift } from 'lucide-react-native';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
 import { Txt } from '@/components/Txt';
-import { Amber, Green, Slate, White } from '@/constants/theme';
+import { Green, Slate, White } from '@/constants/theme';
 import { useCopy } from '@/context/LanguageContext';
 
 const LOGO_DARK = require('@/assets/images/brand/logo-dark.png');
 
 const COPY = {
   en: {
-    title: 'Request submitted',
+    title: 'Account created',
     body: (name: string, business: string) =>
-      `Thanks, ${name}. We have received the registration request for ${business}. You can sign in once your workspace is approved.`,
+      `Thanks, ${name}. The workspace for ${business} is ready. Sign in to start your 7-day free trial.`,
     summary: 'Your details',
-    pending: 'Pending approval',
+    ready: 'Free trial ready',
     business: 'Business',
     phone: 'Phone',
     email: 'Email',
     back: 'Back to sign in',
   },
   bn: {
-    title: 'অনুরোধ পাঠানো হয়েছে',
+    title: 'অ্যাকাউন্ট তৈরি হয়েছে',
     body: (name: string, business: string) =>
-      `ধন্যবাদ, ${name}। ${business} এর রেজিস্ট্রেশনের অনুরোধ আমরা পেয়েছি। ওয়ার্কস্পেস অনুমোদন হলে সাইন ইন করতে পারবেন।`,
+      `ধন্যবাদ, ${name}। ${business}-এর ওয়ার্কস্পেস তৈরি। সাইন ইন করে ৭ দিনের ফ্রি ট্রায়াল শুরু করুন।`,
     summary: 'আপনার দেওয়া তথ্য',
-    pending: 'অনুমোদনের অপেক্ষায়',
+    ready: 'ফ্রি ট্রায়াল প্রস্তুত',
     business: 'ব্যবসা',
     phone: 'মোবাইল',
     email: 'ইমেইল',
@@ -35,7 +35,11 @@ const COPY = {
   },
 };
 
-/** The end of registration: what was submitted, and the way back to sign in. */
+/**
+ * The end of registration: what was submitted, and the way back to sign in,
+ * where the new owner starts the free trial (start-trial). There is no
+ * approval step - the design's "Pending approval" never happened.
+ */
 export default function RegisterSuccessScreen() {
   const t = useCopy(COPY);
   const { name = '', business = '', phone = '', email = '' } =
@@ -64,8 +68,8 @@ export default function RegisterSuccessScreen() {
           <View style={styles.cardHead}>
             <Txt style={styles.cardTitle}>{t.summary}</Txt>
             <View style={styles.badge}>
-              <Clock size={14} color={Amber[800]} strokeWidth={2.2} />
-              <Txt style={styles.badgeText}>{t.pending}</Txt>
+              <Gift size={14} color={Green[800]} strokeWidth={2.2} />
+              <Txt style={styles.badgeText}>{t.ready}</Txt>
             </View>
           </View>
           <View style={styles.rows}>
@@ -105,8 +109,8 @@ const styles = StyleSheet.create({
     borderBottomColor: Slate[200],
   },
   cardTitle: { fontSize: 14, fontWeight: '600', color: Slate[900] },
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 3, paddingHorizontal: 10, borderRadius: 999, backgroundColor: Amber[100] },
-  badgeText: { fontSize: 13, fontWeight: '600', color: Amber[800], lineHeight: 18 },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 3, paddingHorizontal: 10, borderRadius: 999, backgroundColor: Green[100] },
+  badgeText: { fontSize: 13, fontWeight: '600', color: Green[800], lineHeight: 18 },
   rows: { paddingVertical: 4, paddingHorizontal: 16 },
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: 16, paddingVertical: 12 },
   rowDivider: { borderBottomWidth: 1, borderBottomColor: Slate[100] },
