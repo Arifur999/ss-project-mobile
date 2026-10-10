@@ -12,6 +12,7 @@ import { bnDigits, useCopy, useLang } from '@/context/LanguageContext';
 import { AccountCard, flowInk } from '@/features/balance/AccountCard';
 import { BalanceShell } from '@/features/balance/BalanceShell';
 import { BALANCE_COPY } from '@/features/balance/copy';
+import { useReach } from '@/hooks/useCan';
 import { activeFirst } from '@/lib/balance';
 import { accountTotals, BALANCE_TABS } from '@/lib/balanceTabs';
 import { useBalance } from '@/services/balance.services';
@@ -19,6 +20,7 @@ import { useBalance } from '@/services/balance.services';
 /** Balance: where the money stands, account by account, in five views. */
 export default function BalanceOverviewScreen() {
   const t = useCopy(BALANCE_COPY);
+  const ledger = useReach().href('/more/balance/ledger');
   const { lang } = useLang();
   const { money, hidden, toggle } = useAmountShield();
   const { data } = useBalance();
@@ -80,8 +82,8 @@ export default function BalanceOverviewScreen() {
             columns={others}
             closing={closing}
             money={money}
-            accessibilityLabel={t.openLedger(row.name, money(row.current_balance))}
-            onPress={() => router.push({ pathname: '/more/balance/ledger', params: { account: row.id } })}
+            accessibilityLabel={ledger ? t.openLedger(row.name, money(row.current_balance)) : `${row.name}, ${money(row.current_balance)}`}
+            onPress={ledger ? () => router.push({ pathname: '/more/balance/ledger', params: { account: row.id } }) : undefined}
           />
         ))}
       </View>

@@ -17,7 +17,7 @@ export function flowInk(column: BalanceColumn, value: number, onDark = false): s
 /**
  * One account in the overview: name and its closing figure (with the green or
  * red dot) on top, the tab's other columns three to a row underneath. Tapping
- * it opens that account's ledger.
+ * it opens that account's ledger, for a member who may open the Ledger.
  */
 export function AccountCard({
   name,
@@ -40,14 +40,15 @@ export function AccountCard({
   money: (n: number) => string;
   first: boolean;
   accessibilityLabel: string;
-  onPress: () => void;
+  onPress?: () => void;
 }) {
   const close = figures[closing.key] || 0;
   return (
     <Pressable
-      accessibilityRole="button"
+      accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
+      disabled={!onPress}
       style={({ pressed }) => [styles.item, !first && styles.divider, pressed && styles.pressed]}>
       <View style={styles.top}>
         <View style={styles.nameRow}>
