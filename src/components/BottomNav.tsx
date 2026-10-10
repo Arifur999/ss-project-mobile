@@ -24,14 +24,15 @@ const COPY = {
 
 /**
  * The bottom bar: 72 tall plus the home-indicator inset, a hairline on top, the
- * active tab's icon in a 56x30 black pill.
+ * active tab's icon in a 56x30 black pill. `shown` holds the tabs the member
+ * may open; the rest are left out rather than shown and refused.
  */
-export function BottomNav({ active, onPress }: { active: string; onPress: (key: TabKey) => void }) {
+export function BottomNav({ active, shown, onPress }: { active: string; shown: string[]; onPress: (key: TabKey) => void }) {
   const t = useCopy(COPY);
   const insets = useSafeAreaInsets();
   return (
     <View accessibilityRole="tablist" style={[styles.bar, { height: 72 + insets.bottom, paddingBottom: 10 + insets.bottom }]}>
-      {TABS.map(({ key, icon }) => {
+      {TABS.filter(({ key }) => shown.includes(key)).map(({ key, icon }) => {
         const selected = key === active;
         return (
           <Pressable
