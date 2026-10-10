@@ -22,7 +22,9 @@ import { SalesChartCard } from '@/features/dashboard/SalesChartCard';
 import { SpendingsCard } from '@/features/dashboard/SpendingsCard';
 import { TopCustomersCard } from '@/features/dashboard/TopCustomersCard';
 import { TotalsGrid } from '@/features/dashboard/TotalsGrid';
+import { useReach } from '@/hooks/useCan';
 import { rangeLabel } from '@/lib/dates';
+import { hrefOf } from '@/lib/permissions';
 import { dashboardRange, type DashboardPeriod } from '@/lib/periods';
 import { toBusinessInfo, useBusinessSettings } from '@/services/business.services';
 import { useDashboard } from '@/services/dashboard.services';
@@ -37,6 +39,7 @@ export default function DashboardScreen() {
   const [period, setPeriod] = useState<DashboardPeriod>('month');
   const [periodOpen, setPeriodOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const customersHome = useReach().first('customers');
 
   const query = useDashboard(period);
   const business = toBusinessInfo(useBusinessSettings().data);
@@ -93,7 +96,10 @@ export default function DashboardScreen() {
               fallback={{ year: Number(range.to.slice(0, 4)), month: Math.min(Number(range.to.slice(5, 7)), now.getMonth() + 1) }}
             />
 
-            <TopCustomersCard customers={data.topCustomers} onViewAll={() => router.navigate('/customers')} />
+            <TopCustomersCard
+              customers={data.topCustomers}
+              onViewAll={customersHome ? () => router.navigate(hrefOf(customersHome) as never) : undefined}
+            />
           </>
         )}
       </ScrollView>

@@ -8,8 +8,8 @@ import { useCopy } from '@/context/LanguageContext';
 import { DASHBOARD_COPY } from '@/features/dashboard/copy';
 import type { TopCustomer } from '@/lib/dashboard';
 
-/** The period's five best customers, what they bought and what they still owe. */
-export function TopCustomersCard({ customers, onViewAll }: { customers: TopCustomer[]; onViewAll: () => void }) {
+/** The period's five best customers, what they bought and what they still owe; View all only for a member who may open the Customers tab. */
+export function TopCustomersCard({ customers, onViewAll }: { customers: TopCustomer[]; onViewAll?: () => void }) {
   const t = useCopy(DASHBOARD_COPY);
   const { money } = useAmountShield();
   return (
@@ -19,9 +19,11 @@ export function TopCustomersCard({ customers, onViewAll }: { customers: TopCusto
           <Txt style={styles.title}>{t.topCustomers}</Txt>
           <Txt style={styles.sub}>{t.bySales}</Txt>
         </View>
-        <Pressable accessibilityRole="link" onPress={onViewAll} style={styles.viewAll}>
-          <Txt style={styles.viewAllText}>{t.viewAll}</Txt>
-        </Pressable>
+        {onViewAll ? (
+          <Pressable accessibilityRole="link" onPress={onViewAll} style={styles.viewAll}>
+            <Txt style={styles.viewAllText}>{t.viewAll}</Txt>
+          </Pressable>
+        ) : null}
       </View>
 
       {customers.length === 0 ? (
