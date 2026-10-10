@@ -20,7 +20,9 @@ type Direction = 'add' | 'remove';
 /**
  * A manual stock correction, as the website's adjust box makes it - but asked
  * as Add or Remove and a count, rather than a signed number, so nobody has to
- * know that "-5" means five left. Shows the stock before and after.
+ * know that "-5" means five left. Shows the stock before and after, and the
+ * button says which it does - "Remove 82 pcs" - since the sheet opens on
+ * Remove and a count meant to go in would otherwise come off.
  */
 export function AdjustStockSheet({ row, onClose }: { row: StockRow | null; onClose: () => void }) {
   const t = useCopy(INVENTORY_COPY);
@@ -113,7 +115,13 @@ export function AdjustStockSheet({ row, onClose }: { row: StockRow | null; onClo
       <TextField tone="zinc" label={t.reasonField} placeholder={t.reasonPlaceholder} value={reason} onChangeText={setReason} />
       <AlertBanner tone="error">{error}</AlertBanner>
       <View style={styles.actions}>
-        <Button title={saving ? t.saving : t.save} variant="pill" onPress={save} busy={saving} style={styles.grow} />
+        <Button
+          title={saving ? t.saving : valid ? (direction === 'add' ? t.addPcs : t.removePcs)(formatNumber(count, lang)) : t.save}
+          variant="pill"
+          onPress={save}
+          busy={saving}
+          style={styles.grow}
+        />
         <Button title={t.cancel} variant="pillOutline" onPress={onClose} disabled={saving} style={styles.grow} />
       </View>
     </BottomSheet>
