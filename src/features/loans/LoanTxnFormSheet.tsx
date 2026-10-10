@@ -151,7 +151,7 @@ export function LoanTxnFormSheet({ open, onClose, editing }: { open: boolean; on
     try {
       await write(() => (editing ? updateLoan(editing.id, input) : createLoan(input)));
       const saved = editing ? t.txnUpdated : t.txnSaved;
-      if (form.sms && before !== null) {
+      if (receipt && form.sms && before !== null) {
         // After the save: the transaction is on the books whatever the gateway says.
         try {
           const sent = await receipt(lender, amount, before + effect);
@@ -179,7 +179,7 @@ export function LoanTxnFormSheet({ open, onClose, editing }: { open: boolean; on
       <View style={styles.field}>
         <View style={styles.labelRow}>
           <Txt style={styles.label}>{t.personField}</Txt>
-          <InlineSwitch label={t.smsReceipt} value={form.sms} onChange={(sms) => set({ sms })} />
+          {receipt ? <InlineSwitch label={t.smsReceipt} value={form.sms} onChange={(sms) => set({ sms })} /> : null}
         </View>
         <SelectField
           placeholder={t.select}

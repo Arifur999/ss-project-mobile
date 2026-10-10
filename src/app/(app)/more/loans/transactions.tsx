@@ -79,7 +79,7 @@ export default function LoanTransactionsScreen() {
   const lenderOf = (record: Row) => (data?.lenders ?? []).find((l) => lenderKey(l) === lenderKeyFromLoan(record));
 
   const resend = async () => {
-    if (!selected) return;
+    if (!selected || !receipt) return;
     setSheet(null);
     const amounts = transactionAmounts(selected);
     const lender = lenderOf(selected);
@@ -255,7 +255,7 @@ export default function LoanTransactionsScreen() {
         deleteLabel={t.deleteTxn}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        extra={[{ label: t.sendReceipt, icon: 'message', onPress: resend }]}
+        extra={receipt ? [{ label: t.sendReceipt, icon: 'message', onPress: resend }] : []}
         onEdit={() => {
           setSheet(null);
           setEditing(selected);
