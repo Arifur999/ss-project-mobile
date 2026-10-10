@@ -62,7 +62,10 @@ const styles = StyleSheet.create({
     borderTopColor: Zinc[200],
   },
   item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3 },
-  pill: { width: 56, height: 30, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
+  // White when idle, the bar's own colour, rather than none: Android rounds a
+  // background only if the view had one from the start, and the pill a tab
+  // switched to was drawn as a square.
+  pill: { width: 56, height: 30, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: White },
   pillActive: { backgroundColor: Zinc[900] },
   label: { fontSize: 12, lineHeight: 18 },
   labelActive: { fontWeight: '600', color: Zinc[900] },
