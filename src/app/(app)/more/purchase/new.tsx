@@ -155,6 +155,7 @@ function NewPurchaseBody({ data, draft }: { data: SupplierData; draft: { id: str
   };
 
   const save = async () => {
+    if (saving) return;
     setSaving(true);
     setError(null);
     try {
