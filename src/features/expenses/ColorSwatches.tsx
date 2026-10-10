@@ -30,7 +30,7 @@ export function ColorSwatches({ value, onChange }: { value: string; onChange: (h
                   onPress={() => onChange(hex)}
                   style={styles.cell}>
                   <View style={[styles.ring, selected && styles.ringOn]}>
-                    <View style={[styles.gap, selected && styles.gapOn]}>
+                    <View style={styles.gap}>
                       <View style={[styles.swatch, { backgroundColor: hex }]}>
                         {selected ? <DesignIcon name="check" size={16} color={White} strokeWidth={3} /> : null}
                       </View>
@@ -53,9 +53,11 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 4 },
   cell: { flex: 1, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   // 32px swatch, then (when chosen) a 2px white gap and a 2px black ring - the design's box-shadow.
-  ring: { width: 40, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
+  // Both layers are white on the white sheet until chosen, rather than empty:
+  // Android rounds a background only if the view had one from the start, and
+  // a ring that appeared on choosing was drawn square.
+  ring: { width: 40, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: White },
   ringOn: { backgroundColor: Zinc[900] },
-  gap: { width: 36, height: 36, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
-  gapOn: { backgroundColor: White },
+  gap: { width: 36, height: 36, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: White },
   swatch: { width: 32, height: 32, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
 });
