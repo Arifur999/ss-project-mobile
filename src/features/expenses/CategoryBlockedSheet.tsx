@@ -11,7 +11,8 @@ import { EXPENSE_COPY } from '@/features/expenses/copy';
 
 /**
  * Why a category with expenses cannot be deleted - the server refuses it, as
- * the website's guard does - with a way to its transactions.
+ * the website's guard does - with a way to its transactions for a member who
+ * may open them.
  */
 export function CategoryBlockedSheet({
   open,
@@ -24,7 +25,7 @@ export function CategoryBlockedSheet({
   name: string;
   spent: number;
   onClose: () => void;
-  onTransactions: () => void;
+  onTransactions?: () => void;
 }) {
   const t = useCopy(EXPENSE_COPY);
   const { money } = useAmountShield();
@@ -38,7 +39,7 @@ export function CategoryBlockedSheet({
       </Txt>
       <Txt style={styles.text}>{t.blockedText(money(spent))}</Txt>
       <View style={styles.row}>
-        <Button title={t.viewTransactions} variant="pillOutline" onPress={onTransactions} style={styles.grow} />
+        {onTransactions ? <Button title={t.viewTransactions} variant="pillOutline" onPress={onTransactions} style={styles.grow} /> : null}
         <Button title={t.ok} variant="pill" onPress={onClose} style={styles.grow} />
       </View>
     </BottomSheet>

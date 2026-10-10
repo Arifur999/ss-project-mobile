@@ -15,7 +15,7 @@ import type { Category } from '@/services/expenses.services';
 /**
  * One category opened from the list: its total and share, this month and
  * this year, the budget and how much of it is used (or a prompt to set one),
- * then Edit, View transactions and Delete.
+ * then Edit, View transactions (for a member who may open them) and Delete.
  */
 export function CategoryDetailSheet({
   category,
@@ -33,7 +33,7 @@ export function CategoryDetailSheet({
   isTop: boolean;
   onClose: () => void;
   onEdit: () => void;
-  onTransactions: () => void;
+  onTransactions?: () => void;
   onDelete: () => void;
 }) {
   const t = useCopy(EXPENSE_COPY);
@@ -112,10 +112,12 @@ export function CategoryDetailSheet({
           <DesignIcon name="pencil" size={20} color={Zinc[900]} />
           <Txt style={styles.actionText}>{t.editCategory}</Txt>
         </Pressable>
-        <Pressable accessibilityRole="link" onPress={onTransactions} style={[styles.action, styles.divider]}>
-          <DesignIcon name="receiptText" size={20} color={Zinc[900]} />
-          <Txt style={styles.actionText}>{t.viewTransactions}</Txt>
-        </Pressable>
+        {onTransactions ? (
+          <Pressable accessibilityRole="link" onPress={onTransactions} style={[styles.action, styles.divider]}>
+            <DesignIcon name="receiptText" size={20} color={Zinc[900]} />
+            <Txt style={styles.actionText}>{t.viewTransactions}</Txt>
+          </Pressable>
+        ) : null}
         <Pressable accessibilityRole="button" onPress={onDelete} style={[styles.action, styles.divider]}>
           <DesignIcon name="trash" size={20} color={Red[700]} />
           <Txt style={[styles.actionText, { color: Red[700] }]}>{t.deleteCategory}</Txt>
