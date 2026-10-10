@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
 import { Txt } from '@/components/Txt';
+import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { FONT_FILES } from '@/constants/fonts';
 import { White, Zinc } from '@/constants/theme';
 import { AmountShieldProvider } from '@/context/AmountShieldContext';
@@ -43,6 +44,7 @@ export default function RootLayout() {
               <ToastProvider>
                 <StatusBar style="dark" />
                 <RootNavigator />
+                <UpdatePrompt />
               </ToastProvider>
             </AuthProvider>
           </AmountShieldProvider>
