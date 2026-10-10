@@ -15,6 +15,7 @@ import { BalanceSmsSheet } from '@/features/loans/BalanceSmsSheet';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { LoanShell } from '@/features/loans/LoanShell';
 import { OutstandingCard, summaryPhone, type LoanSummary } from '@/features/loans/OutstandingCard';
+import { useCan, useReach } from '@/hooks/useCan';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { buildLoanSummary } from '@/lib/loans';
 import { useLoanData } from '@/services/loans.services';
@@ -26,6 +27,9 @@ const sum = (rows: LoanSummary[], pick: (r: LoanSummary) => number) => rows.redu
 /** Where every bank and person stands, with the totals - Hatim's LoanDashboard. */
 export default function LoanOverviewScreen() {
   const t = useCopy(LOAN_COPY);
+  // Texting is the owner's (every /sms route is); the statement needs its page tick.
+  const mayText = useCan()('sms.send');
+  const statement = useReach().href('/more/loans/statement');
   const { money } = useAmountShield();
   const toast = useToast();
   const { data } = useLoanData();
@@ -121,15 +125,17 @@ export default function LoanOverviewScreen() {
         <Txt accessibilityRole="header" style={styles.listTitle}>
           {t.outstandingTitle}
         </Txt>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: displayed.length === 0 }}
-          disabled={displayed.length === 0}
-          onPress={smsAll}
-          style={[styles.smsAll, displayed.length === 0 && styles.disabled]}>
-          <DesignIcon name="message" size={16} color={White} strokeWidth={2} />
-          <Txt style={styles.smsAllText}>{t.sendSms}</Txt>
-        </Pressable>
+        {mayText ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ disabled: displayed.length === 0 }}
+            disabled={displayed.length === 0}
+            onPress={smsAll}
+            style={[styles.smsAll, displayed.length === 0 && styles.disabled]}>
+            <DesignIcon name="message" size={16} color={White} strokeWidth={2} />
+            <Txt style={styles.smsAllText}>{t.sendSms}</Txt>
+          </Pressable>
+        ) : null}
       </View>
 
       <View style={styles.tools}>
@@ -152,7 +158,12 @@ export default function LoanOverviewScreen() {
       ) : null}
 
       {displayed.map((item) => (
-        <OutstandingCard key={item.key} item={item} onSms={() => smsOne(item)} onStatement={() => openStatement(item)} />
+        <OutstandingCard
+          key={item.key}
+          item={item}
+          onSms={mayText ? () => smsOne(item) : undefined}
+          onStatement={statement ? () => openStatement(item) : undefined}
+        />
       ))}
 
       <View style={styles.total} accessibilityLabel={t.total}>

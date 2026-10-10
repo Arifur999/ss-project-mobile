@@ -28,9 +28,9 @@ export const summaryPhone = (item: LoanSummary) => String(item.lender?.phone || 
 
 /**
  * A bank or person on the loan overview: who, where they stand, the four
- * running figures, then SMS and Statement.
+ * running figures, then SMS and Statement - each only for a member who may.
  */
-export function OutstandingCard({ item, onSms, onStatement }: { item: LoanSummary; onSms: () => void; onStatement: () => void }) {
+export function OutstandingCard({ item, onSms, onStatement }: { item: LoanSummary; onSms?: () => void; onStatement?: () => void }) {
   const t = useCopy(LOAN_COPY);
   const { money } = useAmountShield();
   const side = sideOf(item.balance);
@@ -79,16 +79,22 @@ export function OutstandingCard({ item, onSms, onStatement }: { item: LoanSummar
         ))}
       </View>
 
-      <View style={styles.actions}>
-        <Pressable accessibilityRole="button" onPress={onSms} style={styles.action}>
-          <DesignIcon name="message" size={16} color={Zinc[900]} strokeWidth={2} />
-          <Txt style={styles.actionText}>{t.sms}</Txt>
-        </Pressable>
-        <Pressable accessibilityRole="link" onPress={onStatement} style={[styles.action, styles.actionDivider]}>
-          <DesignIcon name="book" size={16} color={Zinc[900]} strokeWidth={2} />
-          <Txt style={styles.actionText}>{t.statement}</Txt>
-        </Pressable>
-      </View>
+      {onSms || onStatement ? (
+        <View style={styles.actions}>
+          {onSms ? (
+            <Pressable accessibilityRole="button" onPress={onSms} style={styles.action}>
+              <DesignIcon name="message" size={16} color={Zinc[900]} strokeWidth={2} />
+              <Txt style={styles.actionText}>{t.sms}</Txt>
+            </Pressable>
+          ) : null}
+          {onStatement ? (
+            <Pressable accessibilityRole="link" onPress={onStatement} style={[styles.action, onSms && styles.actionDivider]}>
+              <DesignIcon name="book" size={16} color={Zinc[900]} strokeWidth={2} />
+              <Txt style={styles.actionText}>{t.statement}</Txt>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 }
