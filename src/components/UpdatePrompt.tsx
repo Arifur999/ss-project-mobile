@@ -24,13 +24,13 @@ const COPY = {
 };
 
 /** Coming back to the app looks for an update at most this often. */
-const CHECK_EVERY_MS = 30 * 60_000;
+const CHECK_EVERY_MS = 5 * 60_000;
 
 /**
  * Offers an EAS Update once it has downloaded. expo-updates fetches one on a
  * cold start but runs it only on the next, and a shop's phone keeps the app
  * open for days - so it is also looked for when the app comes back to the
- * front (at most every half hour), and once one is waiting the user is asked
+ * front (at most every five minutes), and once one is waiting the user is asked
  * to restart into it. Later leaves it for the next start, so a half-filled
  * form is never thrown away without asking. Nothing shows in development or
  * Expo Go, where updates are off.
