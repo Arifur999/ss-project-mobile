@@ -25,7 +25,10 @@ npx expo install <pkg>   # never plain npm install for a package - picks the SDK
 npx expo export --platform android --output-dir <tmp>   # full bundle check without a phone
 npx eas-cli@latest build -p android --profile preview      # installable APK (link + QR on expo.dev)
 npx eas-cli@latest build -p android --profile production   # Play Store AAB, version code bumped on EAS
+npx eas-cli@latest update --channel preview --message "..." --environment preview   # JS/UI change to installed preview APKs
 ```
+
+EAS Update (expo-updates) carries JavaScript, screens and images to builds already installed; each profile has its channel (`preview`, `production`), so a test update never reaches Play users. `runtimeVersion` follows `expo.version`: anything native - a package with native code, a plugin, a permission or other `app.json` native setting, an SDK upgrade - must bump `version` (1.0.0 → 1.0.1) and ship as a new build; an update published without that would load JS expecting native code the installed app lacks. `UpdatePrompt` (root layout) asks the user to restart once an update has downloaded.
 
 Builds run on EAS (project `@arifur_naxified/furnify`, ID in `app.json`). EAS generated and holds the Android signing keystore - it is the key the Play listing will be tied to, so never delete it from expo.dev. A local Gradle build is not set up: this machine has no JDK or Android SDK, and Windows Smart App Control blocks `hermesc.exe`, which a release build needs.
 
