@@ -13,6 +13,7 @@ import { useToast } from '@/context/ToastContext';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { LenderFormSheet } from '@/features/loans/LenderFormSheet';
 import { LoanShell } from '@/features/loans/LoanShell';
+import { useReach } from '@/hooks/useCan';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { errorMessage } from '@/lib/httpClient';
 import { lenderKey, lenderKeyFromLoan } from '@/lib/loans';
@@ -22,6 +23,7 @@ import { deleteLender, useLoanData, useLoanWrite, type Lender } from '@/services
 /** Every bank and person the business borrows from or lends to - Hatim's LoanLenderList. */
 export default function LoanPeopleScreen() {
   const t = useCopy(LOAN_COPY);
+  const statement = useReach().href('/more/loans/statement');
   const { money } = useAmountShield();
   const toast = useToast();
   const write = useLoanWrite();
@@ -148,16 +150,20 @@ export default function LoanPeopleScreen() {
         deleteLabel={t.delete}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        extra={[
-          {
-            label: t.viewStatement,
-            icon: 'book',
-            onPress: () => {
-              setSheet(null);
-              if (selected) router.replace({ pathname: '/more/loans/statement', params: { lender: selected.id } });
-            },
-          },
-        ]}
+        extra={
+          statement
+            ? [
+                {
+                  label: t.viewStatement,
+                  icon: 'book',
+                  onPress: () => {
+                    setSheet(null);
+                    if (selected) router.replace({ pathname: '/more/loans/statement', params: { lender: selected.id } });
+                  },
+                },
+              ]
+            : []
+        }
         onEdit={() => {
           setSheet(null);
           setEditing(selected);
