@@ -1,8 +1,6 @@
-import { Stack } from 'expo-router';
-
-import { tabStackOptions } from '@/lib/stackOptions';
+import { GuardedStack } from '@/components/GuardedStack';
 
 /** The More tab: the menu, and the screens it opens, keeping the tab bar below. */
 export default function MoreLayout() {
-  return <Stack screenOptions={tabStackOptions} />;
+  return <GuardedStack folder="more" />;
 }
