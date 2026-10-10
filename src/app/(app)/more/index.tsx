@@ -10,7 +10,9 @@ import { Red, White, Zinc } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useCopy } from '@/context/LanguageContext';
 import { MenuGrid, MenuTile } from '@/features/menu/MenuTile';
+import { useReach } from '@/hooks/useCan';
 import { WEBSITE_URL } from '@/lib/config';
+import { hrefOf } from '@/lib/permissions';
 import { whatsAppLink } from '@/lib/support';
 import { useSupportNumber } from '@/services/support.services';
 
@@ -88,39 +90,50 @@ const SECTIONS: Section[] = [
   },
 ];
 
-/** Where each designed destination lives; everything else opens /soon. */
-const ROUTES: Partial<Record<ItemKey, Href>> = {
-  history: '/more/history',
-  calculator: '/more/cash-counter',
-  balance: '/more/balance',
-  shareholders: '/more/shareholders',
-  loans: '/more/loans',
-  expenses: '/more/expenses',
-  products: '/more/products',
-  damage: '/more/damage',
-  supplier: '/more/supplier',
-  purchase: '/more/purchase',
-  employees: '/more/employees',
-  target: '/more/reports',
-  support: '/more/support',
-  marketing: '/more/marketing',
-  billing: '/more/billing',
-  deleteAccount: '/more/delete-account',
-  inventory: '/inventory',
-  sales: '/sales',
-  customers: '/customers',
+/**
+ * The folder of (app) each tile opens. A tile shows only when its member may
+ * open something in it (ROUTE_ACCESS, the website's page ticks) and lands on
+ * the first such screen, so a member with Balance's Ledger but not its
+ * Overview still finds their page. WhatsApp and the privacy policy leave the
+ * app; Admin, the platform owner's alone, is not built yet.
+ */
+const FOLDERS: Partial<Record<ItemKey, string>> = {
+  history: 'more/history',
+  calculator: 'more/cash-counter',
+  balance: 'more/balance',
+  shareholders: 'more/shareholders',
+  loans: 'more/loans',
+  expenses: 'more/expenses',
+  products: 'more/products',
+  inventory: 'inventory',
+  damage: 'more/damage',
+  supplier: 'more/supplier',
+  purchase: 'more/purchase',
+  sales: 'sales',
+  customers: 'customers',
+  target: 'more/reports',
+  marketing: 'more/marketing',
+  employees: 'more/employees',
+  billing: 'more/billing',
+  support: 'more/support',
+  deleteAccount: 'more/delete-account',
 };
 
 /** The More tab: the website's sidebar as tiles, language, and sign out. */
 export default function MenuScreen() {
   const t = useCopy(COPY);
   const { account, signOut } = useAuth();
+  const reach = useReach();
   const name = account?.profile?.full_name?.trim() || account?.user.email || '';
   const role = account?.profile?.role;
   const supportNumber = useSupportNumber();
 
-  // Admin is the platform owner's alone, and billing the workspace owner's.
-  const visible = (key: ItemKey) => (key === 'admin' ? role === 'super_admin' : key === 'billing' ? role === 'owner' : true);
+  const landing = (key: ItemKey) => {
+    const folder = FOLDERS[key];
+    return folder ? reach.first(folder) : null;
+  };
+  const visible = (key: ItemKey) =>
+    key === 'whatsapp' || key === 'privacy' ? true : key === 'admin' ? role === 'super_admin' : landing(key) !== null;
 
   const open = (key: ItemKey) => {
     if (key === 'whatsapp') {
@@ -131,8 +144,8 @@ export default function MenuScreen() {
       Linking.openURL(`${WEBSITE_URL}/privacy`).catch(() => {});
       return;
     }
-    const route = ROUTES[key];
-    if (route) router.navigate(route);
+    const screen = landing(key);
+    if (screen) router.navigate(hrefOf(screen) as Href);
     else router.push({ pathname: '/soon', params: { title: t.items[key] } });
   };
 
