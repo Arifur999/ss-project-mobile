@@ -3,6 +3,9 @@
     "name": "Furnify",
     "slug": "furnify",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "furnify",
@@ -60,6 +63,9 @@
         "projectId": "0ccc303a-e54b-4199-8b65-52d984fec529"
       }
     },
-    "owner": "arifur_naxified"
+    "owner": "arifur_naxified",
+    "updates": {
+      "url": "https://u.expo.dev/0ccc303a-e54b-4199-8b65-52d984fec529"
+    }
   }
 }
