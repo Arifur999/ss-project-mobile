@@ -7,14 +7,15 @@ import { Red, White, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { INVENTORY_COPY } from '@/features/inventory/copy';
-import { STATUS_LOOK, stockStatus } from '@/features/inventory/stockStatus';
+import { STATUS_LOOK, statusText, stockStatus } from '@/features/inventory/stockStatus';
 import { formatNumber } from '@/lib/money';
 import type { StockRow } from '@/services/inventory.services';
 
 /**
  * A product's stock in the list: photo, name, code and supplier, the DP each
  * and the value, then the quantity on hand - red when it has gone below zero -
- * with its status badge. Memoised for the paged list.
+ * with its status badge (an Upcoming one counting what is on the way).
+ * Memoised for the paged list.
  */
 export const StockCard = memo(function StockCard({ row, onPress }: { row: StockRow; onPress: (row: StockRow) => void }) {
   const t = useCopy(INVENTORY_COPY);
@@ -24,12 +25,13 @@ export const StockCard = memo(function StockCard({ row, onPress }: { row: StockR
   const status = stockStatus(row);
   const look = STATUS_LOOK[status];
   const qty = Number(row.available_qty || 0);
+  const badge = statusText(row, t, lang);
   const supplier = String(product?.suppliers?.company_name || product?.suppliers?.name || '').trim();
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${product?.name ?? ''}, ${t.inStock} ${formatNumber(qty, lang)}, ${t.statuses[status]}`}
+      accessibilityLabel={`${product?.name ?? ''}, ${t.inStock} ${formatNumber(qty, lang)}, ${badge}`}
       onPress={() => onPress(row)}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <ProductImage url={product?.image_url} size={56} />
@@ -50,7 +52,7 @@ export const StockCard = memo(function StockCard({ row, onPress }: { row: StockR
         </Txt>
         <View style={[styles.badge, { backgroundColor: look.bg }]}>
           <Txt style={[styles.badgeText, { color: look.ink }]} numberOfLines={1}>
-            {t.statuses[status]}
+            {badge}
           </Txt>
         </View>
       </View>

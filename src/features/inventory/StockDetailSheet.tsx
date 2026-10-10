@@ -10,7 +10,7 @@ import { Green, Red, Zinc } from '@/constants/theme';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { INVENTORY_COPY } from '@/features/inventory/copy';
-import { STATUS_LOOK, stockStatus } from '@/features/inventory/stockStatus';
+import { STATUS_LOOK, statusText, stockStatus } from '@/features/inventory/stockStatus';
 import { dateLabel, toISODate } from '@/lib/dates';
 import { formatNumber } from '@/lib/money';
 import { useStockHistory, type StockRow } from '@/services/inventory.services';
@@ -74,7 +74,7 @@ export function StockDetailSheet({ row, onClose, onAdjust }: { row: StockRow | n
         </View>
         <View style={styles.stockSide}>
           <View style={[styles.badge, { backgroundColor: look.bg }]}>
-            <Txt style={[styles.badgeText, { color: look.ink }]}>{t.statuses[status]}</Txt>
+            <Txt style={[styles.badgeText, { color: look.ink }]}>{row ? statusText(row, t, lang) : ''}</Txt>
           </View>
           <Txt style={styles.stockLabel}>{t.value}</Txt>
           <Txt style={styles.stockValue}>{money(row?.fifo_stock_value)}</Txt>
