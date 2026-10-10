@@ -125,6 +125,151 @@ export const ACTIONS = {
 
 export type Action = keyof typeof ACTIONS;
 
+/**
+ * What a screen needs: a page permission, or one of the website's two
+ * sentinels - 'all' (any signed-in member) and 'owner' (the role, not a tick).
+ */
+export type Access = string;
+
+/**
+ * Every signed-in screen, by its file under src/app/(app), and the website
+ * page it is - the app's copy of the website's ROUTE_ACCESS, so a member sees
+ * the same pages in both. Absent means denied.
+ *
+ * Order matters: within a folder, the order its section chips show, then its
+ * forms, then the screens opened on one record. firstReachable walks it to
+ * pick where a menu tile or tab lands, and a navigator whose first screen is
+ * refused falls back to the next one declared.
+ *
+ * The website's Buy SMS page has no screen: the app sells nothing (store
+ * billing rules).
+ */
+export const ROUTE_ACCESS: Record<string, Access> = {
+  index: 'page:dashboard.overview',
+
+  'sales/index': 'page:sales.ledger',
+  'sales/items': 'page:sales.history',
+  'sales/drafts': 'page:sales.drafts',
+  'sales/new': 'page:sales.new',
+  'sales/edit/[id]': 'page:sales.ledger',
+
+  inventory: 'page:inventory.stock',
+
+  'customers/index': 'page:customers.dashboard',
+  'customers/receipts': 'page:customers.due-received',
+  'customers/ledger': 'page:customers.ledger',
+  'customers/list': 'page:customers.list',
+  'customers/receive': 'page:customers.due-received',
+  'customers/edit-receipt/[id]': 'page:customers.due-received',
+  // Spends the owner's SMS credits; every /sms route is the owner's.
+  'customers/due-sms': 'owner',
+
+  'more/index': 'all',
+  'more/history': 'all',
+  'more/cash-counter': 'all',
+
+  'more/balance/index': 'page:balance.overview',
+  'more/balance/transfers': 'page:balance.transfer',
+  'more/balance/ledger': 'page:balance.ledger',
+  'more/balance/wallet': 'page:balance.wallet',
+
+  'more/shareholders/index': 'page:shareholders.dashboard',
+  'more/shareholders/invest': 'page:shareholders.invest',
+  'more/shareholders/profit': 'page:shareholders.profit',
+  'more/shareholders/list': 'page:shareholders.list',
+
+  'more/loans/index': 'page:loans.dashboard',
+  'more/loans/people': 'page:loans.lenders',
+  'more/loans/transactions': 'page:loans.transactions',
+  'more/loans/statement': 'page:loans.ledger',
+
+  'more/expenses/index': 'page:expenses.overview',
+  'more/expenses/transactions': 'page:expenses.transactions',
+
+  'more/products/index': 'page:products.list',
+  'more/products/update-price': 'page:products.update-price',
+  'more/products/form': 'page:products.list',
+
+  'more/damage/index': 'page:damage.dashboard',
+  'more/damage/entries': 'page:damage.entries',
+  'more/damage/receive': 'page:damage.receive',
+  'more/damage/transactions': 'page:damage.transactions',
+  'more/damage/new': 'page:damage.entries',
+
+  'more/supplier/index': 'page:supplier.dashboard',
+  'more/supplier/payments': 'page:supplier.payments',
+  'more/supplier/income': 'page:supplier.other-income',
+  'more/supplier/list': 'page:supplier.list',
+  'more/supplier/report': 'page:supplier.report',
+
+  'more/purchase/index': 'page:purchase.ledger',
+  'more/purchase/receive': 'page:purchase.received',
+  'more/purchase/history': 'page:purchase.history',
+  'more/purchase/drafts': 'page:purchase.drafts',
+  'more/purchase/new': 'page:purchase.orders',
+  'more/purchase/edit/[id]': 'page:purchase.ledger',
+
+  'more/reports/index': 'page:reports.summary',
+  'more/reports/yearly': 'page:reports.yearly',
+  'more/reports/sales-target': 'page:reports.monthly-target',
+  'more/reports/purchase-target': 'page:reports.purchase-target',
+
+  // The website offers its Campaign page to a ticked member, whose every
+  // request is then refused: every /sms route is the owner's.
+  'more/marketing': 'owner',
+
+  'more/employees/index': 'page:employees.dashboard',
+  'more/employees/payments': 'page:employees.transactions',
+  'more/employees/attendance': 'page:employees.attendance',
+  'more/employees/list': 'page:employees.list',
+
+  'more/support/index': 'all',
+  'more/support/[id]': 'all',
+  'more/billing': 'owner',
+  'more/delete-account': 'all',
+};
+
+/**
+ * Whether this user may open this screen. The website's canReach (Hatim/src/
+ * lib/permissions.ts), keyed by screen file rather than URL and without its
+ * super-admin pages: super_admin and owner pass, then 'all', then 'owner'
+ * refuses everyone else - before the empty-list hatch, as a manager's role
+ * does not reach the owner's pages - then an empty list passes, then the name
+ * has to be held. An unknown screen is refused.
+ */
+export function canReach(role: string | undefined, granted: string[] | undefined, screen: string): boolean {
+  if (role === 'super_admin' || role === 'owner') return true;
+  const access = ROUTE_ACCESS[screen];
+  if (access === undefined) return false;
+  if (access === 'all') return true;
+  if (access === 'owner') return false;
+  const list = granted ?? [];
+  if (list.length === 0) return true;
+  return list.includes(access);
+}
+
+/** The screens in a folder of (app) - `sales`, `more/balance` - in ROUTE_ACCESS order. */
+export function screensIn(folder: string): string[] {
+  return Object.keys(ROUTE_ACCESS).filter((screen) => screen === folder || screen.startsWith(`${folder}/`));
+}
+
+/** The screen an href opens: `/more/balance` is `more/balance/index`, `/` is `index`. */
+export function screenOf(href: string): string {
+  const path = href.replace(/^\/+|\/+$/g, '');
+  if (!path) return 'index';
+  return `${path}/index` in ROUTE_ACCESS ? `${path}/index` : path;
+}
+
+/** The href that opens a screen: `more/balance/index` is `/more/balance`. */
+export function hrefOf(screen: string): string {
+  return `/${screen.replace(/(^|\/)index$/, '')}`;
+}
+
+/** The first screen of a folder this user may open - never one that needs a record's id - or null. */
+export function firstReachable(role: string | undefined, granted: string[] | undefined, folder: string): string | null {
+  return screensIn(folder).find((screen) => !screen.includes('[') && canReach(role, granted, screen)) ?? null;
+}
+
 export function canDo(role: UserRole | undefined, granted: string[] | undefined, action: Action): boolean {
   const gate = ACTIONS[action];
   if (!role || !(gate.roles as readonly UserRole[]).includes(role)) return false;
