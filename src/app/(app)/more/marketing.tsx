@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
@@ -9,6 +9,7 @@ import { Button } from '@/components/Button';
 import { FieldError } from '@/components/FieldError';
 import { FigureCard } from '@/components/FigureCard';
 import { ConfirmSheet } from '@/components/ItemSheets';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { PromptCard } from '@/components/PromptCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
@@ -97,7 +98,7 @@ export default function MarketingScreen() {
           <PromptCard icon="megaphone" text={t.ownerOnly} />
         </View>
       ) : (
-        <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardScreen style={styles.flex}>
           <ScrollView
             contentContainerStyle={styles.body}
             keyboardShouldPersistTaps="handled"
@@ -169,7 +170,7 @@ export default function MarketingScreen() {
               </View>
             ) : null}
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardScreen>
       )}
 
       <RecipientSheet open={picking} contacts={contacts.data ?? []} selected={selected} onChange={setSelected} onClose={() => setPicking(false)} />

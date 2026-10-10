@@ -1,12 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
 import { DateField } from '@/components/DateField';
 import { ConfirmSheet } from '@/components/ItemSheets';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
 import { TotalsList } from '@/components/TotalsList';
@@ -113,7 +114,7 @@ export default function CashCounterScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.cashTitle} onBack={() => router.back()} backLabel={t.back} />
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           <Txt style={styles.intro}>{t.cashIntro}</Txt>
           <View style={styles.pair}>
@@ -167,7 +168,7 @@ export default function CashCounterScreen() {
           ) : null}
           <Button title={t.clear} icon="trash" variant="pillOutline" onPress={() => setConfirming(true)} disabled={totals.notes === 0 && !draft.countedBy.trim()} />
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
 
       <ConfirmSheet
         open={confirming}

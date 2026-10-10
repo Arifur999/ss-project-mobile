@@ -1,12 +1,13 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { DesignIcon } from '@/components/DesignIcon';
 import { FormFooter } from '@/components/FormFooter';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
@@ -108,7 +109,7 @@ export default function BusinessInfoScreen() {
         <View style={styles.headerButton} />
       </View>
 
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           {query.isPending ? (
             <LoadingState minHeight={240} />
@@ -163,7 +164,7 @@ export default function BusinessInfoScreen() {
             <Button title={t.edit} variant="pill" onPress={startEdit} icon="pencil" />
           </View>
         ) : null}
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
     </SafeAreaView>
   );
 }

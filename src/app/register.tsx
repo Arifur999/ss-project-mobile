@@ -1,12 +1,13 @@
 import { router } from 'expo-router';
 import { Lock, Mail, MapPin, Phone, Send, Store, User } from 'lucide-react-native';
 import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { AuthHero } from '@/components/AuthHero';
 import { Button } from '@/components/Button';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
 import { Slate, White } from '@/constants/theme';
@@ -138,7 +139,7 @@ export default function RegisterScreen() {
   });
 
   return (
-    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardScreen style={styles.flex}>
       <ScrollView ref={scroll} style={styles.flex} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <AuthHero
           photo={PHOTO}
@@ -185,7 +186,7 @@ export default function RegisterScreen() {
           </Txt>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardScreen>
   );
 }
 

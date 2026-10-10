@@ -2,12 +2,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
 import { FormFooter } from '@/components/FormFooter';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
 import { SuggestionChips } from '@/components/SuggestionChips';
@@ -131,7 +132,7 @@ export default function ProductFormScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={title} onBack={() => router.back()} backLabel={t.back} />
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           <PhotoField
             uri={photoUri}
@@ -236,7 +237,7 @@ export default function ProductFormScreen() {
           <AlertBanner tone="error">{error}</AlertBanner>
         </ScrollView>
         <FormFooter cancelLabel={t.cancel} onCancel={() => router.back()} saveLabel={saving ? t.saving : t.save} onSave={save} saving={saving} />
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
 
       {guard.sheet}
     </SafeAreaView>

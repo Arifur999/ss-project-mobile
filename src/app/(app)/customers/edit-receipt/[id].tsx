@@ -1,12 +1,13 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { PaymentRowFields, type PaymentRow } from '@/components/PaymentRowFields';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -114,7 +115,7 @@ function EditReceiptBody({ data, receipt }: { data: CustomerData; receipt: Recei
 
   return (
     <>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           <DateField label={t.date} value={form.date} onChange={(date) => set({ date })} />
 
@@ -182,7 +183,7 @@ function EditReceiptBody({ data, receipt }: { data: CustomerData; receipt: Recei
           <AlertBanner tone="error">{error}</AlertBanner>
         </ScrollView>
         <FormFooter cancelLabel={t.cancel} onCancel={() => router.back()} saveLabel={saving ? t.saving : t.save} onSave={save} saving={saving} />
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
       {guard.sheet}
     </>
   );

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
@@ -9,6 +9,7 @@ import { ChoiceCard } from '@/components/ChoiceCard';
 import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
 import { TextField } from '@/components/TextField';
@@ -95,7 +96,7 @@ export default function NewDamageScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.recordDamage} onBack={() => router.back()} backLabel={t.back} />
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           <DateField label={t.date} value={form.date} onChange={(date) => set({ date })} />
 
@@ -168,7 +169,7 @@ export default function NewDamageScreen() {
           <AlertBanner tone="error">{error}</AlertBanner>
         </ScrollView>
         <FormFooter cancelLabel={t.cancel} onCancel={() => router.back()} saveLabel={saving ? t.saving : t.save} onSave={save} saving={saving} />
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
 
       <ProductPickerSheet open={picking} title={t.chooseProduct} onClose={() => setPicking(false)} onPick={addProduct} />
       {guard.sheet}

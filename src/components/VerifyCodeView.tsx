@@ -1,12 +1,13 @@
 import { isAxiosError } from 'axios';
 import { Check, MailOpen, RotateCcw } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AuthTopBar } from '@/components/AuthTopBar';
 import { Button } from '@/components/Button';
 import { FieldError } from '@/components/FieldError';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { OTP_LENGTH, OtpBoxes, type OtpBoxesHandle } from '@/components/OtpBoxes';
 import { Txt } from '@/components/Txt';
 import { Green, Slate, White } from '@/constants/theme';
@@ -117,7 +118,7 @@ export function VerifyCodeView({
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <AuthTopBar onBack={onBack} backLabel={t.back} />
         <ScrollView contentContainerStyle={styles.main} keyboardShouldPersistTaps="handled">
           <View style={styles.intro}>
@@ -180,7 +181,7 @@ export function VerifyCodeView({
             <Txt style={styles.differentText}>{t.different}</Txt>
           </Pressable>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
     </SafeAreaView>
   );
 }

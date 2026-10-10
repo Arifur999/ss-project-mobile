@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
@@ -10,6 +10,7 @@ import { DateField } from '@/components/DateField';
 import { FieldError } from '@/components/FieldError';
 import { FormFooter } from '@/components/FormFooter';
 import { ConfirmSheet } from '@/components/ItemSheets';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SelectField } from '@/components/SelectField';
@@ -192,7 +193,7 @@ function NewPurchaseBody({ data, draft }: { data: SupplierData; draft: { id: str
 
   return (
     <>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
           <View style={styles.group}>
             <SelectField
@@ -308,7 +309,7 @@ function NewPurchaseBody({ data, draft }: { data: SupplierData; draft: { id: str
           <AlertBanner tone="error">{error}</AlertBanner>
         </ScrollView>
         <FormFooter cancelLabel={t.cancel} onCancel={() => router.back()} saveLabel={saving ? t.saving : t.save} onSave={submit} saving={saving} />
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
 
       <ProductPickerSheet
         open={picking}

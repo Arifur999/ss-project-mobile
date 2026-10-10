@@ -1,10 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { Button } from '@/components/Button';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
@@ -80,7 +81,7 @@ export default function TicketThreadScreen() {
           {query.isPending ? <LoadingState /> : <AlertBanner tone="error">{t.loadError}</AlertBanner>}
         </View>
       ) : (
-        <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardScreen style={styles.flex}>
           <ScrollView
             ref={scroll}
             contentContainerStyle={styles.thread}
@@ -115,7 +116,7 @@ export default function TicketThreadScreen() {
               <Button title={sending ? t.sending : t.send} variant="pill" onPress={send} busy={sending} />
             </View>
           </View>
-        </KeyboardAvoidingView>
+        </KeyboardScreen>
       )}
     </SafeAreaView>
   );

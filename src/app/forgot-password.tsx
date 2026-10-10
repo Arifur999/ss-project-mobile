@@ -2,13 +2,14 @@ import { isAxiosError } from 'axios';
 import { router } from 'expo-router';
 import { Lock, Mail, ShieldCheck } from 'lucide-react-native';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlertBanner } from '@/components/AlertBanner';
 import { AuthTopBar } from '@/components/AuthTopBar';
 import { Button } from '@/components/Button';
 import { FieldError } from '@/components/FieldError';
+import { KeyboardScreen } from '@/components/KeyboardScreen';
 import { OTP_LENGTH, OtpBoxes } from '@/components/OtpBoxes';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
@@ -135,7 +136,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen style={styles.flex}>
         <AuthTopBar onBack={backToSignIn} backLabel={t.back} />
         <ScrollView contentContainerStyle={styles.main} keyboardShouldPersistTaps="handled">
           <View style={styles.intro}>
@@ -221,7 +222,7 @@ export default function ForgotPasswordScreen() {
             <Txt style={styles.backLinkText}>{t.backToSignIn}</Txt>
           </Pressable>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
     </SafeAreaView>
   );
 }
