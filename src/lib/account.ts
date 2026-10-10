@@ -31,6 +31,9 @@ export interface OwnerSubscription {
   plan_status?: PlanStatus | null;
   expiry_date?: string | null;
   blocked_reason?: string;
+  /** Whether the one free trial has been started. */
+  trial_used?: boolean | null;
+  address?: string | null;
 }
 
 export interface Account {
@@ -62,6 +65,18 @@ export function isSubscriptionLocked(account: Account | null): boolean {
   if (account?.profile?.role !== 'owner') return false;
   const status = effectiveSubscriptionStatus(account.subscription);
   return status !== 'active' && status !== 'trial';
+}
+
+/**
+ * Whether a locked owner may still start the free trial - the server's own
+ * rule (subscription.service choosePlan): never started, and no paid plan
+ * chosen. A new registration is exactly this: modelled as expired, with the
+ * trial unused, as the website's /choose-plan expects.
+ */
+export function canStartTrial(account: Account | null): boolean {
+  if (!isSubscriptionLocked(account)) return false;
+  const subscription = account?.subscription;
+  return !!subscription && !subscription.trial_used && subscription.plan_type !== 'monthly' && subscription.plan_type !== 'yearly';
 }
 
 export function displayName(account: Account | null): string {
