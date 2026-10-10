@@ -9,6 +9,7 @@ import { Txt } from '@/components/Txt';
 import { Red, White, Zinc } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useCopy } from '@/context/LanguageContext';
+import { AppVersion } from '@/features/menu/AppVersion';
 import { MenuGrid, MenuTile } from '@/features/menu/MenuTile';
 import { useReach } from '@/hooks/useCan';
 import { WEBSITE_URL } from '@/lib/config';
@@ -199,6 +200,8 @@ export default function MenuScreen() {
             </View>
           );
         })}
+
+        <AppVersion />
 
         <Pressable accessibilityRole="button" onPress={signOut} style={({ pressed }) => [styles.logout, pressed && styles.logoutPressed]}>
           <DesignIcon name="logout" size={18} color={Red[700]} />
