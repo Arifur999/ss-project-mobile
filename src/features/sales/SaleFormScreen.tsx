@@ -29,6 +29,7 @@ import { SALES_COPY } from '@/features/sales/copy';
 import { draftFromForm, formFromDraft, type OpenedDraft } from '@/features/sales/saleDraft';
 import {
   dueCollections,
+  editLine,
   formFromSale,
   newInvoiceNo,
   saleEditable,
@@ -37,7 +38,6 @@ import {
   saleTotals,
   withProduct,
   type SaleForm,
-  type SaleLine,
 } from '@/features/sales/saleForm';
 import { SaleLineCard } from '@/features/sales/SaleLineCard';
 import { useCan } from '@/hooks/useCan';
@@ -151,8 +151,8 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
   const guard = useLeaveGuard(dirty);
 
   const set = (patch: Partial<SaleForm>) => setForm((f) => ({ ...f, ...patch }));
-  const setLine = (productId: string, patch: Partial<SaleLine>) =>
-    setForm((f) => ({ ...f, lines: f.lines.map((line) => (line.product_id === productId ? { ...line, ...patch } : line)) }));
+  const setLine = (productId: string, patch: Parameters<typeof editLine>[1]) =>
+    setForm((f) => ({ ...f, lines: f.lines.map((line) => (line.product_id === productId ? editLine(line, patch) : line)) }));
   const setRow = (key: string, patch: Partial<PaymentRow>) =>
     setForm((f) => ({ ...f, rows: f.rows.map((row) => (row.key === key ? { ...row, ...patch } : row)) }));
 

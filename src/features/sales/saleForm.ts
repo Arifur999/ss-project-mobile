@@ -33,8 +33,15 @@ export type SaleLine = {
   cost_price: number;
   qty: string;
   price: string;
+  /** What the discount box shows, in its unit. */
   discount: string;
   mode: DiscountMode;
+  /**
+   * The discount on each piece, in taka - the website's discount_amount, and
+   * what is charged whichever unit the box shows. Typing in the box sets it;
+   * a unit switch or a new price leaves it where it was (editLine).
+   */
+  discountTaka: number;
   delivered: boolean;
   /** Edited lines only: what had already gone out, kept when the line is not marked delivered in full. */
   alreadyDelivered: number;
@@ -85,6 +92,7 @@ export function lineForProduct(product: Product): SaleLine {
     price: String(Number(product.selling_price || 0)),
     discount: '',
     mode: 'amount',
+    discountTaka: 0,
     delivered: true,
     alreadyDelivered: 0,
   };
@@ -103,14 +111,12 @@ export function withProduct(lines: SaleLine[], product: Product): SaleLine[] {
 export type PricedLine = { selling_price: number; discount_amount: number; discount_pct: number; actual_price: number; qty: number; total_amount: number };
 
 /**
- * A line priced as updateItem prices it: money to the whole taka, a percentage
- * turned into taka once, the discount never below 0 or above the price.
+ * A line priced as updateItem prices it: money to the whole taka, the
+ * discount never below 0 or above the price.
  */
 export function priceLine(line: SaleLine): PricedLine {
   const selling = figure(line.price);
-  const typed = Math.max(0, figure(line.discount));
-  const asTaka = line.mode === 'pct' ? roundTaka((roundTaka(selling) * Math.min(typed, 100)) / 100) : typed;
-  const discount = Math.min(Math.max(0, roundTaka(asTaka)), Math.max(0, roundTaka(selling)));
+  const discount = keptDiscount(line.discountTaka, selling);
   const actual = Math.max(0, roundTaka(selling) - discount);
   const qty = figure(line.qty);
   return {
@@ -121,6 +127,50 @@ export function priceLine(line: SaleLine): PricedLine {
     qty,
     total_amount: roundTaka(actual * qty),
   };
+}
+
+/** A discount in taka to the whole taka, never below 0 or above the price. */
+const keptDiscount = (taka: number, selling: number) => Math.min(Math.max(0, roundTaka(taka)), Math.max(0, roundTaka(selling)));
+
+/**
+ * The discount box in its unit, as the website's discountBoxValue draws it:
+ * taka as they are, a percentage of the price to one decimal - derived from the
+ * money, so switching units never makes a second figure.
+ */
+export function discountBoxText(discountTaka: number, price: number, mode: DiscountMode): string {
+  const money = keptDiscount(discountTaka, price);
+  if (money <= 0) return '';
+  if (mode === 'amount') return String(money);
+  return price > 0 ? String(Math.round((money / price) * 1000) / 10) : '';
+}
+
+/**
+ * A change to one line, made the website's updateItem way. Typing in the
+ * discount box sets the money - taka as typed, or a percent (100 at most) of
+ * the price as it then is, turned into taka once - never more than the price.
+ * Switching the unit, or changing the price, leaves the money where it was and
+ * only redraws the box: Tk 100 switched to percent shows 0.2%, where reading
+ * the same 100 as a percent gave the whole line away. A percent past 100, or
+ * more taka than the price, is redrawn as what it counts for.
+ */
+export function editLine(line: SaleLine, patch: Partial<Pick<SaleLine, 'qty' | 'price' | 'discount' | 'mode' | 'delivered'>>): SaleLine {
+  const next: SaleLine = { ...line, ...patch };
+  const selling = roundTaka(figure(next.price));
+  if (patch.discount !== undefined) {
+    const typed = Math.max(0, figure(next.discount));
+    const asked = next.mode === 'pct' ? roundTaka((selling * Math.min(typed, 100)) / 100) : roundTaka(typed);
+    next.discountTaka = keptDiscount(asked, selling);
+    if ((next.mode === 'pct' && typed > 100) || (next.mode === 'amount' && asked > next.discountTaka)) {
+      next.discount = discountBoxText(next.discountTaka, selling, next.mode);
+    }
+  } else if (patch.mode !== undefined && patch.mode !== line.mode) {
+    next.discountTaka = keptDiscount(line.discountTaka, selling);
+    next.discount = discountBoxText(next.discountTaka, selling, next.mode);
+  } else if (patch.price !== undefined && next.mode === 'pct') {
+    // The money stays; what it is as a share of the new price is redrawn.
+    next.discount = discountBoxText(next.discountTaka, selling, 'pct');
+  }
+  return next;
 }
 
 /** The money typed against each account; a blank amount is nothing paid there. */
@@ -304,6 +354,7 @@ export function formFromSale(sale: Row, rowKey: (index: number) => string): Sale
         price: String(selling),
         discount: discount > 0 ? String(discount) : '',
         mode: 'amount',
+        discountTaka: discount,
         delivered,
         alreadyDelivered: delivered ? 0 : deliveredQty(item),
       };

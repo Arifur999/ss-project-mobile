@@ -11,7 +11,7 @@ import {
 import { parseAmount } from '@/lib/money';
 import type { Customer } from '@/services/customers.services';
 
-import { priceLine, type DiscountMode, type SaleForm, type SaleLine, type SaleTotals } from './saleForm';
+import { discountBoxText, priceLine, type DiscountMode, type SaleForm, type SaleLine, type SaleTotals } from './saleForm';
 
 // A sale parked part-way, in the website's own draft shape - the one
 // Hatim/src/lib/draftPayload.ts stamps SALE_DRAFT_VERSION 1, Sales.tsx's
@@ -115,8 +115,9 @@ export function formFromDraft(data: unknown, options: { rowKey: () => string; to
       qty: String(number(item.qty)),
       price: String(selling),
       // The money is what is kept; a percentage is shown as the website's box shows it.
-      discount: discount <= 0 ? '' : mode === 'pct' ? (selling > 0 ? String(Math.round((discount / selling) * 1000) / 10) : '') : String(discount),
+      discount: discountBoxText(discount, selling, mode),
       mode,
+      discountTaka: discount,
       delivered: item.delivery_status === 'delivered',
       alreadyDelivered: 0,
     });
