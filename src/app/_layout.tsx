@@ -16,7 +16,7 @@ import { AmountShieldProvider } from '@/context/AmountShieldContext';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LanguageProvider, useCopy } from '@/context/LanguageContext';
 import { ToastProvider } from '@/context/ToastContext';
-import { isSubscriptionLocked } from '@/lib/account';
+import { canStartTrial, isSubscriptionLocked } from '@/lib/account';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -71,6 +71,8 @@ function RootNavigator() {
   const signedIn = status === 'signedIn';
   const greeting = signedIn && welcome;
   const locked = signedIn && !welcome && isSubscriptionLocked(account);
+  // A new owner's workspace has no plan yet: they start the free trial rather than meet a lock.
+  const trial = locked && canStartTrial(account);
   const inside = signedIn && !welcome && !locked;
 
   // Stack.Protected is the route guard: a screen whose guard is false cannot be
@@ -89,7 +91,10 @@ function RootNavigator() {
       <Stack.Protected guard={greeting}>
         <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
       </Stack.Protected>
-      <Stack.Protected guard={locked}>
+      <Stack.Protected guard={trial}>
+        <Stack.Screen name="start-trial" options={{ animation: 'fade' }} />
+      </Stack.Protected>
+      <Stack.Protected guard={locked && !trial}>
         <Stack.Screen name="locked" options={{ animation: 'fade' }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
