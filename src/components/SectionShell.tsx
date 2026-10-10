@@ -10,6 +10,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
+import { useReach } from '@/hooks/useCan';
 import { SECTION_SWITCH } from '@/lib/stackOptions';
 
 /** The state of whatever query feeds the section. */
@@ -58,6 +59,8 @@ export function SectionShell<K extends string>({
   children: ReactNode;
 }) {
   const chipsRef = useRef<ScrollView>(null);
+  // Only the sub-pages the member's page ticks open, as the website's sidebar.
+  const reach = useReach();
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
@@ -66,7 +69,7 @@ export function SectionShell<K extends string>({
         <ScreenHeader title={title} onBack={backLabel ? () => router.navigate('/more') : undefined} backLabel={backLabel} right={right} />
 
         <ScrollView ref={chipsRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-          {sections.map((section) => {
+          {sections.filter((section) => reach.href(section.route)).map((section) => {
             const on = section.key === current;
             return (
               <Pressable
