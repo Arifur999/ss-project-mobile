@@ -14,7 +14,7 @@ import { PRODUCT_COPY } from '@/features/products/copy';
 import { PRICE_COPY } from '@/features/products/priceCopy';
 import { ProductCard } from '@/features/products/ProductCard';
 import { ProductDetailSheet } from '@/features/products/ProductDetailSheet';
-import { useCan } from '@/hooks/useCan';
+import { useCan, useReach } from '@/hooks/useCan';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { errorMessage } from '@/lib/httpClient';
 import { formatNumber } from '@/lib/money';
@@ -28,6 +28,7 @@ export default function ProductListScreen() {
   const { lang } = useLang();
   const toast = useToast();
   const can = useCan();
+  const reach = useReach();
   const write = useProductWrite();
 
   const [search, setSearch] = useState('');
@@ -111,10 +112,14 @@ export default function ProductListScreen() {
       <ProductDetailSheet
         product={sheet === 'detail' ? selected : null}
         onClose={() => setSheet(null)}
-        onStock={() => {
-          setSheet(null);
-          if (selected) router.navigate({ pathname: '/inventory', params: { search: selected.product_code } });
-        }}
+        onStock={
+          reach.href('/inventory')
+            ? () => {
+                setSheet(null);
+                if (selected) router.navigate({ pathname: '/inventory', params: { search: selected.product_code } });
+              }
+            : undefined
+        }
         onEdit={can('products.write') && selected ? () => edit(selected) : undefined}
         onDelete={can('products.delete') ? askDelete : undefined}
         deleteBusy={checking}

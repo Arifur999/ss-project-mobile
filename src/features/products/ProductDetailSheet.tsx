@@ -13,8 +13,8 @@ import { supplierName, type Product } from '@/services/products.services';
 
 /**
  * A product opened from the list: photo, supplier and opening quantity, both
- * prices before and after their discount, size and weight - then View stock,
- * and Edit / Delete where the user may.
+ * prices before and after their discount, size and weight - then View stock
+ * (for a member who may open Inventory), and Edit / Delete where the user may.
  */
 export function ProductDetailSheet({
   product,
@@ -26,7 +26,7 @@ export function ProductDetailSheet({
 }: {
   product: Product | null;
   onClose: () => void;
-  onStock: () => void;
+  onStock?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
   deleteBusy?: boolean;
@@ -63,7 +63,7 @@ export function ProductDetailSheet({
       onEdit={onEdit}
       onDelete={onDelete}
       deleteBusy={deleteBusy}
-      extra={[{ label: t.viewStock, icon: 'package', onPress: onStock }]}>
+      extra={onStock ? [{ label: t.viewStock, icon: 'package', onPress: onStock }] : []}>
       <View style={styles.top}>
         <ProductImage url={product?.image_url} size={88} radius={16} label={product?.name} />
         <View style={styles.facts}>
