@@ -17,7 +17,7 @@ import { CustomerAccountSheet } from '@/features/customers/CustomerAccountSheet'
 import { CustomersShell } from '@/features/customers/CustomersShell';
 import { DueReminderSheet } from '@/features/customers/DueReminderSheet';
 import { canRemind } from '@/features/customers/dueSms';
-import { useCan } from '@/hooks/useCan';
+import { useCan, useReach } from '@/hooks/useCan';
 import { buildCustomerDashboard, type CustomerDashboardRow } from '@/lib/customerDue';
 import { CUSTOMER_SORTS, customerRows, DUE_FILTERS, type CustomerSort, type DueFilter } from '@/lib/customerOverview';
 import { formatNumber } from '@/lib/money';
@@ -33,6 +33,7 @@ export default function CustomerOverviewScreen() {
   const { lang } = useLang();
   const { money } = useAmountShield();
   const can = useCan();
+  const ledger = useReach().href('/customers/ledger');
   const { data } = useCustomerData();
   const [search, setSearch] = useState('');
   const [due, setDue] = useState<DueFilter>('all');
@@ -127,7 +128,7 @@ export default function CustomerOverviewScreen() {
         customer={sheet === 'account' ? selected : null}
         onClose={() => setSheet(null)}
         onReceive={can('customerPayment.create') && owes ? () => go('/customers/receive') : undefined}
-        onLedger={() => go('/customers/ledger')}
+        onLedger={ledger ? () => go('/customers/ledger') : undefined}
         onRemind={can('sms.send') && owes && isValidBdPhone(selected?.phone || '') ? () => setSheet('remind') : undefined}
       />
       <DueReminderSheet customer={sheet === 'remind' ? selected : null} onClose={() => setSheet(null)} />

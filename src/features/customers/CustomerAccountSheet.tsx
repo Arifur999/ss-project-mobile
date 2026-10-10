@@ -10,8 +10,8 @@ import { callPhone } from '@/lib/phone';
 /**
  * A customer's account in full, as the website's dashboard row reads it:
  * opening due, what they bought, the discounts, what was collected and the
- * current due - then Receive due and the reminder SMS for whoever may, the
- * ledger, and Call.
+ * current due - then Receive due, the ledger and the reminder SMS for whoever
+ * may, and Call.
  */
 export function CustomerAccountSheet({
   customer,
@@ -23,7 +23,7 @@ export function CustomerAccountSheet({
   customer: CustomerDashboardRow | null;
   onClose: () => void;
   onReceive?: () => void;
-  onLedger: () => void;
+  onLedger?: () => void;
   onRemind?: () => void;
 }) {
   const t = useCopy(CUSTOMER_COPY);
@@ -32,7 +32,7 @@ export function CustomerAccountSheet({
 
   const extra: ExtraAction[] = [
     ...(onReceive ? [{ label: t.receiveDue, icon: 'banknote' as const, onPress: onReceive }] : []),
-    { label: t.viewLedger, icon: 'fileText', onPress: onLedger },
+    ...(onLedger ? [{ label: t.viewLedger, icon: 'fileText' as const, onPress: onLedger }] : []),
     ...(onRemind ? [{ label: t.sendReminder, icon: 'message' as const, onPress: onRemind }] : []),
     ...(phone
       ? [{ label: t.call(customer?.name ?? '', phone), icon: 'phone' as const, onPress: () => callPhone(phone) }]
