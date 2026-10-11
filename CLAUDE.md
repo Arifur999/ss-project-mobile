@@ -88,6 +88,7 @@ Layout: `src/app/` holds routes only; screen parts live in `src/features/<area>/
 - Icons: `DesignIcon` holds the design's own 24px paths; prefer it over lucide, whose current release redraws several of the shapes.
 - Money: `formatMoney` or `useAmountShield().money` - `Tk 1,234` in English, `৳ ১,২৩৪` (lakh grouping) in Bangla, `****` while the eye button hides amounts.
 - Reuse the primitives (Button, TextField, SelectField, DateField, BottomSheet, ChoiceSheet, ItemSheets, Toggle, StatTile, FilterChips, ScreenHeader, the toast) rather than restyling per screen. Light mode only.
+- Accessibility floor: a tappable control drawn under 44pt tall gets `hitSlop={slopFor(height)}` (`src/constants/touch.ts`) so its touch area reaches 44pt without changing its look; an icon-only button needs an `accessibilityLabel`; text on white is Zinc 500 or darker (Zinc 400 is 2.6:1 - borders and placeholders only); text grows with the phone's size setting up to `MAX_FONT_SCALE` (1.3, set in `Txt` and the text fields); an animation the app drives itself (not a native screen change) asks `useReducedMotion` and skips the motion when it is on.
 
 ## Strings
 
