@@ -46,3 +46,10 @@ const HIND: Record<Weight, string> = {
  */
 export const fontFamily = (lang: 'en' | 'bn', weight: Weight = 400) =>
   (lang === 'bn' ? HIND : INTER)[weight];
+
+/**
+ * How far the phone's text-size setting may grow the app's text. Larger type
+ * is honoured up to 1.3x; beyond that the design's fixed-height chips, buttons,
+ * fields and tab bar would clip or spill it.
+ */
+export const MAX_FONT_SCALE = 1.3;
