@@ -28,6 +28,8 @@ npx eas-cli@latest build -p android --profile production   # Play Store AAB, ver
 npx eas-cli@latest update --channel preview --message "..." --environment preview   # JS/UI change to installed preview APKs
 ```
 
+On this Windows machine `eas update` can hang compiling Hermes bytecode (Smart App Control holds `hermesc.exe`; kill the process if it does). Publish a plain JS bundle instead, which Hermes runs as well: `npx expo export --platform android --no-bytecode --output-dir <dir>` then `npx eas-cli@latest update --channel preview --environment preview --platform android --skip-bundler --input-dir <dir> --message "..."`.
+
 EAS Update (expo-updates) carries JavaScript, screens and images to builds already installed; each profile has its channel (`preview`, `production`), so a test update never reaches Play users. `runtimeVersion` follows `expo.version`: anything native - a package with native code, a plugin, a permission or other `app.json` native setting, an SDK upgrade - must bump `version` (1.0.0 → 1.0.1) and ship as a new build; an update published without that would load JS expecting native code the installed app lacks. `UpdatePrompt` (root layout) asks the user to restart once an update has downloaded.
 
 Builds run on EAS (project `@arifur_naxified/furnify`, ID in `app.json`). EAS generated and holds the Android signing keystore - it is the key the Play listing will be tied to, so never delete it from expo.dev. A local Gradle build is not set up: this machine has no JDK or Android SDK, and Windows Smart App Control blocks `hermesc.exe`, which a release build needs.
