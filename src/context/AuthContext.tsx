@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import type { Account } from '@/lib/account';
+import type { Account, OwnerSubscription } from '@/lib/account';
 import { isUnauthorized, setSessionExpiredHandler } from '@/lib/httpClient';
 import { tokenStore } from '@/lib/tokenStore';
 import {
@@ -50,6 +50,12 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   /** Re-read the account from the server (also the "Try again" when offline). */
   refreshAccount: () => Promise<void>;
+  /**
+   * Takes a subscription the server just answered with - choose-plan returns the
+   * updated row - so the guards move at once, even if re-reading /auth/me then
+   * fails and would fall back to the saved hint.
+   */
+  applySubscription: (subscription: OwnerSubscription) => void;
 }
 
 /**
@@ -149,6 +155,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const dismissWelcome = useCallback(() => setWelcome(false), []);
 
+  const applySubscription = useCallback(
+    (subscription: OwnerSubscription) => {
+      if (!account) return;
+      const next = { ...account, subscription };
+      setAccount(next);
+      saveHint(next);
+    },
+    [account],
+  );
+
   const registerOwner = useCallback(async (input: RegisterOwnerInput) => {
     const result = await registerOwnerRequest(input);
     return { email: result.email };
@@ -198,8 +214,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       verifyRegistration,
       signOut,
       refreshAccount: loadAccount,
+      applySubscription,
     }),
-    [status, account, welcome, dismissWelcome, signIn, verifyOtp, resendOtp, registerOwner, verifyRegistration, signOut, loadAccount],
+    [status, account, welcome, dismissWelcome, signIn, verifyOtp, resendOtp, registerOwner, verifyRegistration, signOut, loadAccount, applySubscription],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
