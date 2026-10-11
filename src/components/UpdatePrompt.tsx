@@ -31,15 +31,18 @@ const CHECK_EVERY_MS = 5 * 60_000;
  * cold start but runs it only on the next, and a shop's phone keeps the app
  * open for days - so it is also looked for when the app comes back to the
  * front (at most every five minutes), and once one is waiting the user is asked
- * to restart into it. Later leaves it for the next start, so a half-filled
- * form is never thrown away without asking. Nothing shows in development or
+ * to restart into it. Later leaves that update for the next start, so a
+ * half-filled form is never thrown away without asking - and a newer one
+ * downloaded afterwards is offered again. Nothing shows in development or
  * Expo Go, where updates are off.
  */
 export function UpdatePrompt() {
   const t = useCopy(COPY);
   const insets = useSafeAreaInsets();
-  const { isUpdatePending } = Updates.useUpdates();
-  const [dismissed, setDismissed] = useState(false);
+  const { isUpdatePending, downloadedUpdate } = Updates.useUpdates();
+  // Later is remembered for the update it was said to (a rollback has no id).
+  const pendingKey = downloadedUpdate?.updateId ?? 'rollback';
+  const [dismissedKey, setDismissedKey] = useState<string | null>(null);
   const lastCheck = useRef(0);
 
   useEffect(() => {
@@ -56,7 +59,7 @@ export function UpdatePrompt() {
     return () => sub.remove();
   }, []);
 
-  if (!Updates.isEnabled || !isUpdatePending || dismissed) return null;
+  if (!Updates.isEnabled || !isUpdatePending || dismissedKey === pendingKey) return null;
 
   return (
     <View accessibilityRole="alert" accessibilityLiveRegion="polite" style={[styles.card, { top: insets.top + 8 }]}>
@@ -67,7 +70,7 @@ export function UpdatePrompt() {
         <Txt style={styles.title}>{t.title}</Txt>
         <Txt style={styles.text}>{t.text}</Txt>
         <View style={styles.actions}>
-          <Pressable accessibilityRole="button" onPress={() => setDismissed(true)} hitSlop={6} style={styles.later}>
+          <Pressable accessibilityRole="button" onPress={() => setDismissedKey(pendingKey)} hitSlop={6} style={styles.later}>
             <Txt style={styles.laterText}>{t.later}</Txt>
           </Pressable>
           <Pressable
