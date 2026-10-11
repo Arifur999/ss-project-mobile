@@ -4,7 +4,7 @@ import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { SUPPORT_COPY } from '@/features/support/copy';
-import { stampLabel } from '@/features/support/TicketCard';
+import { stampLabel } from '@/lib/dates';
 import type { TicketMessage } from '@/services/support.services';
 
 /** One message in a ticket: the customer's on the right in black, support's on the left in grey, with who and when. */

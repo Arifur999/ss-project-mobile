@@ -15,17 +15,13 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { TOOLS_COPY } from '@/features/tools/copy';
-import { dateLabel, timeLabel, todayISO } from '@/lib/dates';
+import { clockOf, dateLabel, timeLabel, todayISO } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
 import { formatNumber } from '@/lib/money';
 import { printTable, shareTablePdf, type PrintableTable } from '@/lib/print';
 import { useDayActivity, type ActivityEvent } from '@/services/activity.services';
 
 /** "09:30" from an entry's timestamp, in the phone's own time. */
-const hhmm = (iso: string) => {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? '' : `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-};
 
 /**
  * What was done on a day - the website's Today's history: every entry made
@@ -50,7 +46,7 @@ export default function DayHistoryScreen() {
     title: t.historyTitle,
     subtitle: dateLabel(date, lang),
     columns: [{ label: t.colTime }, { label: t.colWhat }, { label: t.colWho }, { label: t.amount, align: 'right' }],
-    rows: events.map((e) => [timeLabel(hhmm(e.at), lang), kindOf(e), [e.title, e.subtitle].filter(Boolean).join(' · '), signed(e)]),
+    rows: events.map((e) => [timeLabel(clockOf(e.at), lang), kindOf(e), [e.title, e.subtitle].filter(Boolean).join(' · '), signed(e)]),
     footer: [
       [t.entries, formatNumber(data?.count ?? 0, lang)],
       [t.moneyIn, money(data?.totals.in ?? 0)],
@@ -100,7 +96,7 @@ export default function DayHistoryScreen() {
           <View style={styles.list}>
             {events.map((event, i) => (
               <View key={`${event.at}-${i}`} style={[styles.item, i > 0 && styles.divider]}>
-                <Txt style={styles.time}>{timeLabel(hhmm(event.at), lang)}</Txt>
+                <Txt style={styles.time}>{timeLabel(clockOf(event.at), lang)}</Txt>
                 <View style={styles.what}>
                   <Txt style={styles.kind}>{kindOf(event)}</Txt>
                   <Txt style={styles.detail} numberOfLines={2}>

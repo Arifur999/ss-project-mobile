@@ -99,3 +99,16 @@ export function timeLabel(hhmm: string, lang: Lang): string {
   const text = `${hour % 12 || 12}:${match[2]} ${hour < 12 ? 'AM' : 'PM'}`;
   return lang === 'bn' ? bnDigits(text) : text;
 }
+
+/** A timestamp's local "HH:MM" - what timeLabel reads - or '' when it is no date. */
+export function clockOf(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+/** "8 Oct 2026, 3:05 PM" - a timestamp's local date and time. */
+export function stampLabel(iso: string, lang: Lang): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return `${dateLabel(toISODate(d), lang)}, ${timeLabel(clockOf(iso), lang)}`;
+}

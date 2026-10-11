@@ -2,19 +2,11 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
-import { useCopy, useLang, type Lang } from '@/context/LanguageContext';
+import { useCopy, useLang } from '@/context/LanguageContext';
 import { SUPPORT_COPY } from '@/features/support/copy';
 import { TICKET_LOOK } from '@/features/support/status';
-import { dateLabel, timeLabel } from '@/lib/dates';
+import { stampLabel } from '@/lib/dates';
 import type { SupportTicket } from '@/services/support.services';
-
-/** "07 Oct 2026, 9:30 AM" for a ticket's timestamps, in the phone's own time. */
-export function stampLabel(iso: string, lang: Lang) {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  return `${dateLabel(day, lang)}, ${timeLabel(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`, lang)}`;
-}
 
 /** A ticket in the list: its subject, where it stands, who spoke last and what they said, and when. */
 export function TicketCard({ ticket, onPress }: { ticket: SupportTicket; onPress: () => void }) {
