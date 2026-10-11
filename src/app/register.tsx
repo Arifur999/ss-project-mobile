@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Lock, Mail, MapPin, Phone, Send, Store, User } from 'lucide-react-native';
+import { Lock, Mail, Send, Store } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,55 +13,46 @@ import { Txt } from '@/components/Txt';
 import { Slate, White } from '@/constants/theme';
 import { bnDigits, useCopy } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
+import { OWNER_DETAILS_COPY, ownerDetailErrors, ownerDetailField } from '@/features/auth/ownerDetails';
 import { errorMessage } from '@/lib/httpClient';
-import { isBdPhone, isEmail, MIN_PASSWORD_LENGTH, normalizePhone, visibleErrors } from '@/lib/validation';
+import { isEmail, MIN_PASSWORD_LENGTH, normalizePhone, visibleErrors } from '@/lib/validation';
 
 const PHOTO = require('@/assets/images/brand/auth-register.jpg');
 
 const COPY = {
   en: {
+    ...OWNER_DETAILS_COPY.en,
     tagline: 'Grow your business, beautifully organised.',
     title: 'Business Registration',
     subtitle: 'Submit your business registration request to create your business workspace.',
-    fullName: 'Full Name', fullNamePh: 'Full name',
     businessName: 'Business Name', businessNamePh: 'Business name',
-    phone: 'Phone Number', phonePh: '01XXXXXXXXX',
     email: 'Email Address', emailPh: 'you@example.com',
-    address: 'Address', addressPh: 'Enter your business address',
     password: 'Password', passwordPh: 'At least 8 characters',
     confirm: 'Confirm Password', confirmPh: 'Confirm your password',
     submit: 'Submit Registration Request', submitting: 'Submitting…',
     haveAccount: 'Already have an account?', signIn: 'Sign in',
     show: 'Show password', hide: 'Hide password',
-    errName: 'Enter your full name',
     errBusiness: 'Enter your business name',
-    errPhone: 'Enter a valid phone number, e.g. 01712345678',
     errEmail: 'Enter a valid email address',
-    errAddress: 'Enter your business address',
     errPassword: 'Password must be at least 8 characters',
     errConfirm: "Passwords don't match",
     fixOne: 'Please fix the highlighted field',
     fixMany: (n: number) => `Please fix the ${n} highlighted fields`,
   },
   bn: {
+    ...OWNER_DETAILS_COPY.bn,
     tagline: 'ব্যবসা বাড়ান, সবকিছু থাকুক সুন্দর করে গোছানো।',
     title: 'ব্যবসার রেজিস্ট্রেশন',
     subtitle: 'আপনার ব্যবসার ওয়ার্কস্পেস খুলতে রেজিস্ট্রেশনের অনুরোধ পাঠান।',
-    fullName: 'পূর্ণ নাম', fullNamePh: 'আপনার পূর্ণ নাম',
     businessName: 'ব্যবসার নাম', businessNamePh: 'ব্যবসার নাম',
-    phone: 'মোবাইল নম্বর', phonePh: '01XXXXXXXXX',
     email: 'ইমেইল', emailPh: 'you@example.com',
-    address: 'ঠিকানা', addressPh: 'ব্যবসার ঠিকানা লিখুন',
     password: 'পাসওয়ার্ড', passwordPh: 'কমপক্ষে ৮ অক্ষর',
     confirm: 'পাসওয়ার্ড নিশ্চিত করুন', confirmPh: 'পাসওয়ার্ড আবার লিখুন',
     submit: 'রেজিস্ট্রেশনের অনুরোধ পাঠান', submitting: 'পাঠানো হচ্ছে…',
     haveAccount: 'আগে থেকেই অ্যাকাউন্ট আছে?', signIn: 'সাইন ইন করুন',
     show: 'পাসওয়ার্ড দেখুন', hide: 'পাসওয়ার্ড লুকান',
-    errName: 'পূর্ণ নাম দিন',
     errBusiness: 'ব্যবসার নাম দিন',
-    errPhone: 'সঠিক মোবাইল নম্বর দিন, যেমন 01712345678',
     errEmail: 'সঠিক ইমেইল দিন',
-    errAddress: 'ব্যবসার ঠিকানা দিন',
     errPassword: 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে',
     errConfirm: 'পাসওয়ার্ড মেলেনি',
     fixOne: 'লাল চিহ্নিত ১টা ঘর ঠিক করুন',
@@ -85,11 +76,9 @@ export default function RegisterScreen() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const all: Partial<Record<Field, string>> = {};
-  if (!values.name.trim()) all.name = t.errName;
+  Object.assign(all, ownerDetailErrors({ name: values.name, phone: values.phone, address: values.address }, t));
   if (!values.business.trim()) all.business = t.errBusiness;
-  if (!isBdPhone(values.phone)) all.phone = t.errPhone;
   if (!isEmail(values.email)) all.email = t.errEmail;
-  if (!values.address.trim()) all.address = t.errAddress;
   if (values.password.length < MIN_PASSWORD_LENGTH) all.password = t.errPassword;
   if (!values.confirm || values.confirm !== values.password) all.confirm = t.errConfirm;
   const errors = visibleErrors(all, values, touched, submitted);
@@ -157,11 +146,11 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.form}>
-            <TextField label={`${t.fullName} *`} icon={User} placeholder={t.fullNamePh} autoComplete="name" textContentType="name" {...fieldProps('name')} />
+            <TextField {...ownerDetailField('name', t, true)} {...fieldProps('name')} />
             <TextField label={`${t.businessName} *`} icon={Store} placeholder={t.businessNamePh} textContentType="organizationName" {...fieldProps('business')} />
-            <TextField label={`${t.phone} *`} icon={Phone} placeholder={t.phonePh} keyboardType="phone-pad" autoComplete="tel" textContentType="telephoneNumber" {...fieldProps('phone')} />
+            <TextField {...ownerDetailField('phone', t, true)} {...fieldProps('phone')} />
             <TextField label={`${t.email} *`} icon={Mail} placeholder={t.emailPh} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress" {...fieldProps('email')} />
-            <TextField label={`${t.address} *`} icon={MapPin} placeholder={t.addressPh} minHeight={104} autoComplete="street-address" textContentType="fullStreetAddress" {...fieldProps('address')} />
+            <TextField {...ownerDetailField('address', t, true)} {...fieldProps('address')} />
             <TextField label={`${t.password} *`} icon={Lock} placeholder={t.passwordPh} password={{ show: t.show, hide: t.hide }} autoComplete="new-password" textContentType="newPassword" {...fieldProps('password')} />
             <TextField label={`${t.confirm} *`} icon={Lock} placeholder={t.confirmPh} password={{ show: t.show, hide: t.hide }} autoComplete="new-password" textContentType="newPassword" {...fieldProps('confirm')} />
 
