@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, TextInput, View, type TextInputProps, type TextS
 
 import { FieldError } from '@/components/FieldError';
 import { Txt } from '@/components/Txt';
-import { fontFamily, type Weight } from '@/constants/fonts';
+import { fontFamily, MAX_FONT_SCALE, type Weight } from '@/constants/fonts';
 import { Red, Slate, White, Zinc } from '@/constants/theme';
 import { useLang } from '@/context/LanguageContext';
 
@@ -75,6 +75,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
         )}
         <TextInput
           ref={ref}
+          maxFontSizeMultiplier={MAX_FONT_SCALE}
           {...input}
           multiline={multiline}
           secureTextEntry={!!password && !revealed}

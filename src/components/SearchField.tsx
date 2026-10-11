@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, View, type ViewStyle } from 'react-native';
 
 import { DesignIcon } from '@/components/DesignIcon';
-import { fontFamily } from '@/constants/fonts';
+import { fontFamily, MAX_FONT_SCALE } from '@/constants/fonts';
 import { White, Zinc } from '@/constants/theme';
 import { useLang } from '@/context/LanguageContext';
 
@@ -33,6 +33,7 @@ export function SearchField({
         <DesignIcon name="search" size={18} color={Zinc[500]} strokeWidth={2} />
       </View>
       <TextInput
+        maxFontSizeMultiplier={MAX_FONT_SCALE}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
 
-import { fontFamily, type Weight } from '@/constants/fonts';
+import { fontFamily, MAX_FONT_SCALE, type Weight } from '@/constants/fonts';
 import { useLang } from '@/context/LanguageContext';
 
 /**
@@ -9,6 +9,7 @@ import { useLang } from '@/context/LanguageContext';
  * custom font in React Native cannot be bolded by fontWeight alone.
  *
  * Line height follows the design's `line-height: 1.5` unless the style sets one.
+ * The phone's text size is honoured up to MAX_FONT_SCALE.
  */
 export function Txt({ style, ...rest }: TextProps) {
   const { lang } = useLang();
@@ -17,6 +18,7 @@ export function Txt({ style, ...rest }: TextProps) {
   const size = flat.fontSize ?? 16;
   return (
     <Text
+      maxFontSizeMultiplier={MAX_FONT_SCALE}
       {...rest}
       style={[
         { lineHeight: Math.round(size * 1.5) },
