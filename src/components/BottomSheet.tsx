@@ -13,11 +13,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Scrim, White, Zinc } from '@/constants/theme';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 /**
  * The design's bottom sheet: a dimmed backdrop that closes it, a white panel
- * with 24px top corners and a 40x4 handle, sliding up from the bottom. Tall
- * content scrolls inside a 92% cap; forms lift above the keyboard.
+ * with 24px top corners and a 40x4 handle, sliding up from the bottom - or
+ * simply there, when the phone asks for reduced motion. Tall content scrolls
+ * inside a 92% cap; forms lift above the keyboard.
  */
 export function BottomSheet({
   open,
@@ -35,6 +37,7 @@ export function BottomSheet({
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(open);
   const [progress] = useState(() => new Animated.Value(0));
+  const reducedMotion = useReducedMotion();
 
   // Mount as soon as it opens - adjusted during render, React's pattern for
   // state that follows a prop - and stay mounted through the closing slide.
@@ -42,13 +45,13 @@ export function BottomSheet({
 
   useEffect(() => {
     if (open) {
-      Animated.timing(progress, { toValue: 1, duration: 240, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+      Animated.timing(progress, { toValue: 1, duration: reducedMotion ? 0 : 240, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
     } else {
-      Animated.timing(progress, { toValue: 0, duration: 180, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(
+      Animated.timing(progress, { toValue: 0, duration: reducedMotion ? 0 : 180, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(
         ({ finished }) => finished && setVisible(false),
       );
     }
-  }, [open, progress]);
+  }, [open, progress, reducedMotion]);
 
   const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [600, 0] });
 
