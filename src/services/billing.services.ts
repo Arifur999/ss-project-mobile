@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { billingRows, type BillingRow } from '@/lib/billingHistory';
+import type { OwnerSubscription } from '@/lib/account';
 import { http } from '@/lib/httpClient';
 
 /**
@@ -17,10 +18,11 @@ export async function loadBillingHistory(): Promise<BillingRow[]> {
 /**
  * Starts the owner's 7-day free trial, with the contact details the website's
  * trial popup asks for (kept for the super admin's follow-up). Free, so it may
- * be offered in the app; a paid plan is never chosen here.
+ * be offered in the app; a paid plan is never chosen here. Resolves to the
+ * subscription as it now stands.
  */
-export async function startFreeTrial(input: { full_name: string; phone: string; address: string }): Promise<void> {
-  await http.post('/subscriptions/choose-plan', { plan_type: 'free_trial', ...input });
+export function startFreeTrial(input: { full_name: string; phone: string; address: string }): Promise<OwnerSubscription> {
+  return http.post<OwnerSubscription>('/subscriptions/choose-plan', { plan_type: 'free_trial', ...input });
 }
 
 export function useBillingHistory(enabled: boolean) {
