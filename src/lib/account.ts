@@ -68,15 +68,24 @@ export function isSubscriptionLocked(account: Account | null): boolean {
 }
 
 /**
- * Whether a locked owner may still start the free trial - the server's own
- * rule (subscription.service choosePlan): never started, and no paid plan
- * chosen. A new registration is exactly this: modelled as expired, with the
- * trial unused, as the website's /choose-plan expects.
+ * Whether an owner may start the free trial: only an expired workspace - the
+ * one the website sends to /choose-plan - whose trial was never started and
+ * that never chose a paid plan (the server's choosePlan rule). A new
+ * registration is exactly this, modelled as expired with the trial unused.
+ * A blocked or suspended owner is a lock the super admin set, which starting
+ * a trial must never lift; a pending one is waiting on a paid plan.
  */
 export function canStartTrial(account: Account | null): boolean {
-  if (!isSubscriptionLocked(account)) return false;
-  const subscription = account?.subscription;
-  return !!subscription && !subscription.trial_used && subscription.plan_type !== 'monthly' && subscription.plan_type !== 'yearly';
+  if (account?.profile?.role !== 'owner') return false;
+  const subscription = account.subscription;
+  return (
+    !!subscription &&
+    effectiveSubscriptionStatus(subscription) === 'expired' &&
+    subscription.status !== 'blocked' &&
+    !subscription.trial_used &&
+    subscription.plan_type !== 'monthly' &&
+    subscription.plan_type !== 'yearly'
+  );
 }
 
 export function displayName(account: Account | null): string {
