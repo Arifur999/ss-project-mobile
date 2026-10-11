@@ -69,11 +69,13 @@ function RootNavigator() {
   if (status === 'offline') return <OfflineScreen />;
 
   const signedIn = status === 'signedIn';
-  const greeting = signedIn && welcome;
-  const locked = signedIn && !welcome && isSubscriptionLocked(account);
-  // A new owner's workspace has no plan yet: they start the free trial rather than meet a lock.
-  const trial = locked && canStartTrial(account);
-  const inside = signedIn && !welcome && !locked;
+  const lockedOwner = signedIn && isSubscriptionLocked(account);
+  // A new owner's workspace has no plan yet: they go straight from sign-in to
+  // starting the free trial - no "Welcome back!" first - rather than meet a lock.
+  const trial = signedIn && canStartTrial(account);
+  const greeting = signedIn && welcome && !trial;
+  const locked = lockedOwner && !welcome && !trial;
+  const inside = signedIn && !welcome && !lockedOwner;
 
   // Stack.Protected is the route guard: a screen whose guard is false cannot be
   // navigated to, and expo-router sends the user to the first allowed one. So
