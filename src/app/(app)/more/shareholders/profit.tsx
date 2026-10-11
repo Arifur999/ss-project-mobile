@@ -7,6 +7,7 @@ import { ActionsSheet, ConfirmDeleteSheet } from '@/components/ItemSheets';
 import { Fab } from '@/components/SectionShell';
 import { Txt } from '@/components/Txt';
 import { Blue, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -84,7 +85,7 @@ export default function ProfitWithdrawScreen() {
           </Txt>
           <Txt style={styles.summary}>{list.length === 0 ? t.noRecords : t.withdrawalsSummary(list.length, money(total))}</Txt>
         </View>
-        <Pressable accessibilityRole="button" onPress={() => setPeriodOpen(true)} style={styles.periodButton}>
+        <Pressable hitSlop={slopFor(40)} accessibilityRole="button" onPress={() => setPeriodOpen(true)} style={styles.periodButton}>
           <Txt style={styles.periodText}>{balanceCopy.listPeriods[period]}</Txt>
           <DesignIcon name="chevronDown" size={16} color={Zinc[900]} strokeWidth={2} />
         </Pressable>

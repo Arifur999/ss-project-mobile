@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DesignIcon } from '@/components/DesignIcon';
 import { Txt } from '@/components/Txt';
 import { Green, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useCopy } from '@/context/LanguageContext';
 
 const COPY = {
@@ -75,6 +76,7 @@ export function UpdatePrompt() {
           </Pressable>
           <Pressable
             accessibilityRole="button"
+            hitSlop={slopFor(36)}
             onPress={() => Updates.reloadAsync().catch(() => {})}
             style={({ pressed }) => [styles.restart, pressed && styles.restartPressed]}>
             <Txt style={styles.restartText}>{t.restart}</Txt>

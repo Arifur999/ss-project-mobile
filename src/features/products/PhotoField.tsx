@@ -5,6 +5,7 @@ import { FieldError } from '@/components/FieldError';
 import { ProductImage } from '@/components/ProductImage';
 import { Txt } from '@/components/Txt';
 import { Red, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useCopy } from '@/context/LanguageContext';
 import { PRODUCT_COPY } from '@/features/products/copy';
 
@@ -37,7 +38,7 @@ export function PhotoField({
         <View style={styles.side}>
           <Button title={uri ? t.changePhoto : t.addPhoto} icon="upload" variant="pillOutline" onPress={onPick} disabled={disabled} style={styles.button} />
           {uri ? (
-            <Pressable accessibilityRole="button" onPress={onRemove} disabled={disabled} style={styles.remove}>
+            <Pressable hitSlop={slopFor(40)} accessibilityRole="button" onPress={onRemove} disabled={disabled} style={styles.remove}>
               <Txt style={styles.removeText}>{t.removePhoto}</Txt>
             </Pressable>
           ) : null}

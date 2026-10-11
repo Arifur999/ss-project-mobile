@@ -7,6 +7,7 @@ import { TextField } from '@/components/TextField';
 import { Toggle } from '@/components/Toggle';
 import { Txt } from '@/components/Txt';
 import { Red, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { SALES_COPY } from '@/features/sales/copy';
@@ -46,7 +47,7 @@ export function SaleLineCard({
           </Txt>
           <Txt style={styles.code}>{line.product_code}</Txt>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
+        <Pressable hitSlop={slopFor(36)} accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
           <Txt style={styles.removeText}>{t.removeLine}</Txt>
         </Pressable>
       </View>

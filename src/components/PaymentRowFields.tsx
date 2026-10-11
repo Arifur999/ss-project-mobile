@@ -4,6 +4,7 @@ import { SelectField } from '@/components/SelectField';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
 import { Red } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import type { Account } from '@/lib/balance';
 
 /** One part of a payment as typed: which account and how much. */
@@ -62,7 +63,7 @@ export function PaymentRowFields({
         />
       </View>
       {onRemove ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={t.remove} onPress={onRemove} style={styles.remove}>
+        <Pressable hitSlop={slopFor(36)} accessibilityRole="button" accessibilityLabel={t.remove} onPress={onRemove} style={styles.remove}>
           <Txt style={styles.removeText}>{t.remove}</Txt>
         </Pressable>
       ) : null}

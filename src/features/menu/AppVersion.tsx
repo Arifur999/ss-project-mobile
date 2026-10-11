@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { stampLabel } from '@/lib/dates';
 
@@ -99,6 +100,7 @@ export function AppVersion() {
         </View>
         {Updates.isEnabled && !isUpdatePending ? (
           <Pressable
+            hitSlop={slopFor(40)}
             accessibilityRole="button"
             accessibilityState={{ busy: !!busy || isDownloading }}
             onPress={check}
@@ -111,7 +113,11 @@ export function AppVersion() {
       {Updates.isEnabled && isUpdatePending ? (
         <View style={styles.ready}>
           <Txt style={styles.readyText}>{t.ready}</Txt>
-          <Pressable accessibilityRole="button" onPress={restart} style={({ pressed }) => [styles.restart, pressed && styles.restartPressed]}>
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={slopFor(36)}
+            onPress={restart}
+            style={({ pressed }) => [styles.restart, pressed && styles.restartPressed]}>
             <Txt style={styles.restartText}>{t.restart}</Txt>
           </Pressable>
         </View>

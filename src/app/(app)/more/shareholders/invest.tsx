@@ -8,6 +8,7 @@ import { ActionsSheet, ConfirmDeleteSheet } from '@/components/ItemSheets';
 import { HeaderIconButton } from '@/components/ScreenHeader';
 import { Txt } from '@/components/Txt';
 import { Green, Red, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -126,7 +127,7 @@ export default function ShareholderInvestScreen() {
         <Txt accessibilityRole="header" style={styles.listTitle}>
           {t.transactions}
         </Txt>
-        <Pressable accessibilityRole="button" onPress={() => setPeriodOpen(true)} style={styles.periodButton}>
+        <Pressable hitSlop={slopFor(40)} accessibilityRole="button" onPress={() => setPeriodOpen(true)} style={styles.periodButton}>
           <Txt style={styles.periodText}>{periodsCopy[period]}</Txt>
           <DesignIcon name="chevronDown" size={16} color={Zinc[900]} strokeWidth={2} />
         </Pressable>

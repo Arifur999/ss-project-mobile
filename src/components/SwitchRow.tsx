@@ -3,6 +3,7 @@ import { Animated, Pressable, StyleSheet, View } from 'react-native';
 
 import { Txt } from '@/components/Txt';
 import { Green, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 
 const SIZES = {
   // "Welcome SMS" / "SMS receipt": 40x24, green when on.
@@ -34,6 +35,7 @@ export function SwitchTrack({ on, size }: { on: boolean; size: keyof typeof SIZE
 export function InlineSwitch({ label, value, onChange }: { label: string; value: boolean; onChange: (next: boolean) => void }) {
   return (
     <Pressable
+      hitSlop={slopFor(36)}
       accessibilityRole="switch"
       accessibilityLabel={label}
       accessibilityState={{ checked: value }}

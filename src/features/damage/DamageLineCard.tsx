@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
 import { Red, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useCopy } from '@/context/LanguageContext';
 import { DAMAGE_COPY } from '@/features/damage/copy';
 import type { DamageLine } from '@/features/damage/damageForm';
@@ -29,7 +30,7 @@ export function DamageLineCard({
           </Txt>
           <Txt style={styles.code}>{line.product_code}</Txt>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
+        <Pressable hitSlop={slopFor(36)} accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
           <Txt style={styles.removeText}>{t.removeLine}</Txt>
         </Pressable>
       </View>

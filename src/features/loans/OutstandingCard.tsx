@@ -8,6 +8,7 @@ import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
+import { slopFor } from '@/constants/touch';
 import { callPhone } from '@/lib/phone';
 import type { Lender } from '@/services/loans.services';
 
@@ -52,6 +53,7 @@ export function OutstandingCard({ item, onSms, onStatement }: { item: LoanSummar
           <Txt style={styles.name}>{item.name}</Txt>
           {phone ? (
             <Pressable
+              hitSlop={slopFor(28)}
               accessibilityRole="link"
               accessibilityLabel={t.call(item.name, phone)}
               onPress={() => callPhone(phone)}

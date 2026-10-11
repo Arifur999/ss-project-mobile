@@ -4,6 +4,7 @@ import { DesignIcon } from '@/components/DesignIcon';
 import { Initial } from '@/components/Initial';
 import { Txt } from '@/components/Txt';
 import { Blue, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { callPhone } from '@/lib/phone';
 
 export type ContactFooter = { label: string; value: string; color: string; chip?: { label: string; bg: string; ink: string } };
@@ -53,6 +54,7 @@ export function ContactCard({
           ))}
           {number ? (
             <Pressable
+              hitSlop={slopFor(30)}
               accessibilityRole="link"
               accessibilityLabel={callLabel}
               onPress={() => callPhone(number)}

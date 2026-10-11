@@ -10,6 +10,7 @@ import { SearchField } from '@/components/SearchField';
 import { SelectPill } from '@/components/SelectPill';
 import { Txt } from '@/components/Txt';
 import { Red, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { bnDigits, useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -208,7 +209,7 @@ export default function ExpenseTransactionsScreen() {
           </Txt>
         </View>
         {isFiltered ? (
-          <Pressable accessibilityRole="button" onPress={clear} style={styles.clear}>
+          <Pressable hitSlop={slopFor(40)} accessibilityRole="button" onPress={clear} style={styles.clear}>
             <Txt style={styles.clearText}>{t.clearFilters}</Txt>
           </Pressable>
         ) : null}

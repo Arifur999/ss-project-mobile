@@ -15,6 +15,7 @@ import { LenderFormSheet } from '@/features/loans/LenderFormSheet';
 import { LoanShell } from '@/features/loans/LoanShell';
 import { useReach } from '@/hooks/useCan';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
+import { slopFor } from '@/constants/touch';
 import { errorMessage } from '@/lib/httpClient';
 import { lenderKey, lenderKeyFromLoan } from '@/lib/loans';
 import { callPhone } from '@/lib/phone';
@@ -100,6 +101,7 @@ export default function LoanPeopleScreen() {
                 <Txt style={[styles.address, { color: lender.address ? Zinc[600] : Zinc[500] }]}>{lender.address || t.noAddress}</Txt>
                 {phone ? (
                   <Pressable
+                    hitSlop={slopFor(30)}
                     accessibilityRole="link"
                     accessibilityLabel={t.call(lender.name, phone)}
                     onPress={() => callPhone(phone)}

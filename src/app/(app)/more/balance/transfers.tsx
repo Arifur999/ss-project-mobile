@@ -8,6 +8,7 @@ import { HeaderIconButton } from '@/components/ScreenHeader';
 import { StatTile } from '@/components/StatTile';
 import { Txt } from '@/components/Txt';
 import { Green, Red, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { bnDigits, useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -106,7 +107,7 @@ export default function TransfersScreen() {
         <Txt accessibilityRole="header" style={styles.listTitle}>
           {t.transferList}
         </Txt>
-        <Pressable accessibilityRole="button" accessibilityLabel={`${t.choosePeriod}: ${t.listPeriods[period]}`} onPress={() => setPeriodOpen(true)} style={styles.periodButton}>
+        <Pressable hitSlop={slopFor(40)} accessibilityRole="button" accessibilityLabel={`${t.choosePeriod}: ${t.listPeriods[period]}`} onPress={() => setPeriodOpen(true)} style={styles.periodButton}>
           <Txt style={styles.periodText}>{t.listPeriods[period]}</Txt>
           <DesignIcon name="chevronDown" size={16} color={Zinc[900]} strokeWidth={2} />
         </Pressable>

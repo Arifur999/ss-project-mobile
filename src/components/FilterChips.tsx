@@ -2,6 +2,7 @@ import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 
 /**
  * A scrolling row of 40-tall filter chips - the account filter on Balance and
@@ -34,6 +35,7 @@ export function FilterChips<K extends string>({
         return (
           <Pressable
             key={option.key}
+            hitSlop={slopFor(40)}
             accessibilityRole="radio"
             accessibilityState={{ selected: on }}
             onPress={() => onSelect(option.key)}

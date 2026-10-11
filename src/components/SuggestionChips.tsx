@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Txt } from '@/components/Txt';
 import { Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 
 /**
  * Tappable suggestions under a free-text field - the website's <datalist>:
@@ -29,7 +30,7 @@ export function SuggestionChips({
   return (
     <View style={styles.row}>
       {shown.map((suggestion) => (
-        <Pressable key={suggestion} accessibilityRole="button" onPress={() => onPick(suggestion)} style={styles.chip}>
+        <Pressable hitSlop={slopFor(36)} key={suggestion} accessibilityRole="button" onPress={() => onPick(suggestion)} style={styles.chip}>
           <Txt style={styles.text} numberOfLines={1}>
             {suggestion}
           </Txt>

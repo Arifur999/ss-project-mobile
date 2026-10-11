@@ -7,6 +7,7 @@ import { CheckRow } from '@/components/CheckRow';
 import { SearchField } from '@/components/SearchField';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { MARKETING_COPY } from '@/features/marketing/copy';
 import { CONTACT_TYPES, filterContacts, type Contact, type ContactType } from '@/lib/marketingContacts';
@@ -63,6 +64,7 @@ export function RecipientSheet({
           const on = types.includes(type);
           return (
             <Pressable
+              hitSlop={slopFor(36)}
               key={type}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: on }}

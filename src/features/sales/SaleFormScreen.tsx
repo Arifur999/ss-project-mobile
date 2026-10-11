@@ -18,6 +18,7 @@ import { TextField } from '@/components/TextField';
 import { TotalsList } from '@/components/TotalsList';
 import { Txt } from '@/components/Txt';
 import { Amber, Blue, Red, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -288,7 +289,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
                 {owed > 0 ? (
                   <Txt style={styles.owed}>{editing ? t.owesOnEdit(money(owed)) : collectable > 0 ? t.owesBefore(money(owed)) : t.owesBeforeInfo(money(owed))}</Txt>
                 ) : null}
-                <Pressable accessibilityRole="button" onPress={() => set({ customer_id: '' })} style={styles.link}>
+                <Pressable hitSlop={slopFor(36)} accessibilityRole="button" onPress={() => set({ customer_id: '' })} style={styles.link}>
                   <Txt style={styles.linkText}>{t.walkIn}</Txt>
                 </Pressable>
               </>
@@ -351,7 +352,7 @@ function SaleFormBody({ data, editing, draft }: { data: CustomerData; editing: R
               <Txt accessibilityRole="header" style={[styles.section, styles.grow]}>
                 {t.payment}
               </Txt>
-              <Pressable accessibilityRole="button" onPress={payInFull} style={styles.link}>
+              <Pressable hitSlop={slopFor(36)} accessibilityRole="button" onPress={payInFull} style={styles.link}>
                 <Txt style={styles.linkText}>{t.payInFull}</Txt>
               </Pressable>
             </View>

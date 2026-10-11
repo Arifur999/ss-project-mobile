@@ -7,6 +7,7 @@ import { Initial } from '@/components/Initial';
 import { ActionsSheet, ConfirmDeleteSheet } from '@/components/ItemSheets';
 import { Txt } from '@/components/Txt';
 import { Blue, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -79,6 +80,7 @@ export default function ShareholderListScreen() {
                 <Txt style={styles.name}>{sh.name}</Txt>
                 {phone ? (
                   <Pressable
+                    hitSlop={slopFor(32)}
                     accessibilityRole="link"
                     accessibilityLabel={t.call(sh.name, phone)}
                     onPress={() => callPhone(phone)}

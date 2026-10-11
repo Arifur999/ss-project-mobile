@@ -4,6 +4,7 @@ import { ActionsSheet } from '@/components/ItemSheets';
 import { TotalsList } from '@/components/TotalsList';
 import { Txt } from '@/components/Txt';
 import { Amber, Blue, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy, useLang } from '@/context/LanguageContext';
 import { SALES_COPY } from '@/features/sales/copy';
@@ -96,6 +97,7 @@ export function SaleSheet({
                 <Txt style={[styles.delivered, pending > 0 && styles.pending]}>{t.deliveredOf(num(deliveredQty(item)), num(item.qty))}</Txt>
                 {pending > 0 && onDeliver ? (
                   <Pressable
+                    hitSlop={slopFor(36)}
                     accessibilityRole="button"
                     accessibilityLabel={`${t.deliver} ${item.product_name}`}
                     onPress={() => onDeliver(item)}
@@ -110,6 +112,7 @@ export function SaleSheet({
                 </Txt>
                 {onRate ? (
                   <Pressable
+                    hitSlop={slopFor(36)}
                     accessibilityRole="button"
                     accessibilityLabel={`${t.rateTitle} ${item.product_name}`}
                     onPress={() => onRate(item)}

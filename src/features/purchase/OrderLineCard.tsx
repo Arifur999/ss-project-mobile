@@ -5,6 +5,7 @@ import { FigureRow } from '@/components/FiguresCard';
 import { TextField } from '@/components/TextField';
 import { Txt } from '@/components/Txt';
 import { Red, White, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { useCopy } from '@/context/LanguageContext';
 import { PURCHASE_COPY } from '@/features/purchase/copy';
@@ -49,7 +50,7 @@ export function OrderLineCard({
           <Txt style={styles.code}>{line.product_code}</Txt>
         </View>
         {onRemove ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
+          <Pressable hitSlop={slopFor(36)} accessibilityRole="button" accessibilityLabel={`${t.removeLine} ${line.product_name}`} onPress={onRemove} style={styles.remove}>
             <Txt style={styles.removeText}>{t.removeLine}</Txt>
           </Pressable>
         ) : null}

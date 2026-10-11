@@ -7,6 +7,7 @@ import { ActionsSheet, ConfirmDeleteSheet } from '@/components/ItemSheets';
 import { SelectPill } from '@/components/SelectPill';
 import { Txt } from '@/components/Txt';
 import { Blue, Green, Red, Zinc } from '@/constants/theme';
+import { slopFor } from '@/constants/touch';
 import { useAmountShield } from '@/context/AmountShieldContext';
 import { bnDigits, useCopy, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
@@ -200,6 +201,7 @@ export default function LoanTransactionsScreen() {
         <Txt style={styles.count}>{t.countTxns(filtered.length)}</Txt>
         {isFiltered ? (
           <Pressable
+            hitSlop={slopFor(36)}
             accessibilityRole="button"
             onPress={() => {
               setPerson(ALL);
