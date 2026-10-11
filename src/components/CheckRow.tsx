@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
   body: { flex: 1, minWidth: 0 },
   name: { fontSize: 15, fontWeight: '600', color: Zinc[900] },
   meta: { fontSize: 12, color: Zinc[500] },
-  muted: { color: Zinc[400] },
+  muted: { color: Zinc[500] },
   end: { flexShrink: 0, fontSize: 14, fontWeight: '600', color: Zinc[900] },
 });

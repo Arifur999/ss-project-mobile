@@ -139,5 +139,5 @@ const styles = StyleSheet.create({
   amount: { flexShrink: 0, fontSize: 14, fontWeight: '600' },
   in: { color: Green[700] },
   out: { color: Red[600] },
-  none: { color: Zinc[400] },
+  none: { color: Zinc[700] },
 });

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   fields: { flexDirection: 'row', gap: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: Zinc[100] },
   field: { flex: 1, minWidth: 0 },
   label: { fontSize: 11, fontWeight: '600', color: Zinc[500] },
-  before: { fontSize: 12, color: Zinc[400], textDecorationLine: 'line-through' },
+  before: { fontSize: 12, color: Zinc[500], textDecorationLine: 'line-through' },
   after: { fontSize: 14, fontWeight: '700', color: Green[700] },
   same: { fontSize: 14, color: Zinc[500] },
 });
