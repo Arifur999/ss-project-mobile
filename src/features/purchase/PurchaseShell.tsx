@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 
 import { SectionShell } from '@/components/SectionShell';
@@ -14,16 +15,18 @@ type QueryState = { isPending: boolean; isError: boolean; isSuccess: boolean; is
  * The Purchase screens' shared frame, fed by the Supplier section's query - or,
  * for the drafts, the query the screen passes. History and Drafts show to
  * whoever the website's Product History and Draft Purchase pages admit.
+ *
+ * New purchase order is on every section, for whoever the website's Purchase
+ * page admits: that tick is its own, and a member holding it without the
+ * Invoice Ledger would otherwise never find the form.
  */
 export function PurchaseShell({
   section,
   query,
-  fab,
   children,
 }: {
   section: PurchaseSection;
   query?: QueryState;
-  fab?: { label: string; onPress: () => void } | null;
   children: ReactNode;
 }) {
   const t = useCopy(PURCHASE_COPY);
@@ -43,7 +46,7 @@ export function PurchaseShell({
       query={query ?? purchases}
       errorText={t.loadError}
       retryLabel={t.retry}
-      fab={fab}>
+      fab={can('purchase.create') ? { label: t.newOrder, onPress: () => router.push('/more/purchase/new') } : null}>
       {children}
     </SectionShell>
   );

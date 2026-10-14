@@ -93,7 +93,7 @@ export default function PurchaseLedgerScreen() {
   };
 
   return (
-    <PurchaseShell section="ledger" fab={can('purchase.create') ? { label: t.newOrder, onPress: () => router.push('/more/purchase/new') } : null}>
+    <PurchaseShell section="ledger">
       <FigureCard dark label={t.totalShown} value={money(total)} caption={t.countInvoices(rows.length, formatNumber(rows.length, lang))} />
       <SearchField height={50} value={search} onChangeText={setSearch} placeholder={t.searchInvoices} label={t.searchLabel} />
       <SelectPill
