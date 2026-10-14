@@ -18,6 +18,7 @@ import { EXPENSE_COPY } from '@/features/expenses/copy';
 import { ExpenseFormSheet } from '@/features/expenses/ExpenseFormSheet';
 import { expenseNote, ExpenseRow } from '@/features/expenses/ExpenseRow';
 import { ExpenseShell } from '@/features/expenses/ExpenseShell';
+import { useCan } from '@/hooks/useCan';
 import { dateLabel, monthName, rangeLabel } from '@/lib/dates';
 import { expenseSource } from '@/lib/expenseSource';
 import { errorMessage } from '@/lib/httpClient';
@@ -34,6 +35,10 @@ const PAGE = 40;
 /** Every expense, newest first, grouped by day - Hatim's ExpenseTransactions. */
 export default function ExpenseTransactionsScreen() {
   const t = useCopy(EXPENSE_COPY);
+  const can = useCan();
+  const mayAdd = can('expense.create');
+  const mayEdit = can('expense.edit');
+  const mayDelete = can('expense.delete');
   const { lang } = useLang();
   const { money } = useAmountShield();
   const toast = useToast();
@@ -163,13 +168,13 @@ export default function ExpenseTransactionsScreen() {
       section="transactions"
       gap={12}
       right={<HeaderIconButton icon="printer" label={t.printList} onPress={print} disabled={filtered.length === 0} />}
-      fab={{
+      fab={mayAdd ? {
         label: t.newExpense,
         onPress: () => {
           setEditing(null);
           setFormOpen(true);
         },
-      }}>
+      } : null}>
       <SearchField height={50} value={query} onChangeText={setQuery} placeholder={t.searchPlaceholder} label={t.searchLabel} />
 
       <View accessibilityLabel={t.filtersLabel} style={styles.filters}>
@@ -240,10 +245,10 @@ export default function ExpenseTransactionsScreen() {
                 row={row}
                 colorOf={colorOf}
                 first={i === 0}
-                onMenu={() => {
+                onMenu={mayEdit || mayDelete ? () => {
                   setSelected(row);
                   setSheet('actions');
-                }}
+                } : undefined}
               />
             ))}
           </View>
@@ -265,12 +270,12 @@ export default function ExpenseTransactionsScreen() {
         deleteLabel={t.deleteExpense}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        onEdit={() => {
+        onEdit={mayEdit ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}>
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}>
         {sel?.sourceText ? (
           <View style={styles.source}>
             <DesignIcon name="link" size={18} color={Zinc[700]} strokeWidth={2} />

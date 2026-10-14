@@ -17,7 +17,7 @@ import { CategoryFormSheet } from '@/features/expenses/CategoryFormSheet';
 import { CategoryRankList } from '@/features/expenses/CategoryRankList';
 import { EXPENSE_COPY } from '@/features/expenses/copy';
 import { ExpenseShell } from '@/features/expenses/ExpenseShell';
-import { useReach } from '@/hooks/useCan';
+import { useCan, useReach } from '@/hooks/useCan';
 import { budgetSummary, categoryShares, expenseTotals } from '@/lib/expenseTotals';
 import { errorMessage } from '@/lib/httpClient';
 import { deleteCategory, useExpenseData, useExpenseWrite, type Category } from '@/services/expenses.services';
@@ -27,6 +27,9 @@ type Sheet = 'detail' | 'blocked' | 'confirm' | null;
 /** Budgets and where the money goes, by category - Hatim's ExpenseDashboard. */
 export default function ExpenseOverviewScreen() {
   const t = useCopy(EXPENSE_COPY);
+  const can = useCan();
+  const mayWrite = can('expenseCategory.write');
+  const mayDelete = can('expenseCategory.delete');
   const transactions = useReach().href('/more/expenses/transactions');
   const { money } = useAmountShield();
   const toast = useToast();
@@ -68,13 +71,13 @@ export default function ExpenseOverviewScreen() {
   return (
     <ExpenseShell
       section="overview"
-      fab={{
+      fab={mayWrite ? {
         label: t.newCategory,
         onPress: () => {
           setEditing(null);
           setFormOpen(true);
         },
-      }}>
+      } : null}>
       <BudgetCard summary={summary} />
 
       <View style={styles.pair}>
@@ -105,13 +108,13 @@ export default function ExpenseOverviewScreen() {
         grandTotal={summary.allTime}
         isTop={!!selected && shares.listed[0]?.category.id === selected.id}
         onClose={() => setSheet(null)}
-        onEdit={() => {
+        onEdit={mayWrite ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
+        } : undefined}
         onTransactions={transactions ? openTransactions : undefined}
-        onDelete={() => setSheet(selected && (totals.allTime[selected.id] || 0) > 0 ? 'blocked' : 'confirm')}
+        onDelete={mayDelete ? () => setSheet(selected && (totals.allTime[selected.id] || 0) > 0 ? 'blocked' : 'confirm') : undefined}
       />
 
       <CategoryFormSheet
