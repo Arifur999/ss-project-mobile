@@ -13,7 +13,7 @@ import { useToast } from '@/context/ToastContext';
 import { LOAN_COPY } from '@/features/loans/copy';
 import { LenderFormSheet } from '@/features/loans/LenderFormSheet';
 import { LoanShell } from '@/features/loans/LoanShell';
-import { useReach } from '@/hooks/useCan';
+import { useCan, useReach } from '@/hooks/useCan';
 import { SIDE_LOOK, sideOf } from '@/constants/side';
 import { slopFor } from '@/constants/touch';
 import { errorMessage } from '@/lib/httpClient';
@@ -24,6 +24,9 @@ import { deleteLender, useLoanData, useLoanWrite, type Lender } from '@/services
 /** Every bank and person the business borrows from or lends to - Hatim's LoanLenderList. */
 export default function LoanPeopleScreen() {
   const t = useCopy(LOAN_COPY);
+  const can = useCan();
+  const mayWrite = can('lender.write');
+  const mayDelete = can('lender.delete');
   const statement = useReach().href('/more/loans/statement');
   const { money } = useAmountShield();
   const toast = useToast();
@@ -65,13 +68,13 @@ export default function LoanPeopleScreen() {
   return (
     <LoanShell
       section="people"
-      fab={{
+      fab={mayWrite ? {
         label: t.addPerson,
         onPress: () => {
           setEditing(null);
           setFormOpen(true);
         },
-      }}>
+      } : null}>
       <View style={styles.head}>
         <Txt accessibilityRole="header" style={styles.count}>
           {t.countPeople(lenders.length)}
@@ -111,16 +114,18 @@ export default function LoanPeopleScreen() {
                   </Pressable>
                 ) : null}
               </View>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t.options(lender.name)}
-                onPress={() => {
-                  setSelected(lender);
-                  setSheet('actions');
-                }}
-                style={styles.more}>
-                <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-              </Pressable>
+              {mayWrite || mayDelete || statement ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t.options(lender.name)}
+                  onPress={() => {
+                    setSelected(lender);
+                    setSheet('actions');
+                  }}
+                  style={styles.more}>
+                  <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+                </Pressable>
+              ) : null}
             </View>
             <View style={styles.figures}>
               <View style={styles.figure}>
@@ -166,12 +171,12 @@ export default function LoanPeopleScreen() {
               ]
             : []
         }
-        onEdit={() => {
+        onEdit={mayWrite ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}
       />
 
       <ConfirmDeleteSheet

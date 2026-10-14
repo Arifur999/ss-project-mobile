@@ -16,6 +16,7 @@ import { LoanShell } from '@/features/loans/LoanShell';
 import { LoanTxnFormSheet } from '@/features/loans/LoanTxnFormSheet';
 import { LoanTxnRow } from '@/features/loans/LoanTxnRow';
 import { useLoanReceipt } from '@/features/loans/useLoanReceipt';
+import { useCan } from '@/hooks/useCan';
 import { dateLabel, monthName } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
 import { balanceAfterRow } from '@/lib/loanBalances';
@@ -33,6 +34,10 @@ const PAGE = 40;
 /** Every loan transaction, newest first, grouped by day - Hatim's LoanTransactions. */
 export default function LoanTransactionsScreen() {
   const t = useCopy(LOAN_COPY);
+  const can = useCan();
+  const mayAdd = can('loan.create');
+  const mayEdit = can('loan.edit');
+  const mayDelete = can('loan.delete');
   const { lang } = useLang();
   const { money } = useAmountShield();
   const toast = useToast();
@@ -133,13 +138,13 @@ export default function LoanTransactionsScreen() {
     <LoanShell
       section="transactions"
       gap={14}
-      fab={{
+      fab={mayAdd ? {
         label: t.newTransaction,
         onPress: () => {
           setEditing(null);
           setFormOpen(true);
         },
-      }}>
+      } : null}>
       <View style={styles.totals}>
         <Txt accessibilityRole="header" style={styles.scope}>
           {`${person === ALL ? t.allPeople : person} · ${month === ALL ? t.allTime : monthLabel(month)}`}
@@ -231,10 +236,10 @@ export default function LoanTransactionsScreen() {
                 key={record.id}
                 record={record}
                 first={i === 0}
-                onMenu={() => {
+                onMenu={mayEdit || mayDelete || !!receipt ? () => {
                   setSelected(record);
                   setSheet('actions');
-                }}
+                } : undefined}
               />
             ))}
           </View>
@@ -258,12 +263,12 @@ export default function LoanTransactionsScreen() {
         cancelLabel={t.cancel}
         closeLabel={t.close}
         extra={receipt ? [{ label: t.sendReceipt, icon: 'message', onPress: resend }] : []}
-        onEdit={() => {
+        onEdit={mayEdit ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}
       />
 
       <ConfirmDeleteSheet
