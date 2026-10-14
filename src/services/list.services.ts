@@ -34,6 +34,21 @@ export async function fetchListOrDenied(
   }
 }
 
+/**
+ * For the lists a screen reads beside its own: fetched the way the website's
+ * shim reads them - a refusal (403) is an empty list, not a broken screen,
+ * since a member's ticks often open a page without every table its figures
+ * draw on - with each refused endpoint noted in `denied`, so the screen can
+ * say its figures leave something out.
+ */
+export const fetchListNoting =
+  (denied: string[]) =>
+  async (endpoint: string, range: Range | null = null): Promise<Row[]> => {
+    const { rows, denied: refused } = await fetchListOrDenied(endpoint, range);
+    if (refused) denied.push(endpoint);
+    return rows;
+  };
+
 /** The accounts a payment can go into: the active ones, in the order the Balance screens show them. */
 export const activeAccounts = (rows: Row[]) =>
   rows.filter((a) => a.is_active !== false).sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0)) as Account[];
