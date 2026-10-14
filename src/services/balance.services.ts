@@ -3,9 +3,11 @@ import { useCallback } from 'react';
 
 import { buildAccountRows, countedSalePayments, type Account, type AccountRow, type BalanceSources } from '@/lib/balance';
 import { http } from '@/lib/httpClient';
-import { fetchList } from '@/services/list.services';
+import { fetchList, fetchListNoting } from '@/services/list.services';
 
 export type BalanceData = {
+  /** Lists the server refused this member; their figures are left out. */
+  denied: string[];
   accounts: Account[];
   rows: AccountRow[];
   sources: BalanceSources;
@@ -17,19 +19,21 @@ export type BalanceData = {
  * account's share out as rows, the transfer list and wallet read their parts.
  */
 export async function loadBalance(): Promise<BalanceData> {
+  const denied: string[] = [];
+  const lenient = fetchListNoting(denied);
   const [accounts, investments, profitWithdrawals, loans, transfers, expenses, sales, salePayments, customerPayments, supplierPayments, otherIncomes] =
     await Promise.all([
       fetchList('/accounts'),
-      fetchList('/investments'),
-      fetchList('/profit-withdrawals'),
-      fetchList('/loans'),
+      lenient('/investments'),
+      lenient('/profit-withdrawals'),
+      lenient('/loans'),
       fetchList('/account-transfers'),
-      fetchList('/expenses'),
-      fetchList('/sales'),
-      fetchList('/sale-payments'),
-      fetchList('/customer-payments'),
-      fetchList('/supplier-payments'),
-      fetchList('/other-incomes'),
+      lenient('/expenses'),
+      lenient('/sales'),
+      lenient('/sale-payments'),
+      lenient('/customer-payments'),
+      lenient('/supplier-payments'),
+      lenient('/other-incomes'),
     ]);
 
   const sorted = [...accounts].sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0)) as Account[];
@@ -46,7 +50,7 @@ export async function loadBalance(): Promise<BalanceData> {
     supplierPayments,
     otherIncomes,
   };
-  return { accounts: sorted, rows: buildAccountRows(sorted, sources), sources };
+  return { accounts: sorted, rows: buildAccountRows(sorted, sources), sources, denied };
 }
 
 export const BALANCE_KEY = ['balance'] as const;

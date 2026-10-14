@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import type { Account } from '@/lib/balance';
 import type { DamageAction, DamageReceiveResult, DamageSource, DamageStatus } from '@/lib/damageRules';
 import { http } from '@/lib/httpClient';
-import { activeAccounts, fetchList, fetchListOrDenied } from '@/services/list.services';
+import { activeAccounts, fetchListNoting, fetchListOrDenied } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -58,6 +58,8 @@ export type DamageMoney = {
 };
 
 export type DamageData = {
+  /** Lists the server refused this member; their figures are left out. */
+  denied: string[];
   entries: DamageEntry[];
   money: DamageMoney[];
   accounts: Account[];
@@ -79,10 +81,12 @@ const moneyRow = (raw: Row, direction: 'out' | 'in'): DamageMoney => ({
 
 /** Everything the four Damage screens read, fetched once and shared - the website's damage pages' loads. */
 export async function loadDamageData(): Promise<DamageData> {
+  const denied: string[] = [];
+  const lenient = fetchListNoting(denied);
   const [entries, transactions, accounts, employees] = await Promise.all([
     http.get<DamageEntry[]>('/damage'),
     http.get<{ expenses: Row[]; other_incomes: Row[] }>('/damage/transactions'),
-    fetchList('/accounts'),
+    lenient('/accounts'),
     fetchListOrDenied('/employees'),
   ]);
   const money = [
@@ -90,6 +94,7 @@ export async function loadDamageData(): Promise<DamageData> {
     ...(transactions?.other_incomes ?? []).map((raw) => moneyRow(raw, 'in')),
   ].sort((a, b) => b.date.localeCompare(a.date));
   return {
+    denied,
     entries: entries ?? [],
     money,
     accounts: activeAccounts(accounts),

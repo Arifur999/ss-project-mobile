@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import type { Account } from '@/lib/balance';
 import { http } from '@/lib/httpClient';
-import { activeAccounts, fetchList } from '@/services/list.services';
+import { activeAccounts, fetchList, fetchListNoting } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -23,6 +23,8 @@ export type Lender = {
 export type ExpenseCategory = { id: string; name: string };
 
 export type LoanData = {
+  /** Lists the server refused this member; their figures are left out. */
+  denied: string[];
   lenders: Lender[];
   loans: Row[];
   /** Active accounts only, in the order the Balance screens show them. */
@@ -34,15 +36,18 @@ export type LoanData = {
 
 /** Everything the four Loan screens read, fetched once and shared. */
 export async function loadLoanData(): Promise<LoanData> {
+  const denied: string[] = [];
+  const lenient = fetchListNoting(denied);
   const [lenders, loans, accounts, categories, otherIncomes] = await Promise.all([
     fetchList('/loan-lenders'),
     fetchList('/loans'),
-    fetchList('/accounts'),
-    fetchList('/expense-categories'),
-    fetchList('/other-incomes'),
+    lenient('/accounts'),
+    lenient('/expense-categories'),
+    lenient('/other-incomes'),
   ]);
   const sources = otherIncomes.map((row) => String(row.source_name || '').trim()).filter(Boolean);
   return {
+    denied,
     lenders: [...lenders].sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''))) as Lender[],
     loans,
     accounts: activeAccounts(accounts),

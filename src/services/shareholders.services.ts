@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import type { Account } from '@/lib/balance';
 import { http } from '@/lib/httpClient';
-import { fetchList } from '@/services/list.services';
+import { fetchList, fetchListNoting } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -18,6 +18,8 @@ export type Shareholder = {
 };
 
 export type ShareholderData = {
+  /** Lists the server refused this member; their figures are left out. */
+  denied: string[];
   shareholders: Shareholder[];
   investments: Row[];
   profitWithdrawals: Row[];
@@ -29,17 +31,20 @@ export type ShareholderData = {
 
 /** Everything the four Shareholder screens read, fetched once and shared. */
 export async function loadShareholderData(): Promise<ShareholderData> {
+  const denied: string[] = [];
+  const lenient = fetchListNoting(denied);
   const [shareholders, investments, profitWithdrawals, sales, expenses, otherIncomes, accounts] = await Promise.all([
     fetchList('/shareholders'),
     fetchList('/investments'),
     fetchList('/profit-withdrawals'),
-    fetchList('/sales'),
-    fetchList('/expenses'),
-    fetchList('/other-incomes'),
-    fetchList('/accounts'),
+    lenient('/sales'),
+    lenient('/expenses'),
+    lenient('/other-incomes'),
+    lenient('/accounts'),
   ]);
   const bySort = (a: Row, b: Row) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0);
   return {
+    denied,
     shareholders: [...shareholders].sort(bySort) as Shareholder[],
     investments,
     profitWithdrawals,

@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import type { Account } from '@/lib/balance';
 import { http } from '@/lib/httpClient';
-import { activeAccounts, fetchList } from '@/services/list.services';
+import { activeAccounts, fetchList, fetchListNoting } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -50,6 +50,8 @@ export type OtherIncome = {
 };
 
 export type SupplierData = {
+  /** Lists the server refused this member; their figures are left out. */
+  denied: string[];
   suppliers: SupplierRecord[];
   /** With their lines, for the balances. */
   purchases: Row[];
@@ -67,14 +69,17 @@ const newestFirst = (a: Row, b: Row) =>
 
 /** Everything the Supplier and Purchase screens read, fetched once and shared - the website's supplier pages' loads. */
 export async function loadSupplierData(): Promise<SupplierData> {
+  const denied: string[] = [];
+  const lenient = fetchListNoting(denied);
   const [suppliers, purchases, payments, incomes, accounts] = await Promise.all([
     fetchList('/suppliers'),
-    fetchList('/purchases'),
-    fetchList('/supplier-payments'),
-    fetchList('/other-incomes'),
-    fetchList('/accounts'),
+    lenient('/purchases'),
+    lenient('/supplier-payments'),
+    lenient('/other-incomes'),
+    lenient('/accounts'),
   ]);
   return {
+    denied,
     suppliers: [...suppliers].sort((a, b) => supplierLabel(a as SupplierRecord).localeCompare(supplierLabel(b as SupplierRecord))) as SupplierRecord[],
     purchases,
     payments: [...payments].sort(newestFirst) as SupplierPayment[],
