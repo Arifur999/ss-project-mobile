@@ -10,6 +10,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Txt } from '@/components/Txt';
 import { White, Zinc } from '@/constants/theme';
+import { useCopy } from '@/context/LanguageContext';
 import { useReach } from '@/hooks/useCan';
 import { SECTION_SWITCH } from '@/lib/stackOptions';
 
@@ -23,6 +24,11 @@ type QueryState = {
 };
 
 export type Section<K extends string> = { key: K; label: string; route: string };
+
+const PARTIAL_COPY = {
+  en: "Some figures here leave out lists your access doesn't include. Ask the owner if they look short.",
+  bn: 'আপনার access-এ সব তালিকা না থাকায় এখানকার কিছু হিসাব অসম্পূর্ণ হতে পারে। কম মনে হলে মালিককে জানান।',
+};
 
 /**
  * The frame of a section with sub-screens (Balance, Shareholders, Loans,
@@ -41,6 +47,7 @@ export function SectionShell<K extends string>({
   retryLabel,
   right,
   fab,
+  partial,
   gap = 16,
   children,
 }: {
@@ -54,11 +61,17 @@ export function SectionShell<K extends string>({
   retryLabel: string;
   right?: ReactNode;
   fab?: { label: string; onPress: () => void } | null;
+  /**
+   * Some list the figures draw on was refused this member (the server's page
+   * ticks), read as empty the way the website's shim reads it; says so.
+   */
+  partial?: boolean;
   /** Space between the body's blocks: 16, or 14 on the denser lists. */
   gap?: number;
   children: ReactNode;
 }) {
   const chipsRef = useRef<ScrollView>(null);
+  const partialText = useCopy(PARTIAL_COPY);
   // Only the sub-pages the member's page ticks open, as the website's sidebar.
   const reach = useReach();
   return (
@@ -95,7 +108,15 @@ export function SectionShell<K extends string>({
               <Button title={retryLabel} variant="pillOutline" onPress={() => query.refetch()} />
             </View>
           ) : (
-            children
+            <>
+              {partial ? (
+                <View accessibilityRole="text" style={styles.partial}>
+                  <DesignIcon name="info" size={16} color={Zinc[600]} strokeWidth={2} />
+                  <Txt style={styles.partialText}>{partialText}</Txt>
+                </View>
+              ) : null}
+              {children}
+            </>
           )}
         </View>
       </ScrollView>
@@ -126,6 +147,8 @@ const styles = StyleSheet.create({
   chipTextOff: { fontWeight: '500', color: Zinc[700] },
   body: { paddingTop: 6, paddingHorizontal: 20 },
   state: { minHeight: 280, justifyContent: 'center', gap: 12 },
+  partial: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, padding: 12, borderRadius: 12, backgroundColor: Zinc[50], borderWidth: 1, borderColor: Zinc[200] },
+  partialText: { flex: 1, fontSize: 13, lineHeight: 19, color: Zinc[700] },
   fab: {
     height: 52,
     paddingLeft: 16,
