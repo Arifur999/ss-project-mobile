@@ -15,6 +15,7 @@ import { useToast } from '@/context/ToastContext';
 import { BalanceShell } from '@/features/balance/BalanceShell';
 import { BALANCE_COPY } from '@/features/balance/copy';
 import { TransferFormSheet, type Transfer } from '@/features/balance/TransferFormSheet';
+import { useCan } from '@/hooks/useCan';
 import { dateLabel } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
 import { inRange, listRange, type ListPeriod } from '@/lib/periods';
@@ -28,6 +29,9 @@ const PERIODS: ListPeriod[] = ['all', 'thisMonth', 'lastMonth', 'thisYear'];
 /** Money moved between accounts: the list by day, and new / edit / delete. */
 export default function TransfersScreen() {
   const t = useCopy(BALANCE_COPY);
+  const can = useCan();
+  const mayWrite = can('transfer.write');
+  const mayDelete = can('transfer.delete');
   const { lang } = useLang();
   const { money } = useAmountShield();
   const toast = useToast();
@@ -92,7 +96,7 @@ export default function TransfersScreen() {
   const count = lang === 'bn' ? bnDigits(all.length) : String(all.length);
 
   return (
-    <BalanceShell section="transfers" right={<HeaderIconButton icon="printer" label={t.printTransfers} onPress={print} />} fab={{ label: t.newTransfer, onPress: openNew }}>
+    <BalanceShell section="transfers" right={<HeaderIconButton icon="printer" label={t.printTransfers} onPress={print} />} fab={mayWrite ? { label: t.newTransfer, onPress: openNew } : null}>
       <View style={styles.tiles}>
         <StatTile label={t.totalTransfer} value={money(total)} />
         <StatTile label={t.totalTransactions} value={count} />
@@ -133,16 +137,18 @@ export default function TransfersScreen() {
                   {item.notes ? <Txt style={styles.itemNote}>{item.notes}</Txt> : null}
                 </View>
                 <Txt style={styles.amount}>{money(item.amount)}</Txt>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t.transferOptions(money(item.amount), item.from_account_name, item.to_account_name)}
-                  onPress={() => {
-                    setSelected(item);
-                    setSheet('actions');
-                  }}
-                  style={styles.more}>
-                  <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-                </Pressable>
+                {mayWrite || mayDelete ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t.transferOptions(money(item.amount), item.from_account_name, item.to_account_name)}
+                    onPress={() => {
+                      setSelected(item);
+                      setSheet('actions');
+                    }}
+                    style={styles.more}>
+                    <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+                  </Pressable>
+                ) : null}
               </View>
             ))}
           </View>
@@ -179,12 +185,12 @@ export default function TransfersScreen() {
         deleteLabel={t.deleteTransfer}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        onEdit={() => {
+        onEdit={mayWrite ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}
       />
 
       <ConfirmDeleteSheet

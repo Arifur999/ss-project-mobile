@@ -12,6 +12,7 @@ import { useToast } from '@/context/ToastContext';
 import { AccountFormSheet } from '@/features/balance/AccountFormSheet';
 import { BalanceShell } from '@/features/balance/BalanceShell';
 import { BALANCE_COPY } from '@/features/balance/copy';
+import { useCan } from '@/hooks/useCan';
 import type { Account } from '@/lib/balance';
 import { errorMessage } from '@/lib/httpClient';
 import { formatMoney } from '@/lib/money';
@@ -20,6 +21,9 @@ import { deleteAccount, updateAccount, useBalance, useBalanceWrite } from '@/ser
 /** The accounts money sits in: switch one off, edit it, delete it, add one. */
 export default function WalletScreen() {
   const t = useCopy(BALANCE_COPY);
+  const can = useCan();
+  const mayWrite = can('account.write');
+  const mayDelete = can('account.delete');
   const { lang } = useLang();
   const toast = useToast();
   const write = useBalanceWrite();
@@ -72,13 +76,13 @@ export default function WalletScreen() {
   return (
     <BalanceShell
       section="wallet"
-      fab={{
+      fab={mayWrite ? {
         label: t.addAccount,
         onPress: () => {
           setEditing(null);
           setFormOpen(true);
         },
-      }}>
+      } : null}>
       <View style={styles.head}>
         <Txt accessibilityRole="header" style={styles.title}>
           {t.accounts}
@@ -104,18 +108,20 @@ export default function WalletScreen() {
               value={account.is_active}
               onChange={() => toggle(account)}
               label={t.activeSwitch(account.name)}
-              disabled={switching === account.id}
+              disabled={!mayWrite || switching === account.id}
             />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t.accountOptions(account.name)}
-              onPress={() => {
-                setSelected(account);
-                setSheet('actions');
-              }}
-              style={styles.more}>
-              <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-            </Pressable>
+            {mayWrite || mayDelete ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t.accountOptions(account.name)}
+                onPress={() => {
+                  setSelected(account);
+                  setSheet('actions');
+                }}
+                style={styles.more}>
+                <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+              </Pressable>
+            ) : null}
           </View>
         ))}
       </View>
@@ -131,12 +137,12 @@ export default function WalletScreen() {
         deleteLabel={t.deleteAccount}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        onEdit={() => {
+        onEdit={mayWrite ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}
       />
 
       <ConfirmDeleteSheet

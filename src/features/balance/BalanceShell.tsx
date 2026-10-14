@@ -16,7 +16,7 @@ export function BalanceShell({
 }: {
   section: BalanceSection;
   right?: ReactNode;
-  fab?: { label: string; onPress: () => void };
+  fab?: { label: string; onPress: () => void } | null;
   children: ReactNode;
 }) {
   const t = useCopy(BALANCE_COPY);
