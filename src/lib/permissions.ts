@@ -78,6 +78,48 @@ export const ACTIONS = {
   'customerPayment.delete': { roles: ['owner', 'manager'], permission: 'act:customers.delete' },
   // expense.route.ts: POST / - a due discount is written as an expense
   'expense.create': { roles: ['owner', 'manager', 'accountant'], permission: 'page:expenses.transactions' },
+  // expense.route.ts: PATCH /:id
+  'expense.edit': { roles: ['owner', 'manager'], permission: 'page:expenses.transactions' },
+  // expense.route.ts: DELETE /:id - the owner alone
+  'expense.delete': { roles: ['owner'] },
+  // expenseCategory.route.ts: POST / and PATCH /:id - a category and its budget
+  'expenseCategory.write': { roles: ['owner', 'manager', 'accountant'], permission: 'page:expenses.transactions' },
+  // expenseCategory.route.ts: DELETE /:id
+  'expenseCategory.delete': { roles: ['owner'] },
+  // account.route.ts: POST / and PATCH /:id - the Overview page's tick, wherever the account is added from
+  'account.write': { roles: ['owner', 'manager'], permission: 'page:balance.overview' },
+  // account.route.ts: DELETE /:id
+  'account.delete': { roles: ['owner'] },
+  // accountTransfer.route.ts: POST / and PATCH /:id
+  'transfer.write': { roles: ['owner', 'manager'], permission: 'page:balance.transfer' },
+  // accountTransfer.route.ts: DELETE /:id
+  'transfer.delete': { roles: ['owner'] },
+  // investment.route.ts: POST / - invest or withdraw
+  'investment.create': { roles: ['owner', 'manager'], permission: 'page:shareholders.invest' },
+  // investment.route.ts: PATCH /:id - the owner alone, no permission asked
+  'investment.edit': { roles: ['owner'] },
+  // investment.route.ts: DELETE /:id
+  'investment.delete': { roles: ['owner'] },
+  // shareholder.route.ts: POST / and PATCH /:id
+  'shareholder.write': { roles: ['owner', 'manager'], permission: 'page:shareholders.list' },
+  // shareholder.route.ts: DELETE /:id
+  'shareholder.delete': { roles: ['owner'] },
+  // profitWithdrawal.route.ts: POST /
+  'profitWithdrawal.create': { roles: ['owner', 'manager'], permission: 'page:shareholders.profit' },
+  // profitWithdrawal.route.ts: PATCH /:id - the owner alone
+  'profitWithdrawal.edit': { roles: ['owner'] },
+  // profitWithdrawal.route.ts: DELETE /:id
+  'profitWithdrawal.delete': { roles: ['owner'] },
+  // loan.route.ts: POST /
+  'loan.create': { roles: ['owner', 'manager'], permission: 'page:loans.transactions' },
+  // loan.route.ts: PATCH /:id - the owner alone
+  'loan.edit': { roles: ['owner'], permission: 'page:loans.transactions' },
+  // loan.route.ts: DELETE /:id
+  'loan.delete': { roles: ['owner'] },
+  // loanLender.route.ts: POST / and PATCH /:id - an accountant may too
+  'lender.write': { roles: ['owner', 'manager', 'accountant'], permission: 'page:loans.lenders' },
+  // loanLender.route.ts: DELETE /:id
+  'lender.delete': { roles: ['owner'] },
   // sms.route.ts: POST /send - the owner's credits, no permission beyond the role
   'sms.send': { roles: ['owner'] },
   // sale.route.ts: POST /
