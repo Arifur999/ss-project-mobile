@@ -15,6 +15,7 @@ import { BALANCE_COPY } from '@/features/balance/copy';
 import { SHAREHOLDER_COPY } from '@/features/shareholders/copy';
 import { ProfitFormSheet } from '@/features/shareholders/ProfitFormSheet';
 import { ShareholderShell } from '@/features/shareholders/ShareholderShell';
+import { useCan } from '@/hooks/useCan';
 import { dateLabel, monthYearLabel } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
 import { inRange, listRange, type ListPeriod } from '@/lib/periods';
@@ -26,6 +27,10 @@ const PERIODS: ListPeriod[] = ['all', 'thisMonth', 'lastMonth', 'thisYear'];
 /** Profit taken out by the owners: the list, and add / edit / delete. */
 export default function ProfitWithdrawScreen() {
   const t = useCopy(SHAREHOLDER_COPY);
+  const can = useCan();
+  const mayAdd = can('profitWithdrawal.create');
+  const mayEdit = can('profitWithdrawal.edit');
+  const mayDelete = can('profitWithdrawal.delete');
   const balanceCopy = useCopy(BALANCE_COPY);
   const { lang } = useLang();
   const { money } = useAmountShield();
@@ -77,7 +82,7 @@ export default function ProfitWithdrawScreen() {
   };
 
   return (
-    <ShareholderShell section="profit" fab={list.length > 0 ? { label: t.newEntry, onPress: openNew } : null}>
+    <ShareholderShell section="profit" fab={mayAdd && list.length > 0 ? { label: t.newEntry, onPress: openNew } : null}>
       <View style={styles.head}>
         <View style={styles.headText}>
           <Txt accessibilityRole="header" style={styles.title}>
@@ -98,7 +103,7 @@ export default function ProfitWithdrawScreen() {
           </View>
           <Txt style={styles.emptyTitle}>{t.noProfitTitle}</Txt>
           <Txt style={styles.emptyBody}>{t.noProfitBody}</Txt>
-          <Fab label={t.newEntry} onPress={openNew} floating={false} />
+          {mayAdd ? <Fab label={t.newEntry} onPress={openNew} floating={false} /> : null}
         </View>
       ) : (
         <View style={styles.list}>
@@ -114,16 +119,18 @@ export default function ProfitWithdrawScreen() {
                 {item.notes ? <Txt style={styles.note}>{item.notes}</Txt> : null}
               </View>
               <Txt style={styles.amount}>{money(item.amount)}</Txt>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t.profitOptions(String(item.shareholder_name))}
-                onPress={() => {
-                  setSelected(item);
-                  setSheet('actions');
-                }}
-                style={styles.more}>
-                <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-              </Pressable>
+              {mayEdit || mayDelete ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t.profitOptions(String(item.shareholder_name))}
+                  onPress={() => {
+                    setSelected(item);
+                    setSheet('actions');
+                  }}
+                  style={styles.more}>
+                  <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+                </Pressable>
+              ) : null}
             </View>
           ))}
         </View>
@@ -156,12 +163,12 @@ export default function ProfitWithdrawScreen() {
         deleteLabel={t.deleteEntry}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        onEdit={() => {
+        onEdit={mayEdit ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}
       />
 
       <ConfirmDeleteSheet

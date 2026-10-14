@@ -14,6 +14,7 @@ import { useToast } from '@/context/ToastContext';
 import { SHAREHOLDER_COPY } from '@/features/shareholders/copy';
 import { ShareholderFormSheet } from '@/features/shareholders/ShareholderFormSheet';
 import { ShareholderShell } from '@/features/shareholders/ShareholderShell';
+import { useCan } from '@/hooks/useCan';
 import { errorMessage } from '@/lib/httpClient';
 import { callPhone } from '@/lib/phone';
 import { totalInvestment } from '@/lib/shareholders';
@@ -22,6 +23,9 @@ import { deleteShareholder, useShareholderData, useShareholderWrite, type Shareh
 /** Who owns the business: contact details, opening and total investment each. */
 export default function ShareholderListScreen() {
   const t = useCopy(SHAREHOLDER_COPY);
+  const can = useCan();
+  const mayWrite = can('shareholder.write');
+  const mayDelete = can('shareholder.delete');
   const { money } = useAmountShield();
   const toast = useToast();
   const write = useShareholderWrite();
@@ -56,13 +60,13 @@ export default function ShareholderListScreen() {
   return (
     <ShareholderShell
       section="list"
-      fab={{
+      fab={mayWrite ? {
         label: t.addShareholder,
         onPress: () => {
           setEditing(null);
           setFormOpen(true);
         },
-      }}>
+      } : null}>
       <View style={styles.head}>
         <Txt accessibilityRole="header" style={styles.count}>
           {t.countText(shareholders.length)}
@@ -94,16 +98,18 @@ export default function ShareholderListScreen() {
                   <Txt style={[styles.addressText, { color: sh.address ? Zinc[600] : Zinc[500] }]}>{sh.address || t.noAddress}</Txt>
                 </View>
               </View>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t.shareholderOptions(sh.name)}
-                onPress={() => {
-                  setSelected(sh);
-                  setSheet('actions');
-                }}
-                style={styles.more}>
-                <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-              </Pressable>
+              {mayWrite || mayDelete ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t.shareholderOptions(sh.name)}
+                  onPress={() => {
+                    setSelected(sh);
+                    setSheet('actions');
+                  }}
+                  style={styles.more}>
+                  <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+                </Pressable>
+              ) : null}
             </View>
             <View style={styles.figures}>
               <View style={styles.figure}>
@@ -130,12 +136,12 @@ export default function ShareholderListScreen() {
         deleteLabel={t.deleteShareholder}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        onEdit={() => {
+        onEdit={mayWrite ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}
       />
 
       <ConfirmDeleteSheet

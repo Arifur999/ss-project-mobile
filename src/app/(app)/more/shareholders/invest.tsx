@@ -16,6 +16,7 @@ import { BALANCE_COPY } from '@/features/balance/copy';
 import { SHAREHOLDER_COPY } from '@/features/shareholders/copy';
 import { InvestFormSheet } from '@/features/shareholders/InvestFormSheet';
 import { ShareholderShell } from '@/features/shareholders/ShareholderShell';
+import { useCan } from '@/hooks/useCan';
 import { dateLabel } from '@/lib/dates';
 import { errorMessage } from '@/lib/httpClient';
 import { inRange, listRange, type ListPeriod } from '@/lib/periods';
@@ -28,6 +29,10 @@ const PERIODS: ListPeriod[] = ['all', 'thisMonth', 'lastMonth', 'thisYear'];
 /** Shareholder capital in and out: totals, the entries by day, add / edit / delete. */
 export default function ShareholderInvestScreen() {
   const t = useCopy(SHAREHOLDER_COPY);
+  const can = useCan();
+  const mayAdd = can('investment.create');
+  const mayEdit = can('investment.edit');
+  const mayDelete = can('investment.delete');
   const periodsCopy = useCopy(BALANCE_COPY).listPeriods;
   const { lang } = useLang();
   const { money } = useAmountShield();
@@ -93,13 +98,13 @@ export default function ShareholderInvestScreen() {
     <ShareholderShell
       section="invest"
       right={<HeaderIconButton icon="printer" label={t.printTransactions} onPress={print} />}
-      fab={{
+      fab={mayAdd ? {
         label: t.newEntry,
         onPress: () => {
           setEditing(null);
           setFormOpen(true);
         },
-      }}>
+      } : null}>
       <Txt style={styles.intro}>{t.investIntro}</Txt>
 
       <View style={styles.totals}>
@@ -157,16 +162,18 @@ export default function ShareholderInvestScreen() {
                   <Txt style={[styles.amount, { color: incoming ? Green[700] : Red[600] }]}>
                     {(incoming ? '+' : '−') + money(amountOf(item))}
                   </Txt>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={t.entryOptions(String(item.shareholder_name), typeLabel(item))}
-                    onPress={() => {
-                      setSelected(item);
-                      setSheet('actions');
-                    }}
-                    style={styles.more}>
-                    <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-                  </Pressable>
+                  {mayEdit || mayDelete ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={t.entryOptions(String(item.shareholder_name), typeLabel(item))}
+                      onPress={() => {
+                        setSelected(item);
+                        setSheet('actions');
+                      }}
+                      style={styles.more}>
+                      <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+                    </Pressable>
+                  ) : null}
                 </View>
               );
             })}
@@ -201,12 +208,12 @@ export default function ShareholderInvestScreen() {
         deleteLabel={t.deleteEntry}
         cancelLabel={t.cancel}
         closeLabel={t.close}
-        onEdit={() => {
+        onEdit={mayEdit ? () => {
           setSheet(null);
           setEditing(selected);
           setFormOpen(true);
-        }}
-        onDelete={() => setSheet('confirm')}
+        } : undefined}
+        onDelete={mayDelete ? () => setSheet('confirm') : undefined}
       />
 
       <ConfirmDeleteSheet
