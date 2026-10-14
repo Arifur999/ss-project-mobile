@@ -15,7 +15,7 @@ type Row = Record<string, any>;
  * One loan transaction in a day's group: who, a Received / Paid chip (and
  * Profit), the account and any note, the signed amount and the ⋮ menu.
  */
-export function LoanTxnRow({ record, first, onMenu }: { record: Row; first: boolean; onMenu: () => void }) {
+export function LoanTxnRow({ record, first, onMenu }: { record: Row; first: boolean; onMenu?: () => void }) {
   const t = useCopy(LOAN_COPY);
   const { money } = useAmountShield();
   const amounts = transactionAmounts(record);
@@ -43,9 +43,11 @@ export function LoanTxnRow({ record, first, onMenu }: { record: Row; first: bool
         {note ? <Txt style={styles.note}>{note}</Txt> : null}
       </View>
       <Txt style={[styles.amount, { color: isIn ? Green[700] : Red[600] }]}>{`${isIn ? '+' : '−'}${amount}`}</Txt>
-      <Pressable accessibilityRole="button" accessibilityLabel={t.txnOptions(isIn, name, amount)} onPress={onMenu} style={styles.more}>
-        <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-      </Pressable>
+      {onMenu ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={t.txnOptions(isIn, name, amount)} onPress={onMenu} style={styles.more}>
+          <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }

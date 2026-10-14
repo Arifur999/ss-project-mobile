@@ -25,7 +25,7 @@ export function expenseNote(row: Row, t: Copy, lang: Lang): { label: string; tex
 }
 
 /** One expense in a day's group: category and colour, account, note, amount and the ⋮ menu. */
-export function ExpenseRow({ row, colorOf, first, onMenu }: { row: Row; colorOf: (categoryId: string) => string | null | undefined; first: boolean; onMenu: () => void }) {
+export function ExpenseRow({ row, colorOf, first, onMenu }: { row: Row; colorOf: (categoryId: string) => string | null | undefined; first: boolean; onMenu?: () => void }) {
   const t = useCopy(EXPENSE_COPY);
   const { lang } = useLang();
   const { money } = useAmountShield();
@@ -55,13 +55,15 @@ export function ExpenseRow({ row, colorOf, first, onMenu }: { row: Row; colorOf:
         ) : null}
       </View>
       <Txt style={styles.amount}>{amount}</Txt>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t.options(row.category_name, amount, dateLabel(String(row.date || ''), lang))}
-        onPress={onMenu}
-        style={styles.more}>
-        <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
-      </Pressable>
+      {onMenu ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t.options(row.category_name, amount, dateLabel(String(row.date || ''), lang))}
+          onPress={onMenu}
+          style={styles.more}>
+          <DesignIcon name="moreVertical" size={20} color={Zinc[600]} strokeWidth={2.4} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }

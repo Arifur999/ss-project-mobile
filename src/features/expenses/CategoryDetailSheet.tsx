@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
-import { DesignIcon } from '@/components/DesignIcon';
+import { DesignIcon, type IconName } from '@/components/DesignIcon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Txt } from '@/components/Txt';
 import { categoryColor, Red, White, Zinc } from '@/constants/theme';
@@ -12,10 +12,13 @@ import { usageColor, usageWidth } from '@/features/expenses/usage';
 import type { ExpenseTotals } from '@/lib/expenseTotals';
 import type { Category } from '@/services/expenses.services';
 
+type SheetAction = { label: string; icon: IconName; ink: string; role: 'button' | 'link'; onPress: () => void };
+
 /**
  * One category opened from the list: its total and share, this month and
  * this year, the budget and how much of it is used (or a prompt to set one),
- * then Edit, View transactions (for a member who may open them) and Delete.
+ * then Edit (and Set budget), View transactions and Delete - each only for a
+ * member who may.
  */
 export function CategoryDetailSheet({
   category,
@@ -32,12 +35,16 @@ export function CategoryDetailSheet({
   grandTotal: number;
   isTop: boolean;
   onClose: () => void;
-  onEdit: () => void;
+  onEdit?: () => void;
   onTransactions?: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
 }) {
   const t = useCopy(EXPENSE_COPY);
   const { money } = useAmountShield();
+  const actions: SheetAction[] = [];
+  if (onEdit) actions.push({ label: t.editCategory, icon: 'pencil', ink: Zinc[900], role: 'button', onPress: onEdit });
+  if (onTransactions) actions.push({ label: t.viewTransactions, icon: 'receiptText', ink: Zinc[900], role: 'link', onPress: onTransactions });
+  if (onDelete) actions.push({ label: t.deleteCategory, icon: 'trash', ink: Red[700], role: 'button', onPress: onDelete });
   const id = category?.id ?? '';
   const total = totals.allTime[id] || 0;
   const month = totals.thisMonth[id] || 0;
@@ -97,7 +104,7 @@ export function CategoryDetailSheet({
           <ProgressBar percent={usageWidth(used, month)} color={usageColor(used, false)} track={Zinc[100]} label={t.monthUsedLabel} />
           <Txt style={styles.usedText}>{t.usedText(Math.round(used), money(Math.max(0, budget - month)))}</Txt>
         </View>
-      ) : (
+      ) : onEdit ? (
         <Pressable accessibilityRole="button" onPress={onEdit} style={styles.setBudget}>
           <DesignIcon name="target" size={20} color={Zinc[900]} />
           <View>
@@ -105,24 +112,22 @@ export function CategoryDetailSheet({
             <Txt style={styles.setHint}>{t.setBudgetHint}</Txt>
           </View>
         </Pressable>
-      )}
+      ) : null}
 
-      <View style={styles.list}>
-        <Pressable accessibilityRole="button" onPress={onEdit} style={styles.action}>
-          <DesignIcon name="pencil" size={20} color={Zinc[900]} />
-          <Txt style={styles.actionText}>{t.editCategory}</Txt>
-        </Pressable>
-        {onTransactions ? (
-          <Pressable accessibilityRole="link" onPress={onTransactions} style={[styles.action, styles.divider]}>
-            <DesignIcon name="receiptText" size={20} color={Zinc[900]} />
-            <Txt style={styles.actionText}>{t.viewTransactions}</Txt>
-          </Pressable>
-        ) : null}
-        <Pressable accessibilityRole="button" onPress={onDelete} style={[styles.action, styles.divider]}>
-          <DesignIcon name="trash" size={20} color={Red[700]} />
-          <Txt style={[styles.actionText, { color: Red[700] }]}>{t.deleteCategory}</Txt>
-        </Pressable>
-      </View>
+      {actions.length > 0 ? (
+        <View style={styles.list}>
+          {actions.map((action, i) => (
+            <Pressable
+              key={action.label}
+              accessibilityRole={action.role}
+              onPress={action.onPress}
+              style={[styles.action, i > 0 && styles.divider]}>
+              <DesignIcon name={action.icon} size={20} color={action.ink} />
+              <Txt style={[styles.actionText, { color: action.ink }]}>{action.label}</Txt>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
     </BottomSheet>
   );
 }
