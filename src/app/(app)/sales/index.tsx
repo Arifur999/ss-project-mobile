@@ -94,7 +94,7 @@ export default function SalesLedgerScreen() {
   };
 
   return (
-    <SalesShell section="invoices" fab={can('sale.create') ? { label: t.newSale, onPress: () => router.push('/sales/new') } : null}>
+    <SalesShell section="invoices">
       <FigureCard dark label={t.totalShown} value={money(total)} caption={t.countInvoices(rows.length, formatNumber(rows.length, lang))} />
       <SearchField
         height={50}

@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 
 import { SectionShell } from '@/components/SectionShell';
@@ -14,16 +15,18 @@ type QueryState = { isPending: boolean; isError: boolean; isSuccess: boolean; is
  * The Sales tab's screens' shared frame, fed by the query it shares with
  * Customers - or, for the drafts, the query the screen passes. Drafts shows
  * to whoever the website's Draft Sales page admits. A tab, so no back arrow.
+ *
+ * New sale is on every section, for whoever the website's New Sales Entry page
+ * admits: that tick is its own, and a member holding it without the Sales
+ * Ledger would otherwise never find the form.
  */
 export function SalesShell({
   section,
   query,
-  fab,
   children,
 }: {
   section: SalesSection;
   query?: QueryState;
-  fab?: { label: string; onPress: () => void } | null;
   children: ReactNode;
 }) {
   const t = useCopy(SALES_COPY);
@@ -41,7 +44,7 @@ export function SalesShell({
       query={query ?? sales}
       errorText={t.loadError}
       retryLabel={t.retry}
-      fab={fab}>
+      fab={can('sale.create') ? { label: t.newSale, onPress: () => router.push('/sales/new') } : null}>
       {children}
     </SectionShell>
   );
