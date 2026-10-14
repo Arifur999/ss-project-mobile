@@ -49,6 +49,21 @@ export const fetchListNoting =
     return rows;
   };
 
+/** fetchListNoting for an endpoint that answers with an object: refused, it is `fallback`. */
+export const fetchNoting =
+  (denied: string[]) =>
+  async <T>(endpoint: string, fallback: T): Promise<T> => {
+    try {
+      return await http.get<T>(endpoint);
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 403) {
+        denied.push(endpoint);
+        return fallback;
+      }
+      throw error;
+    }
+  };
+
 /** The accounts a payment can go into: the active ones, in the order the Balance screens show them. */
 export const activeAccounts = (rows: Row[]) =>
   rows.filter((a) => a.is_active !== false).sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0)) as Account[];
