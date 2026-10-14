@@ -33,6 +33,7 @@ export function BalanceShell({
         { key: 'wallet', label: t.sections.wallet, route: '/more/balance/wallet' },
       ]}
       query={query}
+      partial={!!query.data?.denied.length}
       errorText={t.loadError}
       retryLabel={t.retry}
       right={right}

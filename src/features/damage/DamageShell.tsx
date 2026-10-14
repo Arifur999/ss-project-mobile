@@ -31,6 +31,7 @@ export function DamageShell({
         { key: 'transactions', label: t.sections.transactions, route: '/more/damage/transactions' },
       ]}
       query={query}
+      partial={!!query.data?.denied.length}
       errorText={t.loadError}
       retryLabel={t.retry}
       fab={fab}>

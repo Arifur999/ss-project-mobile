@@ -33,6 +33,7 @@ export function LoanShell({
         { key: 'statement', label: t.sections.statement, route: '/more/loans/statement' },
       ]}
       query={query}
+      partial={!!query.data?.denied.length}
       errorText={t.loadError}
       retryLabel={t.retry}
       fab={fab}

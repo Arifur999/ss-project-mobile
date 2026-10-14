@@ -34,6 +34,7 @@ export function SupplierShell({
         ...(can('supplierReport.view') ? [{ key: 'report' as const, label: t.sections.report, route: '/more/supplier/report' }] : []),
       ]}
       query={query}
+      partial={!!query.data?.denied.length}
       errorText={t.loadError}
       retryLabel={t.retry}
       fab={fab}>

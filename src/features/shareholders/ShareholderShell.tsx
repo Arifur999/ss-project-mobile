@@ -33,6 +33,7 @@ export function ShareholderShell({
         { key: 'list', label: t.sections.list, route: '/more/shareholders/list' },
       ]}
       query={query}
+      partial={!!query.data?.denied.length}
       errorText={t.loadError}
       retryLabel={t.retry}
       right={right}

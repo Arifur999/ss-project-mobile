@@ -44,6 +44,7 @@ export function PurchaseShell({
         ...(can('purchaseDraft.list') ? [{ key: 'drafts' as const, label: t.sections.drafts, route: '/more/purchase/drafts' }] : []),
       ]}
       query={query ?? purchases}
+      partial={!query && !!purchases.data?.denied.length}
       errorText={t.loadError}
       retryLabel={t.retry}
       fab={can('purchase.create') ? { label: t.newOrder, onPress: () => router.push('/more/purchase/new') } : null}>
