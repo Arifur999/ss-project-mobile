@@ -33,6 +33,7 @@ export function ExpenseShell({
         { key: 'transactions', label: t.sections.transactions, route: '/more/expenses/transactions' },
       ]}
       query={query}
+      partial={!!query.data?.denied.length}
       errorText={t.loadError}
       retryLabel={t.retry}
       right={right}

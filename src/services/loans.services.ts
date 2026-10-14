@@ -40,7 +40,7 @@ export async function loadLoanData(): Promise<LoanData> {
   const lenient = fetchListNoting(denied);
   const [lenders, loans, accounts, categories, otherIncomes] = await Promise.all([
     fetchList('/loan-lenders'),
-    fetchList('/loans'),
+    lenient('/loans'),
     lenient('/accounts'),
     lenient('/expense-categories'),
     lenient('/other-incomes'),

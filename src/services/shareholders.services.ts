@@ -35,8 +35,8 @@ export async function loadShareholderData(): Promise<ShareholderData> {
   const lenient = fetchListNoting(denied);
   const [shareholders, investments, profitWithdrawals, sales, expenses, otherIncomes, accounts] = await Promise.all([
     fetchList('/shareholders'),
-    fetchList('/investments'),
-    fetchList('/profit-withdrawals'),
+    lenient('/investments'),
+    lenient('/profit-withdrawals'),
     lenient('/sales'),
     lenient('/expenses'),
     lenient('/other-incomes'),

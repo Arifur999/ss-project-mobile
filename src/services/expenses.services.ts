@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import type { Account } from '@/lib/balance';
 import { http } from '@/lib/httpClient';
-import { activeAccounts, fetchList } from '@/services/list.services';
+import { activeAccounts, fetchList, fetchListNoting } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -17,6 +17,8 @@ export type Category = {
 };
 
 export type ExpenseData = {
+  /** Lists the server refused this member; their figures are left out. */
+  denied: string[];
   /** Newest first, as the server orders them. */
   expenses: Row[];
   categories: Category[];
@@ -26,12 +28,15 @@ export type ExpenseData = {
 
 /** Everything the two Expense screens read, fetched once and shared. */
 export async function loadExpenseData(): Promise<ExpenseData> {
+  const denied: string[] = [];
+  const lenient = fetchListNoting(denied);
   const [expenses, categories, accounts] = await Promise.all([
-    fetchList('/expenses'),
+    lenient('/expenses'),
     fetchList('/expense-categories'),
     fetchList('/accounts'),
   ]);
   return {
+    denied,
     expenses,
     categories: [...categories].sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''))) as Category[],
     accounts: activeAccounts(accounts),

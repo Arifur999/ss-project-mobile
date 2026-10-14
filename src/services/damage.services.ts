@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import type { Account } from '@/lib/balance';
 import type { DamageAction, DamageReceiveResult, DamageSource, DamageStatus } from '@/lib/damageRules';
 import { http } from '@/lib/httpClient';
-import { activeAccounts, fetchListNoting, fetchListOrDenied } from '@/services/list.services';
+import { activeAccounts, fetchListNoting, fetchListOrDenied, fetchNoting } from '@/services/list.services';
 
 type Row = Record<string, any>;
 
@@ -83,9 +83,10 @@ const moneyRow = (raw: Row, direction: 'out' | 'in'): DamageMoney => ({
 export async function loadDamageData(): Promise<DamageData> {
   const denied: string[] = [];
   const lenient = fetchListNoting(denied);
+  const lenientGet = fetchNoting(denied);
   const [entries, transactions, accounts, employees] = await Promise.all([
-    http.get<DamageEntry[]>('/damage'),
-    http.get<{ expenses: Row[]; other_incomes: Row[] }>('/damage/transactions'),
+    lenientGet<DamageEntry[]>('/damage', []),
+    lenientGet<{ expenses: Row[]; other_incomes: Row[] }>('/damage/transactions', { expenses: [], other_incomes: [] }),
     lenient('/accounts'),
     fetchListOrDenied('/employees'),
   ]);
